@@ -205,6 +205,9 @@ export const chatSlice = createSlice({
         state.customerSupportId = action.payload.customerSupportId;
       }
     },
+    setChatStatus: (state, action: PayloadAction<CHAT_STATUS>) => {
+      state.chatStatus = action.payload;
+    },
     addMessagesToDisplay: (state, action: PayloadAction<Message[]>) => {
       let receivedMessages = action.payload || [];
       if (!receivedMessages.length) return;

@@ -6,8 +6,8 @@
   padding: 1rem 1rem;
   width: 77px;
   height: 77px;
-  cursor: pointer;
   background-color: $color-primary;
+  cursor: pointer;
   font-family: $font-chat;
   border-radius: 50%;
   position: fixed;
@@ -15,6 +15,18 @@
   right: 0;
   margin: 1em;
   box-sizing: border-box;
+}
+
+.offline {
+  background-color: $color-gray-alt;
+  cursor: default;
+
+  &:hover {
+    .offlineBubble {
+      opacity: 1;
+      transform: translateY(-50%);
+    }
+  }
 }
 
 .bubble {
@@ -26,4 +38,19 @@
   color: #ffffff;
   font-family: $font-chat;
   border-radius: 50%;
+}
+
+.offlineBubble {
+  white-space: nowrap;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem 0.5rem 0.25rem 0.5rem;
+  background-color: $color-gray-alt;
+  position: absolute;
+  font-size: 1rem;
+  line-height: 1.5;
+  top: 50%;
+  right: calc(100% + 10px);
+  opacity: 0;
+  transform: translateY(100%);
+  transition: all 250ms;
 }

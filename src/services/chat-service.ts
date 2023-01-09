@@ -10,6 +10,10 @@ interface Document {
 }
 
 class ChatService {
+  checkHealth(): Promise<void> {
+    return http.get(RUUTER_ENDPOINTS.HEALTH);
+  }
+
   init(message: Message, endUserTechnicalData: EndUserTechnicalData): Promise<Chat> {
     return http.post(RUUTER_ENDPOINTS.INIT_CHAT, { message, endUserTechnicalData });
   }

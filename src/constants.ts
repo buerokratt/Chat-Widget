@@ -17,10 +17,13 @@ export const FEEDBACK_MESSAGE_LIMIT_VISIBILE_AT = 100;
 export const MESSAGE_QUE_MAX_LENGTH = 5;
 export const TERMS_AND_CONDITIONS_LINK = 'https://www.kratid.ee/kasutustingimused';
 export const ERROR_MESSAGE = 'An error has occured';
+export const CHAT_CLOSED_HEALTH_CHECK_INTERVAL_TIMEOUT = 30000;
+export const CHAT_OPEN_HEALTH_CHECK_INTERVAL_TIMEOUT = 10000;
 
 export enum CHAT_STATUS {
   ENDED = 'ENDED',
   OPEN = 'OPEN',
+  OFFLINE = 'OFFLINE',
 }
 
 export enum CHAT_EVENTS {
@@ -49,6 +52,7 @@ export enum AUTHOR_ROLES {
 }
 
 export enum RUUTER_ENDPOINTS {
+  HEALTH = '/healthz/chat',
   INIT_CHAT = '/init-chat',
   GET_CHAT_BY_ID = '/get-chat-by-id',
   GET_NEW_MESSAGES = '/get-new-messages',

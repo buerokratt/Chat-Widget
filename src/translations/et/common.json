@@ -17,6 +17,7 @@
   "notifications.authenticate.is-authenticated": "tuvastatud",
   "notifications.customer-service-busy": "Hetkel on kõik klienditeenindajad hõivatud.",
   "notifications.waiting-time": "Eeldatud ooteaeg minutites: {{time}}",
+  "notifications.chat-offline": "Bürokratt ei ole hetkel saadaval",
   "keypad.input.placeholder": "Kirjutage oma sõnum...",
   "keypad.button.label": "Saada",
   "keypad.input.label": "Sisesta tekst",
