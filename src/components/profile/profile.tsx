@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { setIsChatOpen } from '../../slices/chat-slice';
@@ -18,6 +18,8 @@ export const Profile = (): JSX.Element => {
     dispatch(setIsChatOpen(true));
   };
 
+  const chatTitle = useMemo(() => chatStatus && chatStatus !== 'OFFLINE' ? t('profile.button.open-chat') : t('notifications.chat-offline'), [chatStatus])
+
   const variants = {
     initial: {
       y: 100,
@@ -32,8 +34,8 @@ export const Profile = (): JSX.Element => {
       <div
         className={`${styles.profile} ${!chatStatus || chatStatus === 'OFFLINE' ? styles.offline : ''}`}
         role="button"
-        aria-label={chatStatus && chatStatus !== 'OFFLINE' ? t('profile.button.open-chat') : t('notifications.chat-offline')}
-        title={chatStatus && chatStatus !== 'OFFLINE' ? t('profile.button.open-chat') : t('notifications.chat-offline')}
+        aria-label={chatTitle}
+        title={chatTitle}
         onKeyDown={openChat}
         onClick={openChat}
         tabIndex={0}
