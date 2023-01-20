@@ -19,6 +19,8 @@ export const TERMS_AND_CONDITIONS_LINK = 'https://www.kratid.ee/kasutustingimuse
 export const ERROR_MESSAGE = 'An error has occured';
 export const CHAT_CLOSED_HEALTH_CHECK_INTERVAL_TIMEOUT = 30000;
 export const CHAT_OPEN_HEALTH_CHECK_INTERVAL_TIMEOUT = 10000;
+export const CHAT_WINDOW_WIDTH = 400;
+export const CHAT_WINDOW_HEIGHT = 460;
 
 export enum CHAT_STATUS {
   ENDED = 'ENDED',
