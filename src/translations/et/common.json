@@ -57,5 +57,8 @@
   "widget.details-header": "Teksti suurus",
   "widget.action.close-confirmation": "Kas soovite vestluse sulgeda?",
   "widget.action.yes": "Jah",
-  "widget.action.no": "Ei"
+  "widget.action.no": "Ei",
+  "widget.action.yesGotAnswer": "Jah, sain vastuse",
+  "widget.action.yesNoAnswer": "Jah, vastuseta",
+  "widget.action.noDontClose": "Ei soovi sulgeda"
 }

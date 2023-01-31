@@ -1,10 +1,21 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Message } from '../model/message-model';
+import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {Message} from '../model/message-model';
 import ChatService from '../services/chat-service';
-import { AUTHOR_ROLES, CHAT_EVENTS, CHAT_STATUS, ERROR_MESSAGE, SESSION_STORAGE_CHAT_ID_KEY, CHAT_WINDOW_HEIGHT, CHAT_WINDOW_WIDTH } from '../constants';
-import { getFromSessionStorage, setToSessionStorage } from '../utils/session-storage-utils';
-import { Chat } from '../model/chat-model';
-import { clearStateVariablesFromSessionStorage, findMatchingMessageFromMessageList } from '../utils/state-management-utils';
+import {
+  AUTHOR_ROLES,
+  CHAT_EVENTS,
+  CHAT_STATUS,
+  CHAT_WINDOW_HEIGHT,
+  CHAT_WINDOW_WIDTH,
+  ERROR_MESSAGE,
+  SESSION_STORAGE_CHAT_ID_KEY
+} from '../constants';
+import {getFromSessionStorage, setToSessionStorage} from '../utils/session-storage-utils';
+import {Chat} from '../model/chat-model';
+import {
+  clearStateVariablesFromSessionStorage,
+  findMatchingMessageFromMessageList
+} from '../utils/state-management-utils';
 
 export interface EstimatedWaiting {
   isActive: boolean;
@@ -120,7 +131,7 @@ export const sendFeedbackMessage = createAsyncThunk('chat/sendFeedbackMessage', 
   ChatService.sendFeedbackMessage({ chatId, userFeedback: args.userInput });
 });
 
-export const endChat = createAsyncThunk('chat/endChat', async (_args, thunkApi) => {
+export const endChat = createAsyncThunk('chat/endChat', async (event: CHAT_EVENTS, thunkApi) => {
   const {
     chat: { chatStatus, chatId },
   } = thunkApi.getState() as { chat: ChatState };
@@ -130,7 +141,7 @@ export const endChat = createAsyncThunk('chat/endChat', async (_args, thunkApi) 
     ? null
     : ChatService.endChat({
         chatId,
-        event: CHAT_EVENTS.CLIENT_LEFT,
+        event,
         authorTimestamp: new Date().toISOString(),
         authorRole: AUTHOR_ROLES.END_USER,
       });

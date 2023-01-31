@@ -44,7 +44,6 @@ const ChatFeedback = (): JSX.Element => {
 const ChatFeedbackStyle = styled.div`
   height: auto;
   padding-top: 0.8em;
-
   border-top: 2px solid #f0f1f2;
   flex-direction: column;
   display: flex;

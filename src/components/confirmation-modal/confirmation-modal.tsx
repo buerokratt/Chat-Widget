@@ -1,15 +1,33 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { endChat } from '../../slices/chat-slice';
 import { closeConfirmationModal } from '../../slices/widget-slice';
 import { RootState, useAppDispatch } from '../../store';
+import { CHAT_CLOSE_NO_RESPONSE_TIMEOUT, CHAT_EVENTS } from "../../constants";
 
 export default function ConfirmationModal(): JSX.Element {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const isConfirmationModelOpen = useSelector((state: RootState) => state.widget.showConfirmationModal);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      dispatch(endChat(CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS));
+    }, CHAT_CLOSE_NO_RESPONSE_TIMEOUT);
+
+    const handleBeforeUnload = () => {
+      dispatch(endChat(CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS));
+    }
+
+    document.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      clearTimeout(timeout);
+      document.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
 
   if (!isConfirmationModelOpen) return <></>;
   return (
@@ -19,11 +37,14 @@ export default function ConfirmationModal(): JSX.Element {
           {t('widget.action.close-confirmation')}
         </h2>
         <div className="actions">
-          <button className="button" title={t('header.button.confirmation.yes')} type="button" onClick={() => dispatch(endChat())}>
-            {t('widget.action.yes')}
+          <button className="button" title={t('widget.action.yesGotAnswer')} type="button" onClick={() => dispatch(endChat(CHAT_EVENTS.CLIENT_LEFT_WITH_ACCEPTED))}>
+            {t('widget.action.yesGotAnswer')}
+          </button>
+          <button className="button" title={t('widget.action.yesNoAnswer')} type="button" onClick={() => dispatch(endChat(CHAT_EVENTS.CLIENT_LEFT_WITH_NO_RESOLUTION))}>
+            {t('widget.action.yesNoAnswer')}
           </button>
           <button className="button" type="button" title={t('header.button.confirmation.no')} onClick={() => dispatch(closeConfirmationModal())}>
-            {t('widget.action.no')}
+            {t('widget.action.noDontClose')}
           </button>
         </div>
       </div>
@@ -41,53 +62,55 @@ const ConfirmationModalStyles = styled.div`
   top: 0;
 
   .actions {
-    align-items: center;
     display: flex;
-    justify-content: space-evenly;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
   }
 
   .button {
-    background-color: transparent;
-    border: 2px solid #003cff;
+    border: 1px solid #003cff;
+    background-color: #003cff;
     border-radius: 100px;
-    color: #003cff;
+    color: #fff;
     font-family: 'Aino Regular';
     font-style: normal;
     font-weight: bold;
-    font-size: 0.8em;
-    flex-basis: 10ch;
-    padding: 0.5rem;
+    font-size: 12px;
+    line-height: 16px;
+    padding: 12px 18px;
     text-align: center;
     letter-spacing: 0.5px;
     text-transform: uppercase;
+    cursor: pointer;
     transition: background-color 250ms, color 250ms;
 
     :active,
     :hover,
     :focus {
-      background-color: #003cff;
-      cursor: pointer;
-      color: #fff;
+      color: #003cff;
+      background-color: #fff;
+      border-color: #003cff;
     }
   }
 
   .content {
     background-color: #fff;
-    box-shadow: 0 2px 2px rgba(167, 169, 171, 0.2);
     display: flex;
+    align-items: center;
+    justify-content: center;
     flex-flow: column nowrap;
-    left: 50%;
-    min-width: 70%;
-    padding: 1.5rem;
     position: absolute;
-    top: 50%;
-    transform: translate3d(-50%, -50%, 0);
+    inset: 20px;
   }
 
   .title {
-    color: #003cff;
-    font-family: 'Aino Headline';
-    font-size: 1.5em;
-    margin: 0 0 1.5rem 0;
+    color: #323334;
+    font-family: 'Aino Regular';
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 1.5;
+    margin: 0 0 10px 0;
+    text-align: center;
   }
 `;

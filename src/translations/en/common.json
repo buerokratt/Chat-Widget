@@ -57,5 +57,8 @@
   "redirect.ask-permission": "Please agree to forwarding the chat",
   "redirect.ask-permission-accepted": "Consent to referral has been given",
   "redirect.ask-permission-rejected": "Consent to the referral has been denied",
-  "widget.action.no": "No"
+  "widget.action.no": "No",
+  "widget.action.yesGotAnswer": "Yes, got answer",
+  "widget.action.yesNoAnswer": "Yes, didn't get answer",
+  "widget.action.noDontClose": "Don't close"
 }
