@@ -25,23 +25,22 @@ export interface Message {
 }
 
 export enum MessageFileTypes {
-    // TODO add correct file types Ticket: https://github.com/buerokratt/Buerokratt-Chatbot/issues/30
     PDF = 'application/pdf',
     PNG = 'image/png',
     JPEG = 'image/jpeg',
-    TXT = 'text/plain', // TODO SLICE NAME
-    DOCX = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // TODO SLICE NAME
-    ODT = 'application/vnd.oasis.opendocument.text', // NOT SPECIFIED
-    XLSX = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // TODO SLICE NAME
-    // ODS = 'ods', // NOT SPECIFIED
-    BDOC = 'application/vnd.etsi.asic-e+zip', // TODO VERIFY, could not find an example
-    CDOC = 'application/x-cdoc', // NOT SPECIFIED
-    ASICE = 'application/vnd.etsi.asic-e+zip', // TODO SLICE NAME
-    MP3 = 'audio/mpeg', // TODO VERIFY, could not find an example
-    WAV = 'audio/wav', // TODO VERIFY, could not find an example
+    TXT = 'text/plain',
+    DOCX = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ODT = 'application/vnd.oasis.opendocument.text',
+    XLSX = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    ODS = 'ods',
+    BDOC = 'application/vnd.etsi.asic-e+zip',
+    CDOC = 'application/x-cdoc',
+    ASICE = 'application/vnd.etsi.asic-e+zip',
+    MP3 = 'audio/mpeg',
+    WAV = 'audio/wav',
     M4A = 'audio/x-m4a',
-    MP4 = 'video/mp4',// TODO
-    WEBM = 'video/webm',// TODO
-    OGG = 'video/ogg',// TODO
-    MOV = 'video/quicktime',// TODO
+    MP4 = 'video/mp4',
+    WEBM = 'video/webm',
+    OGG = 'video/ogg',
+    MOV = 'video/quicktime',
 }

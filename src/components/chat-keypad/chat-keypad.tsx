@@ -21,7 +21,7 @@ import KeypadErrorMessage from './keypad-error-message';
 import ChatKeypadCharCounter from './chat-keypad-char-counter';
 import {
     AUTHOR_ROLES,
-    CHAT_STATUS,
+    CHAT_STATUS, MESSAGE_FILE_SIZE_LIMIT,
     MESSAGE_MAX_CHAR_LIMIT,
     MESSAGE_QUE_MAX_LENGTH,
     StyledButtonType
@@ -208,18 +208,15 @@ const ChatKeyPad = (): JSX.Element => {
         </div>
     );
 
-
-    // READ FILE FROM INPUT
     async function handleFileRead(file: File): Promise<string | null> {
-        const FILE_SIZE_LIMIT = 10_000_000;
 
         if (!Object.values(MessageFileTypes).some((v) => v === file.type)) {
             setErrorMessage(`${file.type} file type is not supported`)
             return null
         }
 
-        if (file.size > FILE_SIZE_LIMIT) {
-            setErrorMessage(`Max allowed file size is ${formatBytes(FILE_SIZE_LIMIT)}`)
+        if (file.size > MESSAGE_FILE_SIZE_LIMIT) {
+            setErrorMessage(`Max allowed file size is ${formatBytes(MESSAGE_FILE_SIZE_LIMIT)}`)
             return null;
         } else {
             return await convertBase64(file)

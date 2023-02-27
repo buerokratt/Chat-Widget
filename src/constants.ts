@@ -7,6 +7,7 @@ export const CLIENT_NAME_ENABLED = false;
 export const EMAIL_REGEX = '^$|^[\\wöäüÖÄÜ!#$%&’*+\\/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+\\/=?`{|}~^-]+)*@(?:[a-zA-ZöäüÖÄÜ0-9-]+\\.)+[a-zA-ZöäüÖÄÜ]{2,6}$';
 export const PHONE_NR_REGEX = '^$|^[+]*[0-9]{1,4}[-\\s.0-9]{6,15}$';
 export const MESSAGE_MAX_CHAR_LIMIT = 3000;
+export const MESSAGE_FILE_SIZE_LIMIT = 10_000_000;
 export const MESSAGE_WARNING_LIMIT = 2900;
 export const MESSAGE_VISIBILITY_LIMIT = 500;
 export const MAXIMUM_MESSAGE_TEXT_LENGTH_FOR_ONE_ROW = 27;
