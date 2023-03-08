@@ -63,5 +63,7 @@
   "widget.form.email": "Teie e-postiaadress",
   "widget.form.message": "Täpsusta siin oma küsimust",
   "widget.form.info": "Edastatud kontaktandmed",
-  "widget.form.success": "Aitäh pöördumast, Teiega võetakse esimesel võimalusel ühendust"
+  "widget.form.success": "Aitäh pöördumast, Teiega võetakse esimesel võimalusel ühendust",
+  "widget.time.minutes": "minutit",
+  "widget.time.minute": "minut"
 }

@@ -63,5 +63,7 @@
   "widget.form.email": "Your email address",
   "widget.form.message": "Type your question here",
   "widget.form.info": "Forwarded contact information",
-  "widget.form.success": "Thank you, you will be contacted as soon as possible."
+  "widget.form.success": "Thank you, you will be contacted as soon as possible.",
+  "widget.time.minutes": "minutes",
+  "widget.time.minute": "minute"
 }
