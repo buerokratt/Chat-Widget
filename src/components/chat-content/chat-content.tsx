@@ -24,8 +24,9 @@ const ChatContent = (): JSX.Element => {
 
   useEffect(() => {
     if (customerSupportId !== '') dispatch(setEstimatedWaitingTimeToZero());
-    else if (estimatedWaiting.time === 0) dispatch(getEstimatedWaitingTime());
-  }, [estimatedWaiting.time, dispatch, customerSupportId]);
+    else if (estimatedWaiting.durationInSeconds === '') dispatch(getEstimatedWaitingTime());
+  }, [estimatedWaiting.durationInSeconds, dispatch, customerSupportId]);
+
 
   return (
     <AnimatePresence initial={false}>
@@ -40,8 +41,8 @@ const ChatContent = (): JSX.Element => {
             scrollbars: { visibility: 'auto', autoHide: 'leave' },
           }}
         >
-            {estimatedWaiting.time > 0 &&
-            estimatedWaiting.isActive &&
+            {~~estimatedWaiting.durationInSeconds > 0 &&
+            ~~estimatedWaiting.positionInUnassignedChats > 0 &&
              <WaitingTimeNotification />}
           {messages.map((message) => (
             <ChatMessage

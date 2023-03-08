@@ -17,35 +17,33 @@ import {
 const WaitingTimeNotification = (): JSX.Element => {
   const { t } = useTranslation();
   const [showForm, setShowForm] = useState(false);
-  const dispatch = useAppDispatch();
 
-  const { estimatedWaiting, customerSupportId } = useChatSelector();
+  const estimatedWaiting2 = {
+    time: 300,
+    isActive: true,
+}
 
-  useEffect(() => {
-    if (customerSupportId !== '') dispatch(setEstimatedWaitingTimeToZero());
-    else if (estimatedWaiting.time === 0) dispatch(getEstimatedWaitingTime());
-  }, [estimatedWaiting.time, dispatch, customerSupportId]);
+const FORMATTED_TIME = formatTime(estimatedWaiting2.time)
 
   return (
     <div className={styles.container}>
       <NotificationMessage showIcon={true}>
-        {t('notifications.waiting-time', {
-          time: formatTime(estimatedWaiting.time),
-        })}
+        {t('notifications.waiting-time')}{' '}
+        {FORMATTED_TIME > 0 ? `${FORMATTED_TIME} ${t('widget.time.minutes')}` : `${FORMATTED_TIME} ${t('widget.time.minute')}`}
       </NotificationMessage>
       <NotificationMessage showIcon={false}>
         {t('notifications.ask-contact-information')}
       </NotificationMessage>
       <div className={styles.action}>
         <Button
-          title="Jah"
+          title={t('widget.action.yes')}
           color={ButtonColor.BLUE}
           onClick={() => setShowForm(true)}
         >
           {t('widget.action.yes')}
         </Button>
         <Button
-          title="Ei"
+          title={t('widget.action.no')}
           color={showForm === false ? ButtonColor.BLUE : ButtonColor.GRAY}
           onClick={() => setShowForm(false)}
         >
