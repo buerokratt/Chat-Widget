@@ -13,7 +13,8 @@
   "notifications.authenticate.needs-authentication": "authenticate",
   "notifications.authenticate.is-authenticated": "authenticated",
   "notifications.customer-service-busy": "All customer service agents are currently busy.",
-  "notifications.waiting-time": "Estimated waiting time in minutes: {{time}}",
+  "notifications.waiting-time": "Currently customer support is busy. Estimated waiting time is {{time}}",
+  "notifications.ask-contact-information": "Would you like to leave your contact information, so customer support can get back to you?",
   "keypad.input.placeholder": "Enter your message...",
   "keypad.button.label": "Send",
   "keypad.input.label": "Enter text",
@@ -53,9 +54,14 @@
   "widget.details-body": "In all popular web browsers, you can zoom in and out by holding down the Ctrl key (the Cmd key in OS X) and pressing either the \"+\" or \"-\" key. Another convenient way is to use the mouse: hold down the Ctrl key and at the same time move the mouse scroll wheel. You can return to normal size by pressing the Ctrl and 0 keys at the same time.",
   "widget.details-header": "Text size",
   "widget.action.close-confirmation": "Would you like to close the conversation?",
-  "widget.action.yes": "Yes",
   "redirect.ask-permission": "Please agree to forwarding the chat",
   "redirect.ask-permission-accepted": "Consent to referral has been given",
   "redirect.ask-permission-rejected": "Consent to the referral has been denied",
-  "widget.action.no": "No"
+  "widget.action.yes": "Yes",
+  "widget.action.no": "No",
+  "widget.form.phone": "Your phone number",
+  "widget.form.email": "Your email address",
+  "widget.form.message": "Type your question here",
+  "widget.form.info": "Forwarded contact information",
+  "widget.form.success": "Thank you, you will be contacted as soon as possible."
 }

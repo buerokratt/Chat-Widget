@@ -16,7 +16,8 @@
   "notifications.authenticate.needs-authentication": "tuvasta",
   "notifications.authenticate.is-authenticated": "tuvastatud",
   "notifications.customer-service-busy": "Hetkel on kõik klienditeenindajad hõivatud.",
-  "notifications.waiting-time": "Eeldatud ooteaeg minutites: {{time}}",
+  "notifications.waiting-time": "Hetkel on lõik klienditeenindajad hõivatud. Eeldatud ooteaeg {{time}}",
+  "notifications.ask-contact-information": "Kas soovite jätta enda kontaktandmed, et klienditeenindaja saaks ise ühendust võtta?",
   "keypad.input.placeholder": "Kirjutage oma sõnum...",
   "keypad.button.label": "Saada",
   "keypad.input.label": "Sisesta tekst",
@@ -57,5 +58,10 @@
   "widget.details-header": "Teksti suurus",
   "widget.action.close-confirmation": "Kas soovite vestluse sulgeda?",
   "widget.action.yes": "Jah",
-  "widget.action.no": "Ei"
+  "widget.action.no": "Ei",
+  "widget.form.phone": "Teie telefon",
+  "widget.form.email": "Teie e-postiaadress",
+  "widget.form.message": "Täpsusta siin oma küsimust",
+  "widget.form.info": "Edastatud kontaktandmed",
+  "widget.form.success": "Aitäh pöördumast, Teiega võetakse esimesel võimalusel ühendust"
 }
