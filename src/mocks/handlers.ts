@@ -5,6 +5,7 @@ import messagesByChatId from './responses/messages-by-chat-id.json';
 import initChat from './responses/init-chat.json';
 import chatById from './responses/chat-by-Id.json';
 import endChat from './responses/end-chat.json';
+import getWaitingTime from './responses/get-waiting-time.json';
 import postMessage from './responses/post-message.json';
 import { RUUTER_ENDPOINTS } from '../constants';
 
@@ -17,6 +18,7 @@ const handlers = [
   rest.post(`${ruuterUrl}${RUUTER_ENDPOINTS.END_CHAT}`, (_req, res, ctx) => res(ctx.json(endChat))),
   rest.post(`${ruuterUrl}${RUUTER_ENDPOINTS.GET_CHAT_BY_ID}`, (_req, res, ctx) => res(ctx.json(chatById))),
   rest.post(`${ruuterUrl}${RUUTER_ENDPOINTS.GET_NEW_MESSAGES}`, (_req, res, ctx) => res(ctx.json(messagesForChatInTimerange))),
+  rest.post(`${ruuterUrl}${RUUTER_ENDPOINTS.GET_WAITING_TIME}`, (_req, res, ctx) => res(ctx.json(getWaitingTime))),
 ];
 
 export default handlers;
