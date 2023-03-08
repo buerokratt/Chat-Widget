@@ -13,7 +13,7 @@
   "notifications.authenticate.needs-authentication": "authenticate",
   "notifications.authenticate.is-authenticated": "authenticated",
   "notifications.customer-service-busy": "All customer service agents are currently busy.",
-  "notifications.waiting-time": "Currently customer support is busy. Estimated waiting time is {{time}}",
+  "notifications.waiting-time": "Currently customer support is busy. Estimated waiting time is",
   "notifications.ask-contact-information": "Would you like to leave your contact information, so customer support can get back to you?",
   "keypad.input.placeholder": "Enter your message...",
   "keypad.button.label": "Send",
