@@ -14,6 +14,7 @@
   "notifications.authenticate.is-authenticated": "authenticated",
   "notifications.customer-service-busy": "All customer service agents are currently busy.",
   "notifications.waiting-time": "Estimated waiting time in minutes: {{time}}",
+  "notifications.idle-chat-notification": "Do you want to continue the conversation?",
   "keypad.input.placeholder": "Enter your message...",
   "keypad.button.label": "Send",
   "keypad.input.label": "Enter text",
