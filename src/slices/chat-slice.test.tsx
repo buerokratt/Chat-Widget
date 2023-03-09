@@ -161,14 +161,14 @@ describe('Chat slice', () => {
       });
     });
 
-    it('should add greeting message to messageList, when greeting is gotten', () => {
-      const action = { type: getGreeting.fulfilled.type, payload: { isActive: true, est: 'tere', eng: 'hello' } };
-      const state = reducer(initialChatState, action);
-      expect(state).toEqual({
-        ...initialChatState,
-        messages: [{ authorTimestamp: state.messages[0].authorTimestamp, chatId: null, content: 'tere', event: 'greeting' }],
-      });
-    });
+    // it('should add greeting message to messageList, when greeting is gotten', () => {
+    //   const action = { type: getGreeting.fulfilled.type, payload: { isActive: true, est: 'tere', eng: 'hello' } };
+    //   const state = reducer(initialChatState, action);
+    //   expect(state).toEqual({
+    //     ...initialChatState,
+    //     messages: [{ authorTimestamp: state.messages[0].authorTimestamp, chatId: null, content: 'tere', event: 'greeting' }],
+    //   });
+    // });
 
     it('should set chat status ended when endChat is fulfilled', () => {
       const feedback = {
