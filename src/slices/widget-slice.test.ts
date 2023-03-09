@@ -2,7 +2,6 @@ import reducer, { closeConfirmationModal, showConfirmationModal, WidgetState } f
 
 const initialState: WidgetState = {
   showConfirmationModal: false,
-  showIdleChatModal: false,
 };
 
 describe('Widget slice', () => {
