@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { endChat } from '../../slices/chat-slice';
 import { closeConfirmationModal } from '../../slices/widget-slice';
 import { RootState, useAppDispatch } from '../../store';
+import { CHAT_EVENTS } from '../../constants';
 
 export default function ConfirmationModal(): JSX.Element {
   const { t } = useTranslation();
@@ -19,7 +20,7 @@ export default function ConfirmationModal(): JSX.Element {
           {t('widget.action.close-confirmation')}
         </h2>
         <div className="actions">
-          <button className="button" title={t('header.button.confirmation.yes')} type="button" onClick={() => dispatch(endChat())}>
+          <button className="button" title={t('header.button.confirmation.yes')} type="button" onClick={() => dispatch(endChat({event: CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS}))}>
             {t('widget.action.yes')}
           </button>
           <button className="button" type="button" title={t('header.button.confirmation.no')} onClick={() => dispatch(closeConfirmationModal())}>
