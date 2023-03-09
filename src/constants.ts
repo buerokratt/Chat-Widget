@@ -19,6 +19,7 @@ export const TERMS_AND_CONDITIONS_LINK = 'https://www.kratid.ee/kasutustingimuse
 export const ERROR_MESSAGE = 'An error has occured';
 export const CHAT_WINDOW_WIDTH = 400;
 export const CHAT_WINDOW_HEIGHT = 460;
+export const IDLE_CHAT_INTERVAL = 30 * 60;
 
 export enum CHAT_STATUS {
   ENDED = 'ENDED',
@@ -29,6 +30,9 @@ export enum CHAT_EVENTS {
   ANSWERED = 'answered',
   TERMINATED = 'terminated',
   CLIENT_LEFT = 'client-left',
+  CLIENT_LEFT_WITH_ACCEPTED = 'client-left-with-accepted',
+  CLIENT_LEFT_WITH_NO_RESOLUTION = 'client-left-with-no-resolution',
+  CLIENT_LEFT_FOR_UNKNOWN_REASONS = 'client-left-for-unknown-reason',
   GREETING = 'greeting',
   RATING = 'rating',
   REQUESTED_AUTHENTICATION = 'requested-authentication',
