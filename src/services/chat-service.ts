@@ -1,3 +1,4 @@
+import { UserContacts } from './../model/user-contacts-model';
 import http from './http-service';
 import { Message } from '../model/message-model';
 import { Chat } from '../model/chat-model';
@@ -60,6 +61,10 @@ class ChatService {
 
   generateForwardingRequest(): Promise<Chat[]> {
     return http.post(RUUTER_ENDPOINTS.GENERATE_FORWARDING_REQUEST);
+  }
+
+  sendUserContacts({chatId, endUserEmail, endUserPhone}:UserContacts  ): Promise<void>{
+    return http.post(RUUTER_ENDPOINTS.SEND_USER_CONTACTS);
   }
 }
 

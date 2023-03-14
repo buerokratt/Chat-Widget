@@ -1,3 +1,4 @@
+import { UserContacts } from './../model/user-contacts-model';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Message } from '../model/message-model';
 import ChatService from '../services/chat-service';
@@ -43,6 +44,14 @@ export interface ChatState {
     phoneNr: string;
     comment: string;
   };
+  contactForm: {
+    data: UserContacts;
+    state: {
+      isLoading: boolean,
+      isSubmitted: boolean,
+      isFailed: boolean,
+    }
+  }
 }
 
 const initialState: ChatState = {
@@ -80,6 +89,18 @@ const initialState: ChatState = {
     isFeedbackRatingGiven: false,
     showFeedbackWarning: false,
   },
+  contactForm: {
+    data: {
+      chatId: null,
+      endUserEmail: null,
+      endUserPhone: null,
+    },
+    state: {
+      isLoading: false,
+      isSubmitted: false,
+      isFailed: false,
+    }
+  }
 };
 
 export const initChat = createAsyncThunk('chat/init', async (message: Message) =>
@@ -143,6 +164,10 @@ export const sendMessageWithRating = createAsyncThunk('chat/sendMessageWithRatin
 export const sendMessageWithNewEvent = createAsyncThunk('chat/sendMessageWithNewEvent', (message: Message) =>
   ChatService.sendMessageWithNewEvent(message),
 );
+
+export const sendUserContacts = createAsyncThunk('chat/sendUserContacts', (args: UserContacts) => {
+  ChatService.sendUserContacts(args);
+})
 
 export const getGreeting = createAsyncThunk('chat/getGreeting', async () => ChatService.getGreeting());
 
@@ -305,6 +330,19 @@ export const chatSlice = createSlice({
         state.isChatRedirected = true;
       }
     });
+
+    builder.addCase(sendUserContacts.pending, (state) => {
+      state.contactForm.state.isLoading = true;
+    })
+    builder.addCase(sendUserContacts.fulfilled, (state, action) => {
+      state.contactForm.state.isLoading = false;
+      state.contactForm.state.isSubmitted = true;
+    })
+    builder.addCase(sendUserContacts.rejected, (state, action) => {
+      state.contactForm.state.isLoading = false;
+      state.contactForm.state.isFailed = true;
+      state.contactForm.state.isSubmitted = false;
+    })
   },
 });
 
