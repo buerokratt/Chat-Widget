@@ -8,22 +8,13 @@ import WaitingTimeNotificationForm from './waiting-time-notification-form';
 import 'overlayscrollbars/css/OverlayScrollbars.css';
 import '../chat-content/os-custom-theme.scss';
 import NotificationMessage from './notification-message';
-import { useAppDispatch } from '../../store';
-import {
-  getEstimatedWaitingTime,
-  setEstimatedWaitingTimeToZero,
-} from '../../slices/chat-slice';
 
 const WaitingTimeNotification = (): JSX.Element => {
   const { t } = useTranslation();
   const [showForm, setShowForm] = useState(false);
+  const { estimatedWaiting } = useChatSelector();
 
-  const estimatedWaiting2 = {
-    time: 300,
-    isActive: true,
-}
-
-const FORMATTED_TIME = formatTime(estimatedWaiting2.time)
+const FORMATTED_TIME = formatTime(parseInt(estimatedWaiting.durationInSeconds))
 
   return (
     <div className={styles.container}>

@@ -38,6 +38,18 @@ export const initialChatState: ChatState = {
     isFeedbackRatingGiven: false,
     showFeedbackWarning: false,
   },
+  contactForm: {
+    data: {
+      chatId: null,
+      endUserEmail: null,
+      endUserPhone: null,
+    },
+    state: {
+      isLoading: false,
+      isSubmitted: false,
+      isFailed: false,
+    }
+  }
 };
 
 export const initialAuthState: AuthenticationState = {
