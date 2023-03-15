@@ -38,6 +38,8 @@ const handlers = [
   )
     
   }),
+
+  rest.post(`${ruuterUrl}${RUUTER_ENDPOINTS.SEND_ATTACHMENT}`, (_req, res, ctx) => res(ctx.status(200))),
 ];
 
 export default handlers;

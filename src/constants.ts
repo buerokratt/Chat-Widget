@@ -70,6 +70,7 @@ export enum RUUTER_ENDPOINTS {
   REMOVE_CHAT_FORWARDING_VALUE = '/remove-chat-forwarding-value',
   GENERATE_FORWARDING_REQUEST = '/origin-forward',
   DOWNLOAD_CHAT = '/download-chat',
+  SEND_ATTACHMENT= '/attachments/add'
 }
 
 export enum StyledButtonType {
