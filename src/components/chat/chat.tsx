@@ -72,10 +72,10 @@ const Chat = (): JSX.Element => {
     feedback.isFeedbackRatingGiven,
   ]);
 
-  useEffect(() => {
-    if (!chatId && !feedback.isFeedbackConfirmationShown && !messages.length)
-      dispatch(getGreeting());
-  }, [dispatch, chatId, feedback.isFeedbackConfirmationShown, messages]);
+  // useEffect(() => {
+  //   if (!chatId && !feedback.isFeedbackConfirmationShown && !messages.length)
+  //     dispatch(getGreeting());
+  // }, [dispatch, chatId, feedback.isFeedbackConfirmationShown, messages]);
 
 
   const handleChatResize: ResizeCallback = (
