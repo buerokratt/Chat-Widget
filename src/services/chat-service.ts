@@ -10,6 +10,17 @@ interface Document {
   _id: string;
 }
 
+interface Response {
+  config: Record<any,any>,
+  data: {
+    response: Record<any,any>
+  },
+  headers: Record<any,any>,
+  request: Record<any,any>,
+  status: number,
+  statusText: string,
+}
+
 class ChatService {
   init(message: Message, endUserTechnicalData: EndUserTechnicalData): Promise<Chat> {
     return http.post(RUUTER_ENDPOINTS.INIT_CHAT, { message, endUserTechnicalData });
@@ -47,8 +58,10 @@ class ChatService {
     return http.post(RUUTER_ENDPOINTS.SEND_FEEDBACK_MESSAGE, { chatId, feedbackText: userFeedback });
   }
 
-  getEstimatedWaitingTime(): Promise<EstimatedWaiting> {
-    return http.post(RUUTER_ENDPOINTS.GET_WAITING_TIME);
+  async getEstimatedWaitingTime(): Promise<any> { //TODO fix return type // Promise<Response>
+    const result = await http.post(RUUTER_ENDPOINTS.GET_WAITING_TIME);
+    //@ts-ignore 
+    return result.data.response;
   }
 
   sendMessageWithNewEvent(message: Message): Promise<void> {
