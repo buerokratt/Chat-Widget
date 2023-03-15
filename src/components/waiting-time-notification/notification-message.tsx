@@ -3,7 +3,7 @@ import InfoIcon from './info-icon';
 import styles from './waiting-time-notification.module.scss';
 
 interface Props {
-  showIcon: boolean;
+  showIcon?: boolean;
   children: any;
 }
 
