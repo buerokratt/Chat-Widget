@@ -1,4 +1,5 @@
 export interface Attachment {
+    chatId: string;
     name: string;
     type: AttachmentTypes;
     size: number;

@@ -55,6 +55,7 @@ const ChatKeyPad = (): JSX.Element => {
 
         setUserInput(e.target.files[0].name);
         setUserInputFile({
+            chatId: chatId!,
             name: e.target.files[0].name,
             type: e.target.files[0].type as AttachmentTypes,
             size: e.target.files[0].size,
