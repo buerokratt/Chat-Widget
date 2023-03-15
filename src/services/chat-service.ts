@@ -1,5 +1,5 @@
 import http from './http-service';
-import { Message } from '../model/message-model';
+import { Attachment, Message } from '../model/message-model';
 import { Chat } from '../model/chat-model';
 import { RUUTER_ENDPOINTS } from '../constants';
 import { EndUserTechnicalData } from '../model/chat-ini-model';
@@ -64,6 +64,10 @@ class ChatService {
 
   generateDownloadChatRequest(): Promise<void> {
     return http.get(RUUTER_ENDPOINTS.DOWNLOAD_CHAT)
+  }
+
+  sendAttachment(attachment: Attachment): Promise<void> {
+    return http.post(RUUTER_ENDPOINTS.SEND_ATTACHMENT, attachment)
   }
 }
 

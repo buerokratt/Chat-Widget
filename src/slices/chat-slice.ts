@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Message } from '../model/message-model';
+import { Attachment, Message, } from '../model/message-model';
 import ChatService from '../services/chat-service';
 import { AUTHOR_ROLES, CHAT_EVENTS, CHAT_STATUS, ERROR_MESSAGE, SESSION_STORAGE_CHAT_ID_KEY, CHAT_WINDOW_HEIGHT, CHAT_WINDOW_WIDTH } from '../constants';
 import { getFromSessionStorage, setToSessionStorage } from '../utils/session-storage-utils';
@@ -163,6 +163,7 @@ export const removeChatForwardingValue = createAsyncThunk('chat/removeChatForwar
 
 export const generateForwardingRequest = createAsyncThunk('chat/generateForwardingRequest', async () => ChatService.generateForwardingRequest());
 export const downloadChat = createAsyncThunk('chat/downloadChat', async () => ChatService.generateDownloadChatRequest());
+export const sendAttachment = createAsyncThunk('chat/sendAttachment', async (attachment: Attachment) => ChatService.sendAttachment(attachment));
 
 export const chatSlice = createSlice({
   name: 'chat',

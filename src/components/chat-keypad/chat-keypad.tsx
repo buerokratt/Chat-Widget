@@ -8,6 +8,7 @@ import {
     clearMessageQueue,
     initChat,
     queueMessage,
+    sendAttachment,
     sendFeedbackMessage,
     sendNewMessage,
     setFeedbackMessageGiven,
@@ -26,14 +27,14 @@ import {
     MESSAGE_QUE_MAX_LENGTH,
     StyledButtonType
 } from '../../constants';
-import {Message, MessageFile, MessageFileTypes} from '../../model/message-model';
+import {Message, Attachment, AttachmentTypes} from '../../model/message-model';
 import StyledButton from '../styled-components/styled-button';
 import Close from "../../static/icons/close.svg";
 import formatBytes from "../../utils/format-bytes";
 
 const ChatKeyPad = (): JSX.Element => {
     const [userInput, setUserInput] = useState<string>('');
-    const [userInputFile, setUserInputFile] = useState<MessageFile>();
+    const [userInputFile, setUserInputFile] = useState<Attachment>();
     const [errorMessage, setErrorMessage] = useState('');
     const [isKeypadDisabled, setKeypadDisabled] = useState(false);
     const {feedback, chatId, loading, messageQueue, chatStatus} = useChatSelector();
@@ -55,7 +56,7 @@ const ChatKeyPad = (): JSX.Element => {
         setUserInput(e.target.files[0].name);
         setUserInputFile({
             name: e.target.files[0].name,
-            type: e.target.files[0].type as MessageFileTypes,
+            type: e.target.files[0].type as AttachmentTypes,
             size: e.target.files[0].size,
             base64: base64
         });
@@ -107,9 +108,9 @@ const ChatKeyPad = (): JSX.Element => {
             authorTimestamp: new Date().toISOString(),
             authorRole: AUTHOR_ROLES.END_USER,
         };
-        console.log('message', message)
 
         dispatch(addMessage(message));
+        dispatch(sendAttachment(userInputFile!))
         handleUploadClear();
 
         if (!chatId && !loading) {
@@ -210,7 +211,7 @@ const ChatKeyPad = (): JSX.Element => {
 
     async function handleFileRead(file: File): Promise<string | null> {
 
-        if (!Object.values(MessageFileTypes).some((v) => v === file.type)) {
+        if (!Object.values(AttachmentTypes).some((v) => v === file.type)) {
             setErrorMessage(`${file.type} file type is not supported`)
             return null
         }

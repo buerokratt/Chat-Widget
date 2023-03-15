@@ -1,6 +1,6 @@
-export interface MessageFile {
+export interface Attachment {
     name: string;
-    type: MessageFileTypes;
+    type: AttachmentTypes;
     size: number;
     base64: string;
 }
@@ -9,7 +9,7 @@ export interface Message {
     chatId: string | null;
     id?: string;
     content?: string;
-    file?: MessageFile;
+    file?: Attachment;
     event?: string;
     rating?: string;
     authorId?: string;
@@ -24,7 +24,8 @@ export interface Message {
     };
 }
 
-export enum MessageFileTypes {
+export enum AttachmentTypes {
+    // TODO not all types displayed correctly or specified in the AC
     PDF = 'application/pdf',
     PNG = 'image/png',
     JPEG = 'image/jpeg',
