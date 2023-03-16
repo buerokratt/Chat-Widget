@@ -2,12 +2,14 @@ import reducer, { closeConfirmationModal, showConfirmationModal, WidgetState } f
 
 const initialState: WidgetState = {
   showConfirmationModal: false,
+  burokrattOnlineStatus: null,
 };
 
 describe('Widget slice', () => {
   it('should showConfirmationModal', () => {
     expect(reducer(initialState, showConfirmationModal())).toEqual({
       showConfirmationModal: true,
+      burokrattOnlineStatus: null,
     });
   });
 

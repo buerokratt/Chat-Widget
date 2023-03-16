@@ -20,6 +20,7 @@ describe('Confirmation modal component', () => {
       preloadedState: {
         widget: {
           showConfirmationModal: true,
+          burokrattOnlineStatus: null,
         },
       },
     });
