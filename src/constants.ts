@@ -20,6 +20,7 @@ export const ERROR_MESSAGE = 'An error has occured';
 export const CHAT_WINDOW_WIDTH = 400;
 export const CHAT_WINDOW_HEIGHT = 460;
 export const ONLINE_CHECK_INTERVAL = 30_000;
+export const ONLINE_CHECK_INTERVAL_ACTIVE_CHAT = 10_000;
 
 export enum CHAT_STATUS {
   ENDED = 'ENDED',

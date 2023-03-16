@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useLayoutEffect, useState } from 'react';
 import { getFromSessionStorage } from './utils/session-storage-utils';
 import { isOfficeHours } from './utils/office-hours-utils';
 import Chat from './components/chat/chat';
@@ -9,6 +9,8 @@ import {
   ONLINE_CHECK_INTERVAL,
   OFFICE_HOURS_INTERVAL_TIMEOUT,
   SESSION_STORAGE_CHAT_ID_KEY,
+  CHAT_STATUS,
+  ONLINE_CHECK_INTERVAL_ACTIVE_CHAT,
 } from './constants';
 import { getChat, getChatMessages, setChatId } from './slices/chat-slice';
 import { useAppDispatch, useAppSelector } from './store';
@@ -42,15 +44,19 @@ const App: FC = () => {
   const [displayWidget, setDisplayWidget] = useState(
     !!getFromSessionStorage(SESSION_STORAGE_CHAT_ID_KEY) || isOfficeHours()
   );
-  const [onlineStatusCheck, setOnlineStatusCheck] = useState(false);
+  const [onlineCheckInterval, setOnlineCheckInterval] = useState(ONLINE_CHECK_INTERVAL);
   const { burokrattOnlineStatus } = useAppSelector((state) => state.widget);
+  const { chatStatus } = useAppSelector((state) => state.chat);
 
-  if (burokrattOnlineStatus === null) {
-    dispatch(burokrattOnlineStatusRequest());
-  }
+  useLayoutEffect(() => {
+    if (burokrattOnlineStatus === null) dispatch(burokrattOnlineStatusRequest());
+    else if(burokrattOnlineStatus === false) setOnlineCheckInterval(ONLINE_CHECK_INTERVAL);
+      else if(chatStatus === CHAT_STATUS.OPEN) setOnlineCheckInterval(ONLINE_CHECK_INTERVAL_ACTIVE_CHAT)
+  }, [chatStatus,burokrattOnlineStatus]);
+
   useInterval(
     () => dispatch(burokrattOnlineStatusRequest()),
-    ONLINE_CHECK_INTERVAL
+    onlineCheckInterval
   );
 
   useInterval(

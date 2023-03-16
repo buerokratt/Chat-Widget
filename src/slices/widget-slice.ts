@@ -29,11 +29,11 @@ export const widgetSlice = createSlice({
     builder.addCase(endChat.pending, (state) => {
       state.showConfirmationModal = false;
     });
-    builder.addCase(burokrattOnlineStatusRequest.fulfilled, (state, action) => {
+    builder.addCase(burokrattOnlineStatusRequest.fulfilled, (state) => {
       state.burokrattOnlineStatus = true;
     });
-    builder.addCase(burokrattOnlineStatusRequest.rejected, (state, action) => {
-      state.burokrattOnlineStatus = true;
+    builder.addCase(burokrattOnlineStatusRequest.rejected, (state) => {
+      state.burokrattOnlineStatus = false;
     });
   },
 });
