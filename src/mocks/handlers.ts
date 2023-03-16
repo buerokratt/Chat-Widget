@@ -40,7 +40,7 @@ const handlers = [
   }),
   rest.get(`${ruuterUrl}${RUUTER_ENDPOINTS.BUROKRATT_ONLINE_STATUS}`, (_req, res, ctx) => {
     return res(ctx.status(200));
-    // return res(ctx.status(500));
+    // return res(ctx.status(503));
   }),
 ];
 
