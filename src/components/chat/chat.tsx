@@ -9,7 +9,7 @@ import ChatHeader from '../chat-header/chat-header';
 import ChatKeyPad from '../chat-keypad/chat-keypad';
 import ConfirmationModal from '../confirmation-modal/confirmation-modal';
 import styles from './chat.module.scss';
-import { useAppDispatch } from '../../store';
+import { useAppDispatch, useAppSelector } from '../../store';
 import {
   getEstimatedWaitingTime,
   getGreeting,
@@ -24,6 +24,7 @@ import WaitingTimeNotification from '../waiting-time-notification/waiting-time-n
 import EndUserContacts from '../end-user-contacts/end-user-contacts';
 import WidgetDetails from '../chat-header/widget-details';
 import useAuthenticationSelector from '../../hooks/use-authentication-selector';
+import OnlineStatusNotification from '../online-status-notification/online-status-notification';
 
 const RESIZABLE_HANDLES = {
   topLeft: true,
@@ -43,6 +44,7 @@ const Chat = (): JSX.Element => {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuthenticationSelector();
   const { isChatEnded, chatId, messageQueue, estimatedWaiting, showContactForm, customerSupportId, feedback, messages, chatDimensions } = useChatSelector();
+  const { burokrattOnlineStatus } = useAppSelector((state) => state.widget);
 
   useEffect(() => {
     if (feedback.isFeedbackRatingGiven && feedback.isFeedbackMessageGiven && !feedback.isFeedbackConfirmationShown) {
@@ -85,6 +87,7 @@ const Chat = (): JSX.Element => {
           <ChatHeader isDetailSelected={showWidgetDetails}
                       detailHandler={() => setShowWidgetDetails(!showWidgetDetails)}/>
           {messageQueue.length >= 5 && <WarningNotification warningMessage={t('chat.error-message')}/>}
+          {burokrattOnlineStatus !== true && <OnlineStatusNotification/>}
           {estimatedWaiting.time > 0 && estimatedWaiting.isActive && !showWidgetDetails && <WaitingTimeNotification/>}
           {showWidgetDetails && <WidgetDetails/>}
           {!showWidgetDetails && showContactForm && <EndUserContacts/>}
