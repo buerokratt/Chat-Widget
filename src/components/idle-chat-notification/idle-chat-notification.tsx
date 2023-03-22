@@ -5,6 +5,7 @@ import { useAppDispatch } from '../../store';
 import { closeConfirmationModal } from '../../slices/widget-slice';
 import { endChat, setIdleChat } from '../../slices/chat-slice';
 import { CHAT_EVENTS } from '../../constants';
+import { customJwtExtend } from '../../slices/authentication-slice';
 
 const IdleChatNotification = () => {
   const { t } = useTranslation();
@@ -24,7 +25,10 @@ const IdleChatNotification = () => {
         <div className={styles.actions}>
           <Button
             title={t('widget.action.yes')}
-            onClick={() => dispatch(setIdleChat({isIdle: false, lastActive: new Date().getTime()}))}
+            onClick={() => {
+              dispatch(setIdleChat({isIdle: false, lastActive: new Date().getTime()}));
+              dispatch(customJwtExtend())
+            }}
           >
             {t('widget.action.yes')}
           </Button>
