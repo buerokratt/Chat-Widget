@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useLayoutEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Resizable, ResizeCallback } from "re-resizable";
 import useChatSelector from '../../hooks/use-chat-selector';
@@ -75,9 +75,9 @@ const Chat = (): JSX.Element => {
     dispatch(setChatDimensions(newDimensions));
   }
 
-useEffect(() => {
+useLayoutEffect(() => {
   if (messages.length > 0 && !isChatEnded) {
-    setInterval(() => {
+    const interval = setInterval(() => {
     let lastActive;
       if(idleChat.lastActive === '') {
         lastActive = messages[messages.length - 1].authorTimestamp;
@@ -93,6 +93,9 @@ useEffect(() => {
           dispatch(endChat({event: CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS}))
         }
     }, IDLE_CHAT_INTERVAL*1000);
+    return () => {
+      clearInterval(interval);
+    }
   }
 }, [idleChat.isIdle, messages]);
 
