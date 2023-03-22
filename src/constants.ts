@@ -70,6 +70,8 @@ export enum RUUTER_ENDPOINTS {
   REMOVE_CHAT_FORWARDING_VALUE = '/remove-chat-forwarding-value',
   GENERATE_FORWARDING_REQUEST = '/origin-forward',
   DOWNLOAD_CHAT = '/download-chat',
+  CUSTOM_JWT_EXTEND = '/custom-jwt-extend',
+  CUSTOM_JWT_USERINFO = '/custom-jwt-userinfo',
 }
 
 export enum StyledButtonType {
