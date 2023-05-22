@@ -19,6 +19,7 @@ export const TERMS_AND_CONDITIONS_LINK = 'https://www.kratid.ee/kasutustingimuse
 export const ERROR_MESSAGE = 'An error has occured';
 export const CHAT_WINDOW_WIDTH = 400;
 export const CHAT_WINDOW_HEIGHT = 460;
+export const LOCAL_STORAGE_CHAT_DIMENSIONS_KEY = 'chat-dimensions';
 
 export enum CHAT_STATUS {
   ENDED = 'ENDED',
