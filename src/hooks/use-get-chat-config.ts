@@ -4,12 +4,12 @@ import useChatSelector from "./use-chat-selector";
 import { getChatConfig } from "../slices/chat-slice";
 
 const useGetChatConfig = (): void => {
-  const { config } = useChatSelector();
+  const { chatConfig } = useChatSelector();
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (!config.isLoaded) dispatch(getChatConfig());
-  }, [dispatch, config]);
+    if (!chatConfig.isLoaded) dispatch(getChatConfig());
+  }, [dispatch, chatConfig]);
 };
 
 export default useGetChatConfig;

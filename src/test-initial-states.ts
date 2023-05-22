@@ -43,7 +43,7 @@ export const initialChatState: ChatState = {
     error: false,
     data: null,
   },
-  config: {
+  chatConfig: {
     proactiveSeconds: CHAT_BUBBLE_PROACTIVE_SECONDS,
     showMessage: CHAT_SHOW_BUBBLE_MESSAGE,
     bubbleMessageSeconds: CHAT_BUBBLE_MESSAGE_DELAY_SECONDS,

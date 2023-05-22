@@ -35,7 +35,7 @@ declare global {
 
 const App: FC = () => {
   const dispatch = useAppDispatch();
-  const { isChatOpen, messages, chatId, config } = useChatSelector();
+  const { isChatOpen, messages, chatId, chatConfig } = useChatSelector();
   const [displayWidget, setDisplayWidget] = useState(!!getFromSessionStorage(SESSION_STORAGE_CHAT_ID_KEY) || isOfficeHours());
 
   useInterval(() => setDisplayWidget(!!getFromSessionStorage(SESSION_STORAGE_CHAT_ID_KEY) || isOfficeHours()), OFFICE_HOURS_INTERVAL_TIMEOUT);
@@ -55,10 +55,10 @@ const App: FC = () => {
       dispatch(getChat());
       dispatch(getChatMessages());
     }
-    if (!config.isLoaded) dispatch(getChatConfig());
-  }, [chatId, dispatch, messages, config]);
+    if (!chatConfig.isLoaded) dispatch(getChatConfig());
+  }, [chatId, dispatch, messages, chatConfig]);
 
-  if (displayWidget && config.isLoaded) return isChatOpen ? <Chat /> : <Profile />;
+  if (displayWidget && chatConfig.isLoaded) return isChatOpen ? <Chat /> : <Profile />;
   return <></>;
 };
 

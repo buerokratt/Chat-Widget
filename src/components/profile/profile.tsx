@@ -11,7 +11,7 @@ import styles from "./profile.module.scss";
 export const Profile = (): JSX.Element => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const { config } = useChatSelector();
+  const { chatConfig } = useChatSelector();
   const [delayFinished, setDelayFinished] = useState(false);
   const newMessagesAmount = getFromSessionStorage("newMessagesAmount");
 
@@ -29,13 +29,13 @@ export const Profile = (): JSX.Element => {
   };
 
   useEffect(() => {
-    setTimeout(() => setDelayFinished(true), config.bubbleMessageSeconds * 1000);
+    setTimeout(() => setDelayFinished(true), chatConfig.bubbleMessageSeconds * 1000);
   }, []);
 
   const getActiveProfileClass = () => {
-    if (delayFinished && config.animation === "jump") return styles.profile__jump;
-    if (delayFinished && config.animation === "wiggle") return styles.profile__wiggle;
-    if (delayFinished && config.animation === "shockwave") return styles.profile__shockwave;
+    if (delayFinished && chatConfig.animation === "jump") return styles.profile__jump;
+    if (delayFinished && chatConfig.animation === "wiggle") return styles.profile__wiggle;
+    if (delayFinished && chatConfig.animation === "shockwave") return styles.profile__shockwave;
   };
 
   return (
@@ -46,8 +46,8 @@ export const Profile = (): JSX.Element => {
         initial="initial"
         animate="animate"
         style={{
-          animationIterationCount: config.proactiveSeconds,
-          backgroundColor: config.color,
+          animationIterationCount: chatConfig.proactiveSeconds,
+          backgroundColor: chatConfig.color,
         }}
         role="button"
         aria-label={t("profile.button.open-chat")}
@@ -58,11 +58,11 @@ export const Profile = (): JSX.Element => {
       >
         <img src={Buerokratt} alt="Buerokratt logo" width={45} style={{ filter: "brightness(0) invert(1)" }} />
       </motion.div>
-      {config.showMessage && (
+      {chatConfig.showMessage && (
         <div
           className={`${styles.profile__greeting_message} ${delayFinished && styles.profile__greeting_message__active}`}
         >
-          {config.bubbleMessageText}
+          {chatConfig.bubbleMessageText}
         </div>
       )}
       {newMessagesAmount !== null && parseInt(newMessagesAmount, 10) > 0 ? (
