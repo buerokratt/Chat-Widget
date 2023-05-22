@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Message } from '../model/message-model';
 import ChatService from '../services/chat-service';
-import { AUTHOR_ROLES, CHAT_EVENTS, CHAT_STATUS, ERROR_MESSAGE, SESSION_STORAGE_CHAT_ID_KEY, CHAT_WINDOW_HEIGHT, CHAT_WINDOW_WIDTH } from '../constants';
+import { AUTHOR_ROLES, CHAT_EVENTS, CHAT_STATUS, ERROR_MESSAGE, SESSION_STORAGE_CHAT_ID_KEY, CHAT_WINDOW_HEIGHT, CHAT_WINDOW_WIDTH, CHAT_BUBBLE_ANIMATION, CHAT_BUBBLE_COLOR, CHAT_BUBBLE_MESSAGE_DELAY_SECONDS, CHAT_BUBBLE_PROACTIVE_SECONDS, CHAT_SHOW_BUBBLE_MESSAGE } from '../constants';
 import { getFromSessionStorage, setToSessionStorage } from '../utils/session-storage-utils';
 import { Chat } from '../model/chat-model';
 import { clearStateVariablesFromSessionStorage, findMatchingMessageFromMessageList } from '../utils/state-management-utils';
@@ -48,6 +48,15 @@ export interface ChatState {
     error: any;
     data:any;
   };
+  config: {
+    proactiveSeconds: number;
+    showMessage: boolean;
+    bubbleMessageSeconds: number;
+    bubbleMessageText: string;
+    color: string;
+    animation: string;
+    isLoaded: boolean;
+  }
 }
 
 const initialState: ChatState = {
@@ -90,6 +99,15 @@ const initialState: ChatState = {
     error: false,
     data: null,
   },
+  config: {
+    proactiveSeconds: CHAT_BUBBLE_PROACTIVE_SECONDS,
+    showMessage: CHAT_SHOW_BUBBLE_MESSAGE,
+    bubbleMessageSeconds: CHAT_BUBBLE_MESSAGE_DELAY_SECONDS,
+    bubbleMessageText: '',
+    color: CHAT_BUBBLE_COLOR,
+    animation: CHAT_BUBBLE_ANIMATION,
+    isLoaded: false,
+  }
 };
 
 export const initChat = createAsyncThunk('chat/init', async (message: Message) =>
@@ -106,6 +124,8 @@ export const getChat = createAsyncThunk('chat/getChat', async (_args, thunkApi) 
   if (chatId) return ChatService.getChatById(chatId);
   return null;
 });
+
+export const getChatConfig = createAsyncThunk('chat/getChatConfig', async () => ChatService.getChatConfig());
 
 export const getChatMessages = createAsyncThunk('chat/getChatMessages', async (args, thunkApi) => {
   const {
@@ -269,6 +289,18 @@ export const chatSlice = createSlice({
     builder.addCase(initChat.pending, (state) => {
       state.lastReadMessageTimestamp = new Date().toISOString();
       state.loading = true;
+    });
+    builder.addCase(getChatConfig.rejected, (state) => {
+      state.config.isLoaded = true;
+    });
+    builder.addCase(getChatConfig.fulfilled, (state, action) => {
+      state.config.isLoaded = true;
+      state.config.proactiveSeconds = action.payload?.widgetProactiveSeconds ?? CHAT_BUBBLE_PROACTIVE_SECONDS;
+      state.config.showMessage = action.payload?.isWidgetActive ?? CHAT_SHOW_BUBBLE_MESSAGE;
+      state.config.bubbleMessageSeconds = action.payload?.widgetDisplayBubbleMessageSeconds ?? CHAT_BUBBLE_MESSAGE_DELAY_SECONDS;
+      state.config.bubbleMessageText = action.payload?.widgetBubbleMessageText ?? '';
+      state.config.color = action.payload?.widgetColor ?? CHAT_BUBBLE_COLOR;
+      state.config.animation = action.payload?.widgetAnimation ?? CHAT_BUBBLE_ANIMATION;
     });
     builder.addCase(initChat.fulfilled, (state, action) => {
       state.chatId = action.payload.id;

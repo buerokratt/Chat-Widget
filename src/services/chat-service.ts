@@ -1,4 +1,5 @@
 import http from './http-service';
+import http2 from './http2-service';
 import { Message } from '../model/message-model';
 import { Chat } from '../model/chat-model';
 import { RUUTER_ENDPOINTS } from '../constants';
@@ -16,6 +17,10 @@ class ChatService {
 
   getChatById(chatId: string): Promise<Chat> {
     return http.post(RUUTER_ENDPOINTS.GET_CHAT_BY_ID, { id: chatId });
+  }
+
+  getChatConfig(): Promise<any> {
+    return http2.get(RUUTER_ENDPOINTS.GET_CHAT_CONFIG);
   }
 
   sendNewMessage(message: Message): Promise<Document> {
