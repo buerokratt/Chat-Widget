@@ -6,13 +6,15 @@ import Profile from './components/profile/profile';
 import useChatSelector from './hooks/use-chat-selector';
 import useInterval from './hooks/use-interval';
 import { OFFICE_HOURS_INTERVAL_TIMEOUT, SESSION_STORAGE_CHAT_ID_KEY } from './constants';
-import { getChat, getChatConfig, getChatMessages, setChatId } from './slices/chat-slice';
+import { getChat, getChatMessages, setChatId } from './slices/chat-slice';
 import { useAppDispatch } from './store';
 import useNewMessageNotification from './hooks/use-new-message-notification';
 import useAuthentication from './hooks/use-authentication';
 import useGetNewMessages from './hooks/use-get-new-messages';
 import useGetChat from './hooks/use-get-chat';
-import useGetChatConfig from './hooks/use-get-chat-config';
+import useGetChatConfig from './hooks/use-get-widget-config';
+import useWidgetSelector from './hooks/use-widget-selector';
+import { getWidgetConfig } from './slices/widget-slice';
 
 declare global {
   interface Window {
@@ -35,7 +37,8 @@ declare global {
 
 const App: FC = () => {
   const dispatch = useAppDispatch();
-  const { isChatOpen, messages, chatId, chatConfig } = useChatSelector();
+  const { isChatOpen, messages, chatId } = useChatSelector();
+  const { widgetConfig } = useWidgetSelector();
   const [displayWidget, setDisplayWidget] = useState(!!getFromSessionStorage(SESSION_STORAGE_CHAT_ID_KEY) || isOfficeHours());
 
   useInterval(() => setDisplayWidget(!!getFromSessionStorage(SESSION_STORAGE_CHAT_ID_KEY) || isOfficeHours()), OFFICE_HOURS_INTERVAL_TIMEOUT);
@@ -55,10 +58,10 @@ const App: FC = () => {
       dispatch(getChat());
       dispatch(getChatMessages());
     }
-    if (!chatConfig.isLoaded) dispatch(getChatConfig());
-  }, [chatId, dispatch, messages, chatConfig]);
+    if (!widgetConfig.isLoaded) dispatch(getWidgetConfig());
+  }, [chatId, dispatch, messages, widgetConfig]);
 
-  if (displayWidget && chatConfig.isLoaded) return isChatOpen ? <Chat /> : <Profile />;
+  if (displayWidget && widgetConfig.isLoaded) return isChatOpen ? <Chat /> : <Profile />;
   return <></>;
 };
 

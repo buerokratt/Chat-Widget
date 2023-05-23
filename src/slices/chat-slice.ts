@@ -48,15 +48,6 @@ export interface ChatState {
     error: any;
     data:any;
   };
-  chatConfig: {
-    proactiveSeconds: number;
-    showMessage: boolean;
-    bubbleMessageSeconds: number;
-    bubbleMessageText: string;
-    color: string;
-    animation: string;
-    isLoaded: boolean;
-  }
 }
 
 const initialState: ChatState = {
@@ -98,15 +89,6 @@ const initialState: ChatState = {
     isLoading: false,
     error: false,
     data: null,
-  },
-  chatConfig: {
-    proactiveSeconds: CHAT_BUBBLE_PROACTIVE_SECONDS,
-    showMessage: CHAT_SHOW_BUBBLE_MESSAGE,
-    bubbleMessageSeconds: CHAT_BUBBLE_MESSAGE_DELAY_SECONDS,
-    bubbleMessageText: '',
-    color: CHAT_BUBBLE_COLOR,
-    animation: CHAT_BUBBLE_ANIMATION,
-    isLoaded: false,
   }
 };
 
@@ -124,8 +106,6 @@ export const getChat = createAsyncThunk('chat/getChat', async (_args, thunkApi) 
   if (chatId) return ChatService.getChatById(chatId);
   return null;
 });
-
-export const getChatConfig = createAsyncThunk('chat/getChatConfig', async () => ChatService.getChatConfig());
 
 export const getChatMessages = createAsyncThunk('chat/getChatMessages', async (args, thunkApi) => {
   const {
@@ -289,18 +269,6 @@ export const chatSlice = createSlice({
     builder.addCase(initChat.pending, (state) => {
       state.lastReadMessageTimestamp = new Date().toISOString();
       state.loading = true;
-    });
-    builder.addCase(getChatConfig.rejected, (state) => {
-      state.chatConfig.isLoaded = true;
-    });
-    builder.addCase(getChatConfig.fulfilled, (state, action) => {
-      state.chatConfig.isLoaded = true;
-      state.chatConfig.proactiveSeconds = action.payload?.widgetProactiveSeconds ?? CHAT_BUBBLE_PROACTIVE_SECONDS;
-      state.chatConfig.showMessage = action.payload?.isWidgetActive ?? CHAT_SHOW_BUBBLE_MESSAGE;
-      state.chatConfig.bubbleMessageSeconds = action.payload?.widgetDisplayBubbleMessageSeconds ?? CHAT_BUBBLE_MESSAGE_DELAY_SECONDS;
-      state.chatConfig.bubbleMessageText = action.payload?.widgetBubbleMessageText ?? '';
-      state.chatConfig.color = action.payload?.widgetColor ?? CHAT_BUBBLE_COLOR;
-      state.chatConfig.animation = action.payload?.widgetAnimation ?? CHAT_BUBBLE_ANIMATION;
     });
     builder.addCase(initChat.fulfilled, (state, action) => {
       state.chatId = action.payload.id;

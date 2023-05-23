@@ -42,15 +42,6 @@ export const initialChatState: ChatState = {
     isLoading: false,
     error: false,
     data: null,
-  },
-  chatConfig: {
-    proactiveSeconds: CHAT_BUBBLE_PROACTIVE_SECONDS,
-    showMessage: CHAT_SHOW_BUBBLE_MESSAGE,
-    bubbleMessageSeconds: CHAT_BUBBLE_MESSAGE_DELAY_SECONDS,
-    bubbleMessageText: '',
-    color: CHAT_BUBBLE_COLOR,
-    animation: CHAT_BUBBLE_ANIMATION,
-    isLoaded: false,
   }
 };
 

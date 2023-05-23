@@ -7,11 +7,12 @@ import { useAppDispatch } from "../../store";
 import { getFromSessionStorage } from "../../utils/session-storage-utils";
 import useChatSelector from "../../hooks/use-chat-selector";
 import styles from "./profile.module.scss";
+import useWidgetSelector from "../../hooks/use-widget-selector";
 
 export const Profile = (): JSX.Element => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const { chatConfig } = useChatSelector();
+  const { widgetConfig } = useWidgetSelector();
   const [delayFinished, setDelayFinished] = useState(false);
   const newMessagesAmount = getFromSessionStorage("newMessagesAmount");
 
@@ -29,13 +30,13 @@ export const Profile = (): JSX.Element => {
   };
 
   useEffect(() => {
-    setTimeout(() => setDelayFinished(true), chatConfig.bubbleMessageSeconds * 1000);
+    setTimeout(() => setDelayFinished(true), widgetConfig.bubbleMessageSeconds * 1000);
   }, []);
 
   const getActiveProfileClass = () => {
-    if (delayFinished && chatConfig.animation === "jump") return styles.profile__jump;
-    if (delayFinished && chatConfig.animation === "wiggle") return styles.profile__wiggle;
-    if (delayFinished && chatConfig.animation === "shockwave") return styles.profile__shockwave;
+    if (delayFinished && widgetConfig.animation === "jump") return styles.profile__jump;
+    if (delayFinished && widgetConfig.animation === "wiggle") return styles.profile__wiggle;
+    if (delayFinished && widgetConfig.animation === "shockwave") return styles.profile__shockwave;
   };
 
   return (
@@ -46,8 +47,8 @@ export const Profile = (): JSX.Element => {
         initial="initial"
         animate="animate"
         style={{
-          animationIterationCount: chatConfig.proactiveSeconds,
-          backgroundColor: chatConfig.color,
+          animationIterationCount: widgetConfig.proactiveSeconds,
+          backgroundColor: widgetConfig.color,
         }}
         role="button"
         aria-label={t("profile.button.open-chat")}
@@ -58,11 +59,11 @@ export const Profile = (): JSX.Element => {
       >
         <img src={Buerokratt} alt="Buerokratt logo" width={45} style={{ filter: "brightness(0) invert(1)" }} />
       </motion.div>
-      {chatConfig.showMessage && (
+      {widgetConfig.showMessage && (
         <div
           className={`${styles.profile__greeting_message} ${delayFinished && styles.profile__greeting_message__active}`}
         >
-          {chatConfig.bubbleMessageText}
+          {widgetConfig.bubbleMessageText}
         </div>
       )}
       {newMessagesAmount !== null && parseInt(newMessagesAmount, 10) > 0 ? (
