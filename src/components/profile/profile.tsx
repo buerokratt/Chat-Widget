@@ -5,7 +5,6 @@ import { setIsChatOpen } from "../../slices/chat-slice";
 import Buerokratt from "../../static/icons/buerokratt.svg";
 import { useAppDispatch } from "../../store";
 import { getFromSessionStorage } from "../../utils/session-storage-utils";
-import useChatSelector from "../../hooks/use-chat-selector";
 import styles from "./profile.module.scss";
 import useWidgetSelector from "../../hooks/use-widget-selector";
 

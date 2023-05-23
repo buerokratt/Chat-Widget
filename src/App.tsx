@@ -12,9 +12,9 @@ import useNewMessageNotification from './hooks/use-new-message-notification';
 import useAuthentication from './hooks/use-authentication';
 import useGetNewMessages from './hooks/use-get-new-messages';
 import useGetChat from './hooks/use-get-chat';
-import useGetChatConfig from './hooks/use-get-widget-config';
 import useWidgetSelector from './hooks/use-widget-selector';
 import { getWidgetConfig } from './slices/widget-slice';
+import useGetWidgetConfig from './hooks/use-get-widget-config';
 
 declare global {
   interface Window {
@@ -42,7 +42,7 @@ const App: FC = () => {
   const [displayWidget, setDisplayWidget] = useState(!!getFromSessionStorage(SESSION_STORAGE_CHAT_ID_KEY) || isOfficeHours());
 
   useInterval(() => setDisplayWidget(!!getFromSessionStorage(SESSION_STORAGE_CHAT_ID_KEY) || isOfficeHours()), OFFICE_HOURS_INTERVAL_TIMEOUT);
-  useGetChatConfig();
+  useGetWidgetConfig();
   useAuthentication();
   useGetChat();
   useGetNewMessages();
