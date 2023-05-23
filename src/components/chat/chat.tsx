@@ -3,7 +3,7 @@ import React, { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Resizable, ResizeCallback } from "re-resizable";
 import useChatSelector from '../../hooks/use-chat-selector';
-import { FEEDBACK_CONFIRMATION_TIMEOUT, CHAT_WINDOW_HEIGHT, CHAT_WINDOW_WIDTH } from '../../constants';
+import { FEEDBACK_CONFIRMATION_TIMEOUT, CHAT_WINDOW_HEIGHT, CHAT_WINDOW_WIDTH, CHAT_EVENTS } from '../../constants';
 import ChatContent from '../chat-content/chat-content';
 import ChatHeader from '../chat-header/chat-header';
 import ChatKeyPad from '../chat-keypad/chat-keypad';
@@ -55,7 +55,13 @@ const Chat = (): JSX.Element => {
   }, [dispatch, feedback.isFeedbackConfirmationShown, feedback.isFeedbackMessageGiven, feedback.isFeedbackRatingGiven]);
 
   useEffect(() => {
-    if (!chatId && !feedback.isFeedbackConfirmationShown && !messages.length) dispatch(getGreeting());
+    if (
+      !chatId &&
+      !feedback.isFeedbackConfirmationShown &&
+      (!messages.length || !messages.map((m) => m.event).includes(CHAT_EVENTS.GREETING))
+    ) {
+      dispatch(getGreeting());
+    }
   }, [dispatch, chatId, feedback.isFeedbackConfirmationShown, messages]);
 
   useEffect(() => {
