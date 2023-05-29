@@ -7,6 +7,14 @@ class WidgetService {
     return http2.get(RUUTER_ENDPOINTS.GET_CHAT_CONFIG);
   }
 
+  sendContactInfo(chatId:string, email: string, phone: string): Promise<WidgetConfigResponse> {
+    return http2.post(RUUTER_ENDPOINTS.SEND_CONTACT_INFO, {
+      "chatId": chatId,
+      "endUserEmail": email,
+      "endUserPhone": phone
+    });
+  }
+
   authenticateUser(chatId:string, id: string, firstName: string, lastName: string): Promise<WidgetConfigResponse> {
     return http2.post(RUUTER_ENDPOINTS.AUTHENTICATE_USER, {
       "chatId": chatId,
