@@ -22,6 +22,7 @@ declare global {
     _env_: {
       RUUTER_API_URL: string;
       RUUTER_2_API_URL: string;
+      ENVIRONMENT: "development"; // 'developement | production'
       TIM_AUTHENTICATION_URL: string;
       ORGANIZATION_NAME: string;
       TERMS_AND_CONDITIONS_LINK: string;
@@ -45,7 +46,10 @@ const App: FC = () => {
   );
 
   useInterval(
-    () => setDisplayWidget(!!getFromSessionStorage(SESSION_STORAGE_CHAT_ID_KEY) || isOfficeHours()),
+    () =>
+      setDisplayWidget(
+        !!getFromSessionStorage(SESSION_STORAGE_CHAT_ID_KEY) || isOfficeHours()
+      ),
     OFFICE_HOURS_INTERVAL_TIMEOUT
   );
   useGetWidgetConfig();
@@ -56,8 +60,11 @@ const App: FC = () => {
   useNewMessageNotification();
 
   useEffect(() => {
-    const sessionStorageChatId = getFromSessionStorage(SESSION_STORAGE_CHAT_ID_KEY);
-    if (sessionStorageChatId !== null) dispatch(setChatId(sessionStorageChatId));
+    const sessionStorageChatId = getFromSessionStorage(
+      SESSION_STORAGE_CHAT_ID_KEY
+    );
+    if (sessionStorageChatId !== null)
+      dispatch(setChatId(sessionStorageChatId));
   }, [dispatch]);
 
   useEffect(() => {
@@ -69,7 +76,8 @@ const App: FC = () => {
     if (!widgetConfig.isLoaded) dispatch(getWidgetConfig());
   }, [chatId, dispatch, messages, widgetConfig]);
 
-  if (displayWidget && widgetConfig.isLoaded) return isChatOpen ? <Chat /> : <Profile />;
+  if (displayWidget && widgetConfig.isLoaded)
+    return isChatOpen ? <Chat /> : <Profile />;
   return <></>;
 };
 
