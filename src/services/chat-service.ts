@@ -89,6 +89,11 @@ class ChatService {
   sendUserContacts({chatId, endUserEmail, endUserPhone}:UserContacts  ): Promise<void>{
     return http.post(RUUTER_ENDPOINTS.SEND_USER_CONTACTS);
   }
+
+  burokrattOnlineStatus(): Promise<boolean> {
+    return http.get(RUUTER_ENDPOINTS.BUROKRATT_ONLINE_STATUS);
+    // return http.get('https://cors-anywhere.herokuapp.com/dd7f1f96-2c1a-4f86-ad6c-793e84234937.mock.pstmn.io/healthz');
+  }
 }
 
 export default new ChatService();
