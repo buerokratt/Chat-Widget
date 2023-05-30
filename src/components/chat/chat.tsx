@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useLayoutEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Resizable, ResizeCallback } from 're-resizable';
 import useChatSelector from '../../hooks/use-chat-selector';
-import { FEEDBACK_CONFIRMATION_TIMEOUT, CHAT_WINDOW_HEIGHT, CHAT_WINDOW_WIDTH, CHAT_EVENTS } from '../../constants';
+import { FEEDBACK_CONFIRMATION_TIMEOUT, CHAT_WINDOW_HEIGHT, CHAT_WINDOW_WIDTH, CHAT_EVENTS, IDLE_CHAT_INTERVAL } from '../../constants';
 import ChatContent from '../chat-content/chat-content';
 import ChatHeader from '../chat-header/chat-header';
 import ChatKeyPad from '../chat-keypad/chat-keypad';
@@ -11,9 +11,13 @@ import ConfirmationModal from '../confirmation-modal/confirmation-modal';
 import styles from './chat.module.scss';
 import { useAppDispatch, useAppSelector } from '../../store';
 import {
+  endChat,
+  getEstimatedWaitingTime,
   getGreeting,
   setChatDimensions,
-  setIsFeedbackConfirmationShown,
+  setEstimatedWaitingTimeToZero,
+  setIdleChat,
+  setIsFeedbackConfirmationShown
 } from '../../slices/chat-slice';
 import WarningNotification from '../warning-notification/warning-notification';
 import ChatFeedback from '../chat-feedback/chat-feedback';
@@ -22,6 +26,8 @@ import EndUserContacts from '../end-user-contacts/end-user-contacts';
 import WidgetDetails from '../chat-header/widget-details';
 import useAuthenticationSelector from '../../hooks/use-authentication-selector';
 import OnlineStatusNotification from '../online-status-notification/online-status-notification';
+import IdleChatNotification from '../idle-chat-notification/idle-chat-notification';
+import getIdleTime from '../../utils/getIdleTime';
 
 const RESIZABLE_HANDLES = {
   topLeft: true,
@@ -85,6 +91,30 @@ const Chat = (): JSX.Element => {
     };
     dispatch(setChatDimensions(newDimensions));
   };
+
+useLayoutEffect(() => {
+  if (messages.length > 0 && !isChatEnded) {
+    const interval = setInterval(() => {
+    let lastActive;
+      if(idleChat.lastActive === '') {
+        lastActive = messages[messages.length - 1].authorTimestamp;
+      } else {
+        lastActive = idleChat.lastActive
+      }
+      const differenceInSeconds = getIdleTime(lastActive);
+        if(differenceInSeconds > IDLE_CHAT_INTERVAL) {
+          dispatch(setIdleChat({isIdle: true}));
+        }
+
+        if(differenceInSeconds > IDLE_CHAT_INTERVAL + 10) {
+          dispatch(endChat({event: CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS}))
+        }
+    }, IDLE_CHAT_INTERVAL*1000);
+    return () => {
+      clearInterval(interval);
+    }
+  }
+}, [idleChat.isIdle, messages]);
 
   return (
     <div className={styles.chatWrapper}>

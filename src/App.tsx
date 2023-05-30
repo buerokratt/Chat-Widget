@@ -8,8 +8,8 @@ import useInterval from './hooks/use-interval';
 import {
   ONLINE_CHECK_INTERVAL,
   OFFICE_HOURS_INTERVAL_TIMEOUT,
-  CHAT_STATUS,
   SESSION_STORAGE_CHAT_ID_KEY,
+  CHAT_STATUS,
   ONLINE_CHECK_INTERVAL_ACTIVE_CHAT,
 } from './constants';
 import { getChat, getChatMessages, getEmergencyNotice, setChatId } from "./slices/chat-slice";
@@ -23,6 +23,7 @@ import useWidgetSelector from "./hooks/use-widget-selector";
 import { getWidgetConfig } from "./slices/widget-slice";
 import useGetWidgetConfig from "./hooks/use-get-widget-config";
 import useGetEmergencyNotice from "./hooks/use-get-emergency-notice";
+import { customJwtExtend } from './slices/authentication-slice';
 
 declare global {
   interface Window {
@@ -80,6 +81,16 @@ const App: FC = () => {
   useGetChat();
   useGetNewMessages();
   useNewMessageNotification();
+
+  useLayoutEffect(() => {
+    let waitTime = IDLE_CHAT_INTERVAL; 
+    const interval = setInterval(() => {
+      if(!displayWidget || !isChatOpen || !chatId) return;
+      dispatch(customJwtExtend())
+      waitTime = 120 * 60 * 1000;
+    }, waitTime );
+    return () => clearInterval(interval);
+  }, [messages]);
 
   useEffect(() => {
     const sessionStorageChatId = getFromSessionStorage(
