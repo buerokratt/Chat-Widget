@@ -16,7 +16,6 @@ const ConfirmationModalNps = ({ npsFeedback }: Props) => {
   const [stars, setStars] = useState<number>(0);
   const dispatch = useAppDispatch();
 
-
   return (
     <div className={styles.npsContainer}>
       <h2 className={styles.title}>{t('widget.action.nps-confirmation')}</h2>
@@ -33,7 +32,10 @@ const ConfirmationModalNps = ({ npsFeedback }: Props) => {
           {t('widget.action.skip')}
         </Button>
         <Button
-          onClick={() => dispatch(endChat({event: npsFeedback}))}
+          onClick={() => {
+            dispatch(sendChatNpmRating({ NpmRating: stars }));
+            dispatch(endChat({event: npsFeedback}));
+          }}
           title={t('widget.action.confirm')}
           color={ButtonColor.BLUE}
         >
