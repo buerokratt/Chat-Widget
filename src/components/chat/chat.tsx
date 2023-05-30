@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
-import React, { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Resizable, ResizeCallback } from "re-resizable";
+import { Resizable, ResizeCallback } from 're-resizable';
 import useChatSelector from '../../hooks/use-chat-selector';
-import { FEEDBACK_CONFIRMATION_TIMEOUT, CHAT_WINDOW_HEIGHT, CHAT_WINDOW_WIDTH } from '../../constants';
+import { FEEDBACK_CONFIRMATION_TIMEOUT, CHAT_WINDOW_HEIGHT, CHAT_WINDOW_WIDTH, CHAT_EVENTS } from '../../constants';
 import ChatContent from '../chat-content/chat-content';
 import ChatHeader from '../chat-header/chat-header';
 import ChatKeyPad from '../chat-keypad/chat-keypad';
@@ -11,16 +11,13 @@ import ConfirmationModal from '../confirmation-modal/confirmation-modal';
 import styles from './chat.module.scss';
 import { useAppDispatch, useAppSelector } from '../../store';
 import {
-  getEstimatedWaitingTime,
   getGreeting,
   setChatDimensions,
-  setEstimatedWaitingTimeToZero,
-  setIsFeedbackConfirmationShown
+  setIsFeedbackConfirmationShown,
 } from '../../slices/chat-slice';
 import WarningNotification from '../warning-notification/warning-notification';
 import ChatFeedback from '../chat-feedback/chat-feedback';
 import ChatFeedbackConfirmation from '../chat-feedback/chat-feedback-confirmation';
-import WaitingTimeNotification from '../waiting-time-notification/waiting-time-notification';
 import EndUserContacts from '../end-user-contacts/end-user-contacts';
 import WidgetDetails from '../chat-header/widget-details';
 import useAuthenticationSelector from '../../hooks/use-authentication-selector';
@@ -35,7 +32,7 @@ const RESIZABLE_HANDLES = {
   bottom: false,
   bottomLeft: false,
   left: true,
-}
+};
 
 const Chat = (): JSX.Element => {
   const dispatch = useAppDispatch();
@@ -47,31 +44,47 @@ const Chat = (): JSX.Element => {
   const { burokrattOnlineStatus } = useAppSelector((state) => state.widget);
 
   useEffect(() => {
-    if (feedback.isFeedbackRatingGiven && feedback.isFeedbackMessageGiven && !feedback.isFeedbackConfirmationShown) {
+    if (
+      feedback.isFeedbackRatingGiven &&
+      feedback.isFeedbackMessageGiven &&
+      !feedback.isFeedbackConfirmationShown
+    ) {
       setShowFeedbackResult(true);
       setTimeout(async () => {
         dispatch(setIsFeedbackConfirmationShown(true));
         setShowFeedbackResult(false);
       }, FEEDBACK_CONFIRMATION_TIMEOUT);
     }
-  }, [dispatch, feedback.isFeedbackConfirmationShown, feedback.isFeedbackMessageGiven, feedback.isFeedbackRatingGiven]);
+  }, [
+    dispatch,
+    feedback.isFeedbackConfirmationShown,
+    feedback.isFeedbackMessageGiven,
+    feedback.isFeedbackRatingGiven,
+  ]);
 
   useEffect(() => {
-    if (!chatId && !feedback.isFeedbackConfirmationShown && !messages.length) dispatch(getGreeting());
+    if (
+      !chatId &&
+      !feedback.isFeedbackConfirmationShown &&
+      (!messages.length || !messages.map((m) => m.event).includes(CHAT_EVENTS.GREETING))
+    ) {
+      dispatch(getGreeting());
+    }
   }, [dispatch, chatId, feedback.isFeedbackConfirmationShown, messages]);
 
-  useEffect(() => {
-    if (customerSupportId !== '') dispatch(setEstimatedWaitingTimeToZero());
-    else if (estimatedWaiting.time === 0) dispatch(getEstimatedWaitingTime());
-  }, [estimatedWaiting.time, dispatch, customerSupportId]);
 
-  const handleChatResize: ResizeCallback = (event, direction, elementRef, delta) => {
+  const handleChatResize: ResizeCallback = (
+    event,
+    direction,
+    elementRef,
+    delta
+  ) => {
     const newDimensions = {
       width: chatDimensions.width + delta.width,
-      height: chatDimensions.height + delta.height
-    }
+      height: chatDimensions.height + delta.height,
+    };
     dispatch(setChatDimensions(newDimensions));
-  }
+  };
 
   return (
     <div className={styles.chatWrapper}>
@@ -82,10 +95,17 @@ const Chat = (): JSX.Element => {
         enable={RESIZABLE_HANDLES}
         onResizeStop={handleChatResize}
       >
-        <motion.div className={`${styles.chat} ${isAuthenticated ? styles.authenticated : ''}`} style={{y: 400}}
-                    animate={{y: 0}}>
-          <ChatHeader isDetailSelected={showWidgetDetails}
-                      detailHandler={() => setShowWidgetDetails(!showWidgetDetails)}/>
+        <motion.div
+          className={`${styles.chat} ${
+            isAuthenticated ? styles.authenticated : ''
+          }`}
+          animate={{ y: 0 }}
+          style={{ y: 400 }}
+        >
+          <ChatHeader
+            isDetailSelected={showWidgetDetails}
+            detailHandler={() => setShowWidgetDetails(!showWidgetDetails)}
+          />
           {messageQueue.length >= 5 && <WarningNotification warningMessage={t('chat.error-message')}/>}
           {burokrattOnlineStatus !== true && <OnlineStatusNotification/>}
           {estimatedWaiting.time > 0 && estimatedWaiting.isActive && !showWidgetDetails && <WaitingTimeNotification/>}
@@ -93,13 +113,18 @@ const Chat = (): JSX.Element => {
           {!showWidgetDetails && showContactForm && <EndUserContacts/>}
           {!showWidgetDetails && !showContactForm && <ChatContent/>}
           {showFeedbackResult ? (
-            <ChatFeedbackConfirmation/>
+            <ChatFeedbackConfirmation />
           ) : (
             <>
-              {!showWidgetDetails && !showContactForm && !feedback.isFeedbackConfirmationShown && isChatEnded && chatId &&
-                  <ChatFeedback/>}
-              {!showWidgetDetails && !showContactForm && !feedback.isFeedbackConfirmationShown && <ChatKeyPad/>}
-              <ConfirmationModal/>
+              {!showWidgetDetails &&
+                !showContactForm &&
+                !feedback.isFeedbackConfirmationShown &&
+                isChatEnded &&
+                chatId && <ChatFeedback />}
+              {!showWidgetDetails &&
+                !showContactForm &&
+                !feedback.isFeedbackConfirmationShown && <ChatKeyPad />}
+              <ConfirmationModal />
             </>
           )}
         </motion.div>

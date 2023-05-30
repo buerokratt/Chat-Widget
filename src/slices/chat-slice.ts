@@ -1,14 +1,14 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Message } from '../model/message-model';
 import ChatService from '../services/chat-service';
-import { AUTHOR_ROLES, CHAT_EVENTS, CHAT_STATUS, ERROR_MESSAGE, SESSION_STORAGE_CHAT_ID_KEY, CHAT_WINDOW_HEIGHT, CHAT_WINDOW_WIDTH } from '../constants';
+import { AUTHOR_ROLES, CHAT_EVENTS, CHAT_STATUS, ERROR_MESSAGE, SESSION_STORAGE_CHAT_ID_KEY, CHAT_WINDOW_HEIGHT, CHAT_WINDOW_WIDTH, CHAT_BUBBLE_ANIMATION, CHAT_BUBBLE_COLOR, CHAT_BUBBLE_MESSAGE_DELAY_SECONDS, CHAT_BUBBLE_PROACTIVE_SECONDS, CHAT_SHOW_BUBBLE_MESSAGE } from '../constants';
 import { getFromSessionStorage, setToSessionStorage } from '../utils/session-storage-utils';
 import { Chat } from '../model/chat-model';
 import { clearStateVariablesFromSessionStorage, findMatchingMessageFromMessageList } from '../utils/state-management-utils';
 
 export interface EstimatedWaiting {
-  isActive: boolean;
-  time: number;
+  positionInUnassignedChats: string;
+  durationInSeconds: string;
 }
 
 export interface ChatState {
@@ -48,6 +48,12 @@ export interface ChatState {
     error: any;
     data:any;
   };
+  emergencyNotice: {
+    start: string;
+    end: string;
+    text: string;
+    isVisible: boolean;
+  } | null
 }
 
 const initialState: ChatState = {
@@ -68,8 +74,8 @@ const initialState: ChatState = {
   showContactForm: false,
   isChatRedirected: false,
   estimatedWaiting: {
-    isActive: false,
-    time: 0,
+    positionInUnassignedChats: '',
+    durationInSeconds: '',
   },
   loading: false,
   endUserContacts: {
@@ -90,6 +96,7 @@ const initialState: ChatState = {
     error: false,
     data: null,
   },
+  emergencyNotice: null
 };
 
 export const initChat = createAsyncThunk('chat/init', async (message: Message) =>
@@ -155,6 +162,8 @@ export const sendMessageWithNewEvent = createAsyncThunk('chat/sendMessageWithNew
 
 export const getGreeting = createAsyncThunk('chat/getGreeting', async () => ChatService.getGreeting());
 
+export const getEmergencyNotice = createAsyncThunk('chat/getEmergencyNotice', async () => ChatService.getEmergencyNotice());
+
 export const sendNewMessage = createAsyncThunk('chat/sendNewMessage', (message: Message) => ChatService.sendNewMessage(message));
 
 export const getEstimatedWaitingTime = createAsyncThunk('chat/getEstimatedWaitingTime', async () => ChatService.getEstimatedWaitingTime());
@@ -212,7 +221,7 @@ export const chatSlice = createSlice({
       state.feedback.isFeedbackConfirmationShown = action.payload;
     },
     setEstimatedWaitingTimeToZero: (state) => {
-      state.estimatedWaiting.time = 0;
+      state.estimatedWaiting.durationInSeconds = '';
     },
     setEmailAdress: (state, action) => {
       state.endUserContacts.mailAddress = action.payload;
@@ -293,6 +302,14 @@ export const chatSlice = createSlice({
         event: 'greeting',
         authorTimestamp: new Date().toISOString(),
       });
+    });
+    builder.addCase(getEmergencyNotice.fulfilled, (state, action) => {
+      state.emergencyNotice = {
+        start: action.payload.emergencyNoticeStartISO,
+        end: action.payload.emergencyNoticeEndISO,
+        text: action.payload.emergencyNoticeText,
+        isVisible: action.payload.isEmergencyNoticeVisible,
+      };
     });
     builder.addCase(endChat.fulfilled, (state) => {
       state.chatStatus = CHAT_STATUS.ENDED;

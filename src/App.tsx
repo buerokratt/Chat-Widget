@@ -1,29 +1,35 @@
 import React, { FC, useEffect, useLayoutEffect, useState } from 'react';
 import { getFromSessionStorage } from './utils/session-storage-utils';
 import { isOfficeHours } from './utils/office-hours-utils';
-import Chat from './components/chat/chat';
 import Profile from './components/profile/profile';
+import Chat from './components/chat/chat';
 import useChatSelector from './hooks/use-chat-selector';
 import useInterval from './hooks/use-interval';
 import {
   ONLINE_CHECK_INTERVAL,
   OFFICE_HOURS_INTERVAL_TIMEOUT,
-  SESSION_STORAGE_CHAT_ID_KEY,
   CHAT_STATUS,
+  SESSION_STORAGE_CHAT_ID_KEY,
   ONLINE_CHECK_INTERVAL_ACTIVE_CHAT,
 } from './constants';
-import { getChat, getChatMessages, setChatId } from './slices/chat-slice';
+import { getChat, getChatMessages, getEmergencyNotice, setChatId } from "./slices/chat-slice";
 import { useAppDispatch, useAppSelector } from './store';
 import useNewMessageNotification from './hooks/use-new-message-notification';
 import useAuthentication from './hooks/use-authentication';
 import useGetNewMessages from './hooks/use-get-new-messages';
 import useGetChat from './hooks/use-get-chat';
 import { burokrattOnlineStatusRequest } from './slices/widget-slice';
+import useWidgetSelector from "./hooks/use-widget-selector";
+import { getWidgetConfig } from "./slices/widget-slice";
+import useGetWidgetConfig from "./hooks/use-get-widget-config";
+import useGetEmergencyNotice from "./hooks/use-get-emergency-notice";
 
 declare global {
   interface Window {
     _env_: {
       RUUTER_API_URL: string;
+      RUUTER_2_API_URL: string;
+      ENVIRONMENT: "development"; // 'developement | production'
       TIM_AUTHENTICATION_URL: string;
       ORGANIZATION_NAME: string;
       TERMS_AND_CONDITIONS_LINK: string;
@@ -40,7 +46,8 @@ declare global {
 
 const App: FC = () => {
   const dispatch = useAppDispatch();
-  const { isChatOpen, messages, chatId } = useChatSelector();
+  const { isChatOpen, messages, chatId, emergencyNotice } = useChatSelector();
+  const { widgetConfig } = useWidgetSelector();
   const [displayWidget, setDisplayWidget] = useState(
     !!getFromSessionStorage(SESSION_STORAGE_CHAT_ID_KEY) || isOfficeHours()
   );
@@ -67,6 +74,8 @@ const App: FC = () => {
     OFFICE_HOURS_INTERVAL_TIMEOUT
   );
 
+  useGetWidgetConfig();
+  useGetEmergencyNotice();
   useAuthentication();
   useGetChat();
   useGetNewMessages();
@@ -85,10 +94,13 @@ const App: FC = () => {
       dispatch(getChat());
       dispatch(getChatMessages());
     }
-  }, [chatId, dispatch, messages]);
+    if (emergencyNotice === null) dispatch(getEmergencyNotice());
+    if (!widgetConfig.isLoaded) dispatch(getWidgetConfig());
+  }, [chatId, dispatch, messages, widgetConfig]);
 
   if (burokrattOnlineStatus !== true) return <></>;
-  if (displayWidget) return isChatOpen ? <Chat /> : <Profile />;
+  if (displayWidget && widgetConfig.isLoaded)
+    return isChatOpen ? <Chat /> : <Profile />;
   return <></>;
 };
 
