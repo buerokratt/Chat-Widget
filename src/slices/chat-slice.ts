@@ -46,7 +46,7 @@ export interface ChatState {
   downloadChat: {
     isLoading: boolean;
     error: any;
-    data:any;
+    data: any;
   };
 }
 
@@ -130,7 +130,7 @@ export const sendFeedbackMessage = createAsyncThunk('chat/sendFeedbackMessage', 
   ChatService.sendFeedbackMessage({ chatId, userFeedback: args.userInput });
 });
 
-export const endChat = createAsyncThunk('chat/endChat', async (_args, thunkApi) => {
+export const endChat = createAsyncThunk('chat/endChat', async (args: { event: CHAT_EVENTS }, thunkApi) => {
   const {
     chat: { chatStatus, chatId },
   } = thunkApi.getState() as { chat: ChatState };
@@ -139,10 +139,11 @@ export const endChat = createAsyncThunk('chat/endChat', async (_args, thunkApi) 
   return chatStatus === CHAT_STATUS.ENDED
     ? null
     : ChatService.endChat({
-        chatId,
-        authorTimestamp: new Date().toISOString(),
-        authorRole: AUTHOR_ROLES.END_USER,
-      });
+      chatId,
+      authorTimestamp: new Date().toISOString(),
+      authorRole: AUTHOR_ROLES.END_USER,
+      event: args.event.toUpperCase(),
+    });
 });
 
 export const sendMessageWithRating = createAsyncThunk('chat/sendMessageWithRating', async (message: Message) =>
@@ -323,7 +324,7 @@ export const chatSlice = createSlice({
       state.downloadChat.error = false;
       state.downloadChat.data = action.payload;
     });
-    builder.addCase(downloadChat.rejected, (state,action) => {
+    builder.addCase(downloadChat.rejected, (state, action) => {
       state.downloadChat.isLoading = false;
       state.downloadChat.error = action.error;
     });
