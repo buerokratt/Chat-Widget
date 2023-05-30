@@ -1,10 +1,12 @@
 import { UserContacts } from './../model/user-contacts-model';
 import http from './http-service';
+import http2 from "./http2-service";
 import { Message } from '../model/message-model';
 import { Chat } from '../model/chat-model';
 import { RUUTER_ENDPOINTS } from '../constants';
 import { EndUserTechnicalData } from '../model/chat-ini-model';
 import { EstimatedWaiting } from '../slices/chat-slice';
+import { EmergencyNoticeResponse } from '../model/emergency-notice-response-model';
 
 interface Document {
   _id: string;
@@ -50,6 +52,10 @@ class ChatService {
     return http.post(RUUTER_ENDPOINTS.GET_GREETING);
   }
 
+  getEmergencyNotice(): Promise<EmergencyNoticeResponse> {
+    return http2.get(RUUTER_ENDPOINTS.GET_EMERGENCY_NOTICE);
+  }
+
   sendNpmRating({ chatId, npmRating }: { chatId: string; npmRating: number }): Promise<void> {
     return http.post(RUUTER_ENDPOINTS.SEND_NPM_RATING, { chatId, feedbackRating: npmRating });
   }
@@ -74,6 +80,10 @@ class ChatService {
 
   generateForwardingRequest(): Promise<Chat[]> {
     return http.post(RUUTER_ENDPOINTS.GENERATE_FORWARDING_REQUEST);
+  }
+
+  generateDownloadChatRequest(): Promise<void> {
+    return http.get(RUUTER_ENDPOINTS.DOWNLOAD_CHAT)
   }
 
   sendUserContacts({chatId, endUserEmail, endUserPhone}:UserContacts  ): Promise<void>{

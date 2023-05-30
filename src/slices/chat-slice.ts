@@ -2,7 +2,7 @@ import { UserContacts } from './../model/user-contacts-model';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Message } from '../model/message-model';
 import ChatService from '../services/chat-service';
-import { AUTHOR_ROLES, CHAT_EVENTS, CHAT_STATUS, ERROR_MESSAGE, SESSION_STORAGE_CHAT_ID_KEY, CHAT_WINDOW_HEIGHT, CHAT_WINDOW_WIDTH } from '../constants';
+import { AUTHOR_ROLES, CHAT_EVENTS, CHAT_STATUS, ERROR_MESSAGE, SESSION_STORAGE_CHAT_ID_KEY, CHAT_WINDOW_HEIGHT, CHAT_WINDOW_WIDTH, CHAT_BUBBLE_ANIMATION, CHAT_BUBBLE_COLOR, CHAT_BUBBLE_MESSAGE_DELAY_SECONDS, CHAT_BUBBLE_PROACTIVE_SECONDS, CHAT_SHOW_BUBBLE_MESSAGE } from '../constants';
 import { getFromSessionStorage, setToSessionStorage } from '../utils/session-storage-utils';
 import { Chat } from '../model/chat-model';
 import { clearStateVariablesFromSessionStorage, findMatchingMessageFromMessageList } from '../utils/state-management-utils';
@@ -44,6 +44,17 @@ export interface ChatState {
     phoneNr: string;
     comment: string;
   };
+  downloadChat: {
+    isLoading: boolean;
+    error: any;
+    data:any;
+  };
+  emergencyNotice: {
+    start: string;
+    end: string;
+    text: string;
+    isVisible: boolean;
+  } | null
   contactForm: {
     data: UserContacts;
     state: {
@@ -89,6 +100,12 @@ const initialState: ChatState = {
     isFeedbackRatingGiven: false,
     showFeedbackWarning: false,
   },
+  downloadChat: {
+    isLoading: false,
+    error: false,
+    data: null,
+  },
+  emergencyNotice: null
   contactForm: {
     data: {
       chatId: null,
@@ -151,7 +168,6 @@ export const endChat = createAsyncThunk('chat/endChat', async (_args, thunkApi) 
     ? null
     : ChatService.endChat({
         chatId,
-        event: CHAT_EVENTS.CLIENT_LEFT,
         authorTimestamp: new Date().toISOString(),
         authorRole: AUTHOR_ROLES.END_USER,
       });
@@ -171,6 +187,8 @@ export const sendUserContacts = createAsyncThunk('chat/sendUserContacts', (args:
 
 export const getGreeting = createAsyncThunk('chat/getGreeting', async () => ChatService.getGreeting());
 
+export const getEmergencyNotice = createAsyncThunk('chat/getEmergencyNotice', async () => ChatService.getEmergencyNotice());
+
 export const sendNewMessage = createAsyncThunk('chat/sendNewMessage', (message: Message) => ChatService.sendNewMessage(message));
 
 export const getEstimatedWaitingTime = createAsyncThunk('chat/getEstimatedWaitingTime', async () => ChatService.getEstimatedWaitingTime());
@@ -178,6 +196,7 @@ export const getEstimatedWaitingTime = createAsyncThunk('chat/getEstimatedWaitin
 export const removeChatForwardingValue = createAsyncThunk('chat/removeChatForwardingValue', async () => ChatService.removeChatForwardingValue());
 
 export const generateForwardingRequest = createAsyncThunk('chat/generateForwardingRequest', async () => ChatService.generateForwardingRequest());
+export const downloadChat = createAsyncThunk('chat/downloadChat', async () => ChatService.generateDownloadChatRequest());
 
 export const chatSlice = createSlice({
   name: 'chat',
@@ -309,6 +328,14 @@ export const chatSlice = createSlice({
         authorTimestamp: new Date().toISOString(),
       });
     });
+    builder.addCase(getEmergencyNotice.fulfilled, (state, action) => {
+      state.emergencyNotice = {
+        start: action.payload.emergencyNoticeStartISO,
+        end: action.payload.emergencyNoticeEndISO,
+        text: action.payload.emergencyNoticeText,
+        isVisible: action.payload.isEmergencyNoticeVisible,
+      };
+    });
     builder.addCase(endChat.fulfilled, (state) => {
       state.chatStatus = CHAT_STATUS.ENDED;
       state.feedback.isFeedbackMessageGiven = false;
@@ -329,6 +356,18 @@ export const chatSlice = createSlice({
         state.chatId = action.payload[0].externalId;
         state.isChatRedirected = true;
       }
+    });
+    builder.addCase(downloadChat.pending, (state) => {
+      state.downloadChat.isLoading = true;
+    });
+    builder.addCase(downloadChat.fulfilled, (state, action) => {
+      state.downloadChat.isLoading = false;
+      state.downloadChat.error = false;
+      state.downloadChat.data = action.payload;
+    });
+    builder.addCase(downloadChat.rejected, (state,action) => {
+      state.downloadChat.isLoading = false;
+      state.downloadChat.error = action.error;
     });
 
     builder.addCase(sendUserContacts.pending, (state) => {

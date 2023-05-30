@@ -21,6 +21,11 @@ export const TERMS_AND_CONDITIONS_LINK =
 export const ERROR_MESSAGE = 'An error has occured';
 export const CHAT_WINDOW_WIDTH = 400;
 export const CHAT_WINDOW_HEIGHT = 460;
+export const CHAT_BUBBLE_PROACTIVE_SECONDS = 3;
+export const CHAT_SHOW_BUBBLE_MESSAGE = false;
+export const CHAT_BUBBLE_MESSAGE_DELAY_SECONDS = 5;
+export const CHAT_BUBBLE_COLOR = '#003CFF';
+export const CHAT_BUBBLE_ANIMATION = 'shockwave';
 
 export enum CHAT_STATUS {
   ENDED = 'ENDED',
@@ -31,6 +36,10 @@ export enum CHAT_EVENTS {
   ANSWERED = 'answered',
   TERMINATED = 'terminated',
   CLIENT_LEFT = 'client-left',
+  CLIENT_LEFT_WITH_ACCEPTED = 'client-left-with-accepted',
+  CLIENT_LEFT_WITH_NO_RESOLUTION = 'client-left-with-no-resolution',
+  CLIENT_LEFT_FOR_UNKNOWN_REASONS = 'client-left-for-unknown-reasons',
+  EMERGENCY_NOTICE = 'emergency-notice',
   GREETING = 'greeting',
   RATING = 'rating',
   REQUESTED_AUTHENTICATION = 'requested-authentication',
@@ -55,18 +64,23 @@ export enum AUTHOR_ROLES {
 export enum RUUTER_ENDPOINTS {
   INIT_CHAT = '/init-chat',
   GET_CHAT_BY_ID = '/get-chat-by-id',
+  GET_WIDGET_CONFIG = '/get-widget-config',
+  SEND_CONTACT_INFO = '/end-user-email-phone',
+  AUTHENTICATE_USER = '/end-user-id-name',
   GET_NEW_MESSAGES = '/get-new-messages',
   POST_MESSAGE = '/post-message',
   POST_NEW_RATING = '/post-message-with-rating',
   GET_MESSAGES_BY_CHAT_ID = '/get-messages-by-chat-id',
   END_CHAT = '/end-chat',
   GET_GREETING = '/get-greeting-message',
+  GET_EMERGENCY_NOTICE = '/get-emergency-notice',
   SEND_NPM_RATING = '/post-chat-feedback-rating',
   SEND_FEEDBACK_MESSAGE = '/post-chat-feedback-text',
   GET_WAITING_TIME = '/estimated-waiting-time',
   SEND_MESSAGE_WITH_NEW_EVENT = '/post-message-with-new-event',
   REMOVE_CHAT_FORWARDING_VALUE = '/remove-chat-forwarding-value',
   GENERATE_FORWARDING_REQUEST = '/origin-forward',
+  DOWNLOAD_CHAT = '/chat/download',
   SEND_USER_CONTACTS = '/end-user-email-phone'
 }
 
