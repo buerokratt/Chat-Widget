@@ -162,7 +162,7 @@ describe('Chat slice', () => {
     });
 
     // it('should add greeting message to messageList, when greeting is gotten', () => {
-    //   const action = { type: getGreeting.fulfilled.type, payload: { isActive: true, est: 'tere', eng: 'hello' } };
+    //   const action = { type: getGreeting.fulfilled.type, payload: { positionInUnassignedChats: true, est: 'tere', eng: 'hello' } };
     //   const state = reducer(initialChatState, action);
     //   expect(state).toEqual({
     //     ...initialChatState,
@@ -195,9 +195,9 @@ describe('Chat slice', () => {
     });
 
     it('should set estimatedWaitingTime when getEstimatedWaitingTime is fulfilled', () => {
-      const action = { type: getEstimatedWaitingTime.fulfilled.type, payload: { isActive: true, time: 37 } };
+      const action = { type: getEstimatedWaitingTime.fulfilled.type, payload: { positionInUnassignedChats: '1', durationInSeconds: '100' } };
       const state = reducer(initialChatState, action);
-      expect(state).toEqual({ ...initialChatState, estimatedWaiting: { isActive: true, time: 37 } });
+      expect(state).toEqual({ ...initialChatState, estimatedWaiting: { positionInUnassignedChats: '1', durationInSeconds: '100' } });
     });
   });
 
