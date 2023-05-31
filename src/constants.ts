@@ -30,7 +30,6 @@ export const CHAT_SHOW_BUBBLE_MESSAGE = false;
 export const CHAT_BUBBLE_MESSAGE_DELAY_SECONDS = 5;
 export const CHAT_BUBBLE_COLOR = '#003CFF';
 export const CHAT_BUBBLE_ANIMATION = 'shockwave';
-export const IDLE_CHAT_INTERVAL = 30 * 60;
 
 export enum CHAT_STATUS {
   ENDED = 'ENDED',
@@ -89,7 +88,7 @@ export enum RUUTER_ENDPOINTS {
   CUSTOM_JWT_EXTEND = '/custom-jwt-extend',
   CUSTOM_JWT_USERINFO = '/custom-jwt-userinfo',
   DOWNLOAD_CHAT = '/chat/download',
-  SEND_ATTACHMENT= '/attachments/add'
+  SEND_ATTACHMENT= '/attachments/add',
   SEND_USER_CONTACTS = '/end-user-email-phone'
 }
 

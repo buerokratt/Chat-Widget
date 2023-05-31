@@ -28,6 +28,7 @@ import useAuthenticationSelector from '../../hooks/use-authentication-selector';
 import OnlineStatusNotification from '../online-status-notification/online-status-notification';
 import IdleChatNotification from '../idle-chat-notification/idle-chat-notification';
 import getIdleTime from '../../utils/getIdleTime';
+import WaitingTimeNotification from '../waiting-time-notification/waiting-time-notification';
 
 const RESIZABLE_HANDLES = {
   topLeft: true,
