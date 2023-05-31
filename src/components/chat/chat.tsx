@@ -139,7 +139,8 @@ useLayoutEffect(() => {
           />
           {messageQueue.length >= 5 && <WarningNotification warningMessage={t('chat.error-message')}/>}
           {burokrattOnlineStatus !== true && <OnlineStatusNotification/>}
-          {estimatedWaiting.time > 0 && estimatedWaiting.isActive && !showWidgetDetails && <WaitingTimeNotification/>}
+          {/* TODO: Needs fix - commented out because it's broken */}
+          {/* {estimatedWaiting.time > 0 && estimatedWaiting.isActive && !showWidgetDetails && <WaitingTimeNotification/>} */}
           {showWidgetDetails && <WidgetDetails/>}
           {!showWidgetDetails && showContactForm && <EndUserContacts/>}
           {!showWidgetDetails && !showContactForm && <ChatContent/>}
