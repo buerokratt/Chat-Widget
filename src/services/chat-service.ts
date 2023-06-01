@@ -1,12 +1,26 @@
+import { UserContacts } from './../model/user-contacts-model';
 import http from './http-service';
-import { Message } from '../model/message-model';
+import http2 from "./http2-service";
+import { Attachment, Message } from '../model/message-model';
 import { Chat } from '../model/chat-model';
 import { RUUTER_ENDPOINTS } from '../constants';
 import { EndUserTechnicalData } from '../model/chat-ini-model';
 import { EstimatedWaiting } from '../slices/chat-slice';
+import { EmergencyNoticeResponse } from '../model/emergency-notice-response-model';
 
 interface Document {
   _id: string;
+}
+
+interface Response {
+  config: Record<any,any>,
+  data: {
+    response: Record<any,any>
+  },
+  headers: Record<any,any>,
+  request: Record<any,any>,
+  status: number,
+  statusText: string,
 }
 
 class ChatService {
@@ -38,6 +52,10 @@ class ChatService {
     return http.post(RUUTER_ENDPOINTS.GET_GREETING);
   }
 
+  getEmergencyNotice(): Promise<EmergencyNoticeResponse> {
+    return http2.get(RUUTER_ENDPOINTS.GET_EMERGENCY_NOTICE);
+  }
+
   sendNpmRating({ chatId, npmRating }: { chatId: string; npmRating: number }): Promise<void> {
     return http.post(RUUTER_ENDPOINTS.SEND_NPM_RATING, { chatId, feedbackRating: npmRating });
   }
@@ -46,8 +64,10 @@ class ChatService {
     return http.post(RUUTER_ENDPOINTS.SEND_FEEDBACK_MESSAGE, { chatId, feedbackText: userFeedback });
   }
 
-  getEstimatedWaitingTime(): Promise<EstimatedWaiting> {
-    return http.post(RUUTER_ENDPOINTS.GET_WAITING_TIME);
+  async getEstimatedWaitingTime(): Promise<any> { //TODO fix return type // Promise<Response>
+    const result = await http.post(RUUTER_ENDPOINTS.GET_WAITING_TIME);
+    //@ts-ignore 
+    return result.data.response;
   }
 
   sendMessageWithNewEvent(message: Message): Promise<void> {
@@ -64,6 +84,19 @@ class ChatService {
 
   generateDownloadChatRequest(): Promise<void> {
     return http.get(RUUTER_ENDPOINTS.DOWNLOAD_CHAT)
+  }
+
+  sendAttachment(attachment: Attachment): Promise<void> {
+    return http.post(RUUTER_ENDPOINTS.SEND_ATTACHMENT, attachment)
+  }
+
+  sendUserContacts({chatId, endUserEmail, endUserPhone}:UserContacts  ): Promise<void>{
+    return http.post(RUUTER_ENDPOINTS.SEND_USER_CONTACTS);
+  }
+
+  burokrattOnlineStatus(): Promise<boolean> {
+    return http.get(RUUTER_ENDPOINTS.BUROKRATT_ONLINE_STATUS);
+    // return http.get('https://cors-anywhere.herokuapp.com/dd7f1f96-2c1a-4f86-ad6c-793e84234937.mock.pstmn.io/healthz');
   }
 }
 

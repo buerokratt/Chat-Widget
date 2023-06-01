@@ -1,7 +1,7 @@
 import { ChatState } from './slices/chat-slice';
 import { AuthenticationState } from './slices/authentication-slice';
 import { Message } from './model/message-model';
-import { CHAT_STATUS, CHAT_WINDOW_WIDTH, CHAT_WINDOW_HEIGHT } from './constants';
+import { CHAT_STATUS, CHAT_WINDOW_WIDTH, CHAT_WINDOW_HEIGHT, CHAT_BUBBLE_ANIMATION, CHAT_BUBBLE_COLOR, CHAT_BUBBLE_MESSAGE_DELAY_SECONDS, CHAT_BUBBLE_PROACTIVE_SECONDS, CHAT_SHOW_BUBBLE_MESSAGE } from './constants';
 
 export const initialChatState: ChatState = {
   endUserContacts: {
@@ -27,8 +27,12 @@ export const initialChatState: ChatState = {
   lastReadMessageTimestamp: null,
   contactMsgId: '',
   estimatedWaiting: {
-    isActive: false,
-    time: 20,
+    positionInUnassignedChats: '',
+    durationInSeconds: '',
+  },
+  idleChat: {
+    isIdle: false,
+    lastActive: '',
   },
   loading: false,
   newMessagesAmount: 0,
@@ -43,6 +47,19 @@ export const initialChatState: ChatState = {
     error: false,
     data: null,
   },
+  emergencyNotice: null
+  contactForm: {
+    data: {
+      chatId: null,
+      endUserEmail: null,
+      endUserPhone: null,
+    },
+    state: {
+      isLoading: false,
+      isSubmitted: false,
+      isFailed: false,
+    }
+  }
 };
 
 export const initialAuthState: AuthenticationState = {
