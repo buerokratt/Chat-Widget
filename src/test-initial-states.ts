@@ -30,6 +30,10 @@ export const initialChatState: ChatState = {
     positionInUnassignedChats: '',
     durationInSeconds: '',
   },
+  idleChat: {
+    isIdle: false,
+    lastActive: '',
+  },
   loading: false,
   newMessagesAmount: 0,
   feedback: {
@@ -44,6 +48,18 @@ export const initialChatState: ChatState = {
     data: null,
   },
   emergencyNotice: null
+  contactForm: {
+    data: {
+      chatId: null,
+      endUserEmail: null,
+      endUserPhone: null,
+    },
+    state: {
+      isLoading: false,
+      isSubmitted: false,
+      isFailed: false,
+    }
+  }
 };
 
 export const initialAuthState: AuthenticationState = {

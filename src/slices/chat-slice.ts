@@ -1,5 +1,6 @@
+import { UserContacts } from './../model/user-contacts-model';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Message } from '../model/message-model';
+import { Attachment, Message, } from '../model/message-model';
 import ChatService from '../services/chat-service';
 import { AUTHOR_ROLES, CHAT_EVENTS, CHAT_STATUS, ERROR_MESSAGE, SESSION_STORAGE_CHAT_ID_KEY, CHAT_WINDOW_HEIGHT, CHAT_WINDOW_WIDTH, CHAT_BUBBLE_ANIMATION, CHAT_BUBBLE_COLOR, CHAT_BUBBLE_MESSAGE_DELAY_SECONDS, CHAT_BUBBLE_PROACTIVE_SECONDS, CHAT_SHOW_BUBBLE_MESSAGE } from '../constants';
 import { getFromSessionStorage, setToSessionStorage } from '../utils/session-storage-utils';
@@ -27,6 +28,10 @@ export interface ChatState {
   eventMessagesToHandle: Message[];
   errorMessage: string;
   estimatedWaiting: EstimatedWaiting;
+  idleChat: {
+    isIdle: boolean,
+    lastActive: string,
+  };
   loading: boolean;
   showContactForm: boolean;
   contactMsgId: string;
@@ -54,6 +59,14 @@ export interface ChatState {
     text: string;
     isVisible: boolean;
   } | null
+  contactForm: {
+    data: UserContacts;
+    state: {
+      isLoading: boolean,
+      isSubmitted: boolean,
+      isFailed: boolean,
+    }
+  }
 }
 
 const initialState: ChatState = {
@@ -77,6 +90,10 @@ const initialState: ChatState = {
     positionInUnassignedChats: '',
     durationInSeconds: '',
   },
+  idleChat: {
+    isIdle: false,
+    lastActive: '',
+  },
   loading: false,
   endUserContacts: {
     idCode: '',
@@ -97,6 +114,18 @@ const initialState: ChatState = {
     data: null,
   },
   emergencyNotice: null
+  contactForm: {
+    data: {
+      chatId: null,
+      endUserEmail: null,
+      endUserPhone: null,
+    },
+    state: {
+      isLoading: false,
+      isSubmitted: false,
+      isFailed: false,
+    }
+  }
 };
 
 export const initChat = createAsyncThunk('chat/init', async (message: Message) =>
@@ -161,6 +190,10 @@ export const sendMessageWithNewEvent = createAsyncThunk('chat/sendMessageWithNew
   ChatService.sendMessageWithNewEvent(message),
 );
 
+export const sendUserContacts = createAsyncThunk('chat/sendUserContacts', (args: UserContacts) => {
+  ChatService.sendUserContacts(args);
+})
+
 export const getGreeting = createAsyncThunk('chat/getGreeting', async () => ChatService.getGreeting());
 
 export const getEmergencyNotice = createAsyncThunk('chat/getEmergencyNotice', async () => ChatService.getEmergencyNotice());
@@ -173,6 +206,7 @@ export const removeChatForwardingValue = createAsyncThunk('chat/removeChatForwar
 
 export const generateForwardingRequest = createAsyncThunk('chat/generateForwardingRequest', async () => ChatService.generateForwardingRequest());
 export const downloadChat = createAsyncThunk('chat/downloadChat', async () => ChatService.generateDownloadChatRequest());
+export const sendAttachment = createAsyncThunk('chat/sendAttachment', async (attachment: Attachment) => ChatService.sendAttachment(attachment));
 
 export const chatSlice = createSlice({
   name: 'chat',
@@ -223,6 +257,12 @@ export const chatSlice = createSlice({
     },
     setEstimatedWaitingTimeToZero: (state) => {
       state.estimatedWaiting.durationInSeconds = '';
+    },
+    setIdleChat: (state, action) => {
+      state.idleChat = {
+        ...state.idleChat,
+        ...action.payload,
+      };
     },
     setEmailAdress: (state, action) => {
       state.endUserContacts.mailAddress = action.payload;
@@ -345,6 +385,19 @@ export const chatSlice = createSlice({
       state.downloadChat.isLoading = false;
       state.downloadChat.error = action.error;
     });
+
+    builder.addCase(sendUserContacts.pending, (state) => {
+      state.contactForm.state.isLoading = true;
+    })
+    builder.addCase(sendUserContacts.fulfilled, (state, action) => {
+      state.contactForm.state.isLoading = false;
+      state.contactForm.state.isSubmitted = true;
+    })
+    builder.addCase(sendUserContacts.rejected, (state, action) => {
+      state.contactForm.state.isLoading = false;
+      state.contactForm.state.isFailed = true;
+      state.contactForm.state.isSubmitted = false;
+    })
   },
 });
 
@@ -366,6 +419,7 @@ export const {
   setEmailAdress,
   setShowContactForm,
   setEstimatedWaitingTimeToZero,
+  setIdleChat,
   setChat,
   addMessagesToDisplay,
   handleStateChangingEventMessages,

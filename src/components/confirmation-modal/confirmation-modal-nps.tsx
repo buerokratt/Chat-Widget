@@ -27,7 +27,10 @@ const ConfirmationModalNps = ({ npsFeedback }: Props) => {
       <Stars onClick={(e) => setStars(e)} />
       <div className={styles.npsActions}>
         <Button
-          onClick={() => dispatch(endChat(endChatParams))}
+          onClick={() => {
+            dispatch(sendChatNpmRating({ NpmRating: stars }));
+            dispatch(endChat(endChatParams))
+          }}
           title={t('widget.action.skip')}
           color={ButtonColor.GRAY}
         >
