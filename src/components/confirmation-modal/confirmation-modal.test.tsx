@@ -47,4 +47,5 @@ describe('Confirmation modal component', () => {
     // expect(screen.getByRole('dialog')).toBeInTheDocument();
     // expect(screen.getByText('Kas soovite vestluse sulgeda?')).toBeInTheDocument();
   // });
+});
 

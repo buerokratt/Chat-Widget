@@ -113,7 +113,7 @@ const initialState: ChatState = {
     error: false,
     data: null,
   },
-  emergencyNotice: null
+  emergencyNotice: null,
   contactForm: {
     data: {
       chatId: null,
