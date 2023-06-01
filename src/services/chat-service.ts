@@ -36,6 +36,10 @@ class ChatService {
     return http.post(RUUTER_ENDPOINTS.POST_MESSAGE, message);
   }
 
+  sendMessagePreview({ chatId, content }: Message): Promise<void> {
+    return http.post(RUUTER_ENDPOINTS.POST_MESSAGE_PREVIEW, { chatId, content });
+  }
+
   getMessages(chatId: string): Promise<Message[]> {
     return http.post(RUUTER_ENDPOINTS.GET_MESSAGES_BY_CHAT_ID, { id: chatId });
   }
@@ -96,7 +100,6 @@ class ChatService {
 
   burokrattOnlineStatus(): Promise<boolean> {
     return http.get(RUUTER_ENDPOINTS.BUROKRATT_ONLINE_STATUS);
-    // return http.get('https://cors-anywhere.herokuapp.com/dd7f1f96-2c1a-4f86-ad6c-793e84234937.mock.pstmn.io/healthz');
   }
 }
 

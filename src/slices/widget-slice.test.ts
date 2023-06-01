@@ -21,9 +21,9 @@ describe('Widget slice', () => {
       showConfirmationModal: true,
       burokrattOnlineStatus: null,
     });
-  });
 
-  // it('should closeConfirmationModal', () => {
-  //   expect(reducer(initialState, closeConfirmationModal())).toEqual({ ...initialState, showConfirmationModal: false });
-  // });
+    // it('should closeConfirmationModal', () => {
+    //   expect(reducer(initialState, closeConfirmationModal())).toEqual({ ...initialState, showConfirmationModal: false });
+    // });
+  });
 });

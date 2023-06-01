@@ -22,6 +22,7 @@ export const TERMS_AND_CONDITIONS_LINK =
 export const ERROR_MESSAGE = 'An error has occured';
 export const CHAT_WINDOW_WIDTH = 400;
 export const CHAT_WINDOW_HEIGHT = 460;
+export const LOCAL_STORAGE_CHAT_DIMENSIONS_KEY = 'chat-dimensions';
 export const IDLE_CHAT_INTERVAL = 30 * 60;
 export const ONLINE_CHECK_INTERVAL = 30_000;
 export const ONLINE_CHECK_INTERVAL_ACTIVE_CHAT = 10_000;
@@ -30,6 +31,7 @@ export const CHAT_SHOW_BUBBLE_MESSAGE = false;
 export const CHAT_BUBBLE_MESSAGE_DELAY_SECONDS = 5;
 export const CHAT_BUBBLE_COLOR = '#003CFF';
 export const CHAT_BUBBLE_ANIMATION = 'shockwave';
+export const CHAT_INPUT_DEBOUNCE_TIMEOUT = 500;
 
 export enum CHAT_STATUS {
   ENDED = 'ENDED',
@@ -39,10 +41,10 @@ export enum CHAT_STATUS {
 export enum CHAT_EVENTS {
   ANSWERED = 'answered',
   TERMINATED = 'terminated',
-  CLIENT_LEFT = 'client-left',
-  CLIENT_LEFT_WITH_ACCEPTED = 'client-left-with-accepted',
-  CLIENT_LEFT_WITH_NO_RESOLUTION = 'client-left-with-no-resolution',
-  CLIENT_LEFT_FOR_UNKNOWN_REASONS = 'client-left-for-unknown-reasons',
+  CLIENT_LEFT = 'client_left',
+  CLIENT_LEFT_WITH_ACCEPTED = 'client_left_with_accepted',
+  CLIENT_LEFT_WITH_NO_RESOLUTION = 'client_left_with_no_resolution',
+  CLIENT_LEFT_FOR_UNKNOWN_REASONS = 'client_left_for_unknown_reasons',
   EMERGENCY_NOTICE = 'emergency-notice',
   GREETING = 'greeting',
   RATING = 'rating',
@@ -74,6 +76,7 @@ export enum RUUTER_ENDPOINTS {
   AUTHENTICATE_USER = '/end-user-id-name',
   GET_NEW_MESSAGES = '/get-new-messages',
   POST_MESSAGE = '/post-message',
+  POST_MESSAGE_PREVIEW = 'post-message-preview',
   POST_NEW_RATING = '/post-message-with-rating',
   GET_MESSAGES_BY_CHAT_ID = '/get-messages-by-chat-id',
   END_CHAT = '/end-chat',
@@ -89,7 +92,7 @@ export enum RUUTER_ENDPOINTS {
   CUSTOM_JWT_EXTEND = '/custom-jwt-extend',
   CUSTOM_JWT_USERINFO = '/custom-jwt-userinfo',
   DOWNLOAD_CHAT = '/chat/download',
-  SEND_ATTACHMENT= '/attachments/add',
+  SEND_ATTACHMENT = '/attachments/add',
   SEND_USER_CONTACTS = '/end-user-email-phone',
 }
 
