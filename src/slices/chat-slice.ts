@@ -336,7 +336,6 @@ export const chatSlice = createSlice({
     },
     handleStateChangingEventMessages: (state, action: PayloadAction<Message[]>) => {
       action.payload.forEach((msg) => {
-        console.log(msg.event)
         switch (msg.event) {
           case CHAT_EVENTS.ASK_PERMISSION_IGNORED:
             state.messages = state.messages.map((message) => (message.id === msg.id ? msg : message));
