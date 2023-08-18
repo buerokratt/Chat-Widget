@@ -120,6 +120,7 @@ const Chat = (): JSX.Element => {
       if (messages.length > 0) {
         const interval = setInterval(() => {
           let lastActive;
+
           if (idleChat.lastActive === "") {
             lastActive = messages[messages.length - 1].authorTimestamp;
           } else {
