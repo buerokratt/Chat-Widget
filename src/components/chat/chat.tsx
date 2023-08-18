@@ -18,6 +18,7 @@ import ConfirmationModal from "../confirmation-modal/confirmation-modal";
 import styles from "./chat.module.scss";
 import { useAppDispatch, useAppSelector } from "../../store";
 import {
+  resetChatState,
   endChat,
   getGreeting,
   sendNewMessage,
@@ -115,29 +116,41 @@ const Chat = (): JSX.Element => {
   };
 
   useLayoutEffect(() => {
-    if (messages.length > 0 && !isChatEnded) {
-      const interval = setInterval(() => {
-        let lastActive;
-        if (idleChat.lastActive === "") {
-          lastActive = messages[messages.length - 1].authorTimestamp;
-        } else {
-          lastActive = idleChat.lastActive;
-        }
-        const differenceInSeconds = getIdleTime(lastActive);
-        if (differenceInSeconds >= IDLE_CHAT_INTERVAL) {
-          dispatch(setIdleChat({ isIdle: true }));
-          if (showConfirmationModal) {
-            dispatch(
-              endChat({ event: CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS })
-            );
+    if (isChatEnded === false) {
+      if (messages.length > 0) {
+        const interval = setInterval(() => {
+          let lastActive;
+          if (idleChat.lastActive === "") {
+            lastActive = messages[messages.length - 1].authorTimestamp;
+          } else {
+            lastActive = idleChat.lastActive;
           }
-        }
-      }, 60 * 1000);
-      return () => {
-        clearInterval(interval);
-      };
+          const differenceInSeconds = getIdleTime(lastActive);
+          if (differenceInSeconds >= IDLE_CHAT_INTERVAL) {
+            dispatch(setIdleChat({ isIdle: true }));
+            if (showConfirmationModal) {
+              dispatch(
+                endChat({ event: CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS })
+              );
+            }
+          }
+        }, 60 * 1000);
+        return () => {
+          clearInterval(interval);
+        };
+      }
+    } else {
+      if (feedback.isFeedbackConfirmationShown) {
+        dispatch(resetChatState({ event: null }));
+      }
     }
-  }, [idleChat.isIdle, messages, showConfirmationModal]);
+  }, [
+    idleChat.isIdle,
+    messages,
+    showConfirmationModal,
+    isChatEnded,
+    feedback.isFeedbackConfirmationShown,
+  ]);
 
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
