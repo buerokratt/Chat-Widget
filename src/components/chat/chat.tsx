@@ -25,6 +25,7 @@ import {
   setChatDimensions,
   setIdleChat,
   setIsFeedbackConfirmationShown,
+  sendMessagePreview,
 } from "../../slices/chat-slice";
 import WarningNotification from "../warning-notification/warning-notification";
 import ChatFeedback from "../chat-feedback/chat-feedback";
@@ -194,10 +195,12 @@ const Chat = (): JSX.Element => {
         authorRole: AUTHOR_ROLES.END_USER,
         authorTimestamp: new Date().toISOString(),
         event: CHAT_EVENTS.MESSAGE_READ,
+        preview: "",
       };
       dispatch(sendNewMessage(message)).then((_) => {
         setSubmittingMessageRead(false);
       });
+      dispatch(sendMessagePreview(message));
     }
   }, [dispatch, messages]);
 
