@@ -21,6 +21,7 @@
   "notifications.idle-chat-notification": "Kas soovid vestlust jätkata?",
   "notifications.ask-contact-information": "Kas soovite jätta enda kontaktandmed, et klienditeenindaja saaks ise ühendust võtta?",
   "keypad.input.placeholder": "Kirjutage oma sõnum...",
+  "keypad.input.feedbackPlaceholder": "Sisestage oma tagasiside...",
   "keypad.button.label": "Saada",
   "keypad.input.label": "Sisesta tekst",
   "chatMessage.accept": "nõustun",
