@@ -200,7 +200,6 @@ const Chat = (): JSX.Element => {
       dispatch(sendNewMessage(message)).then((_) => {
         setSubmittingMessageRead(false);
       });
-      dispatch(sendMessagePreview(message));
     }
   }, [dispatch, messages]);
 
