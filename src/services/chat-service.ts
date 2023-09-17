@@ -7,6 +7,7 @@ import { RUUTER_ENDPOINTS } from '../constants';
 import { EndUserTechnicalData } from '../model/chat-ini-model';
 import { EstimatedWaiting } from '../slices/chat-slice';
 import { EmergencyNoticeResponse } from '../model/emergency-notice-response-model';
+import { OrganizationWorkingTimeResponse } from '../model/organization-working-time-model';
 
 interface Document {
   _id: string;
@@ -57,6 +58,18 @@ class ChatService {
   }
 
   getEmergencyNotice(): Promise<EmergencyNoticeResponse> {
+    return http2.get(RUUTER_ENDPOINTS.GET_EMERGENCY_NOTICE);
+  }
+
+  getAvailableCsas(): Promise<Array<Object>> {
+    return http2.get(RUUTER_ENDPOINTS.GET_AVAILABLE_CSAS);
+  }
+
+  getOrganizationWorkingTime(): Promise<OrganizationWorkingTimeResponse> {
+    return http2.get(RUUTER_ENDPOINTS.GET_ORGANIZATION_WORKING_TIME);
+  }
+
+  get(): Promise<EmergencyNoticeResponse> {
     return http2.get(RUUTER_ENDPOINTS.GET_EMERGENCY_NOTICE);
   }
 

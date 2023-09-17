@@ -2,6 +2,8 @@ import { UserContacts } from './../model/user-contacts-model';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Attachment, Message, } from '../model/message-model';
 import ChatService from '../services/chat-service';
+import Holidays from 'date-holidays';
+import { format } from 'date-fns';
 import { 
   AUTHOR_ROLES,
   CHAT_EVENTS,
@@ -16,7 +18,8 @@ import {
   CHAT_BUBBLE_MESSAGE_DELAY_SECONDS,
   CHAT_BUBBLE_PROACTIVE_SECONDS,
   CHAT_SHOW_BUBBLE_MESSAGE,
-  TERMINATE_STATUS
+  TERMINATE_STATUS,
+  CURRENT_COUNTRY
 } from '../constants';
 import { getFromSessionStorage, setToSessionStorage } from '../utils/session-storage-utils';
 import { Chat } from '../model/chat-model';
@@ -54,7 +57,9 @@ export interface ChatState {
   };
   loading: boolean;
   showContactForm: boolean;
+  availableCsas: number;
   contactMsgId: string;
+  isOrganizationAvaialble: boolean;
   isChatRedirected: boolean;
   feedback: {
     isFeedbackConfirmationShown: boolean;
@@ -102,6 +107,8 @@ const initialState: ChatState = {
   eventMessagesToHandle: [],
   errorMessage: '',
   showContactForm: false,
+  availableCsas: 0,
+  isOrganizationAvaialble: false,
   isChatRedirected: false,
   estimatedWaiting: {
     positionInUnassignedChats: '',
@@ -228,6 +235,10 @@ export const sendUserContacts = createAsyncThunk('chat/sendUserContacts', (args:
 })
 
 export const getGreeting = createAsyncThunk('chat/getGreeting', async () => ChatService.getGreeting());
+
+export const getAvailableCsas = createAsyncThunk('chat/getAvailableCsas', async () => ChatService.getAvailableCsas());
+
+export const getOrganizationWorkingTime = createAsyncThunk('chat/getOrganizationWorkingTime', async () => ChatService.getOrganizationWorkingTime());
 
 export const getEmergencyNotice = createAsyncThunk('chat/getEmergencyNotice', async () => ChatService.getEmergencyNotice());
 
@@ -404,6 +415,29 @@ export const chatSlice = createSlice({
       if (!action.payload) return;
       state.lastReadMessageTimestamp = new Date().toISOString();
       state.messages = action.payload;
+    });
+    builder.addCase(getAvailableCsas.fulfilled, (state, action) => {
+      if (!action.payload) return;
+      state.availableCsas = action.payload.length ?? 0;    
+    });
+    builder.addCase(getOrganizationWorkingTime.fulfilled, (state, action) => {
+      if (!action.payload) return;
+      console.log(action.payload)
+      // Check if today is within the avaiable weekdays
+      const organizationWorkingTimeWeekdays = action.payload.organizationWorkingTimeWeekdays;
+      const isTodayAvailable = organizationWorkingTimeWeekdays.includes(format(new Date(), 'EEEE').toLowerCase())
+
+      // Check if today is a holiday & if its allowed to work on holidays
+      const organizationWorkingTimeNationalHolidays = action.payload.organizationWorkingTimeNationalHolidays;
+      let isTodayAHoliday = false;
+      if (organizationWorkingTimeNationalHolidays === true) {
+         isTodayAHoliday = new Holidays(CURRENT_COUNTRY).isHoliday(format(new Date(), 'yyyy-MM-dd')) !== false;
+      }
+
+      // Check if the current time is still within the working time
+
+      console.log(isTodayAvailable)
+      console.log(isTodayAHoliday)      
     });
     builder.addCase(getGreeting.fulfilled, (state, action) => {
       if (!action.payload.isActive) return;
