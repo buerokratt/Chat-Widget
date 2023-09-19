@@ -422,22 +422,30 @@ export const chatSlice = createSlice({
     });
     builder.addCase(getOrganizationWorkingTime.fulfilled, (state, action) => {
       if (!action.payload) return;
-      console.log(action.payload)
+      const currentDate: Date = new Date();
+
       // Check if today is within the avaiable weekdays
       const organizationWorkingTimeWeekdays = action.payload.organizationWorkingTimeWeekdays;
-      const isTodayAvailable = organizationWorkingTimeWeekdays.includes(format(new Date(), 'EEEE').toLowerCase())
+      const isTodayAvailable = organizationWorkingTimeWeekdays.includes(format(currentDate, 'EEEE').toLowerCase())
 
       // Check if today is a holiday & if its allowed to work on holidays
-      const organizationWorkingTimeNationalHolidays = action.payload.organizationWorkingTimeNationalHolidays;
-      let isTodayAHoliday = false;
-      if (organizationWorkingTimeNationalHolidays === true) {
-         isTodayAHoliday = new Holidays(CURRENT_COUNTRY).isHoliday(format(new Date(), 'yyyy-MM-dd')) !== false;
+      let isHolidayAvailable = action.payload.organizationWorkingTimeNationalHolidays;
+      if (isHolidayAvailable != true) {
+         isHolidayAvailable = !(new Holidays(CURRENT_COUNTRY).isHoliday(format(currentDate, 'yyyy-MM-dd')) !== false);
       }
 
       // Check if the current time is still within the working time
+      let isWithinWorkingTime = false;
+      if (action.payload.organizationWorkingTimeStartISO && action.payload.organizationWorkingTimeEndISO) {
+          const currentTime = format(currentDate, 'HH:mm:ss');
+          const startTime = format(new Date(action.payload.organizationWorkingTimeStartISO), 'HH:mm:ss');
+          const endTime = format(new Date(action.payload.organizationWorkingTimeEndISO), 'HH:mm:ss');
+          if (currentTime >= startTime && currentTime <= endTime) {
+             isWithinWorkingTime = true;
+          }
+      }
 
-      console.log(isTodayAvailable)
-      console.log(isTodayAHoliday)      
+      state.isOrganizationAvaialble = isTodayAvailable && isHolidayAvailable && isWithinWorkingTime; 
     });
     builder.addCase(getGreeting.fulfilled, (state, action) => {
       if (!action.payload.isActive) return;
