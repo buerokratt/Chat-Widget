@@ -25,9 +25,6 @@ import {
   setChatDimensions,
   setIdleChat,
   setIsFeedbackConfirmationShown,
-  sendMessagePreview,
-  getAvailableCsas,
-  getOrganizationWorkingTime,
 } from "../../slices/chat-slice";
 import WarningNotification from "../warning-notification/warning-notification";
 import ChatFeedback from "../chat-feedback/chat-feedback";
@@ -102,8 +99,6 @@ const Chat = (): JSX.Element => {
         !messages.map((m) => m.event).includes(CHAT_EVENTS.GREETING))
     ) {
       dispatch(getGreeting());
-      dispatch(getAvailableCsas());
-      dispatch(getOrganizationWorkingTime());
     }
   }, [dispatch, chatId, feedback.isFeedbackConfirmationShown, messages]);
 
