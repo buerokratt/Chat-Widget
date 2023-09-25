@@ -61,14 +61,6 @@ class ChatService {
     return http2.get(RUUTER_ENDPOINTS.GET_EMERGENCY_NOTICE);
   }
 
-  getAvailableCsas(): Promise<Array<Object>> {
-    return http2.get(RUUTER_ENDPOINTS.GET_AVAILABLE_CSAS);
-  }
-
-  getOrganizationWorkingTime(): Promise<OrganizationWorkingTimeResponse> {
-    return http2.get(RUUTER_ENDPOINTS.GET_ORGANIZATION_WORKING_TIME);
-  }
-
   get(): Promise<EmergencyNoticeResponse> {
     return http2.get(RUUTER_ENDPOINTS.GET_EMERGENCY_NOTICE);
   }

@@ -19,8 +19,6 @@ export const initialChatState: ChatState = {
   customerSupportId: '1',
   isChatOpen: false,
   showContactForm: false,
-  availableCsas: 0,
-  isOrganizationAvaialble: false,
   isChatRedirected: false,
   messages: [],
   messageQueue: [],

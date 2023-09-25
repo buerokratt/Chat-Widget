@@ -57,9 +57,7 @@ export interface ChatState {
   };
   loading: boolean;
   showContactForm: boolean;
-  availableCsas: number;
   contactMsgId: string;
-  isOrganizationAvaialble: boolean;
   isChatRedirected: boolean;
   feedback: {
     isFeedbackConfirmationShown: boolean;
@@ -107,8 +105,6 @@ const initialState: ChatState = {
   eventMessagesToHandle: [],
   errorMessage: '',
   showContactForm: false,
-  availableCsas: 0,
-  isOrganizationAvaialble: false,
   isChatRedirected: false,
   estimatedWaiting: {
     positionInUnassignedChats: '',
@@ -235,10 +231,6 @@ export const sendUserContacts = createAsyncThunk('chat/sendUserContacts', (args:
 })
 
 export const getGreeting = createAsyncThunk('chat/getGreeting', async () => ChatService.getGreeting());
-
-export const getAvailableCsas = createAsyncThunk('chat/getAvailableCsas', async () => ChatService.getAvailableCsas());
-
-export const getOrganizationWorkingTime = createAsyncThunk('chat/getOrganizationWorkingTime', async () => ChatService.getOrganizationWorkingTime());
 
 export const getEmergencyNotice = createAsyncThunk('chat/getEmergencyNotice', async () => ChatService.getEmergencyNotice());
 
@@ -415,37 +407,6 @@ export const chatSlice = createSlice({
       if (!action.payload) return;
       state.lastReadMessageTimestamp = new Date().toISOString();
       state.messages = action.payload;
-    });
-    builder.addCase(getAvailableCsas.fulfilled, (state, action) => {
-      if (!action.payload) return;
-      state.availableCsas = action.payload.length ?? 0;    
-    });
-    builder.addCase(getOrganizationWorkingTime.fulfilled, (state, action) => {
-      if (!action.payload) return;
-      const currentDate: Date = new Date();
-
-      // Check if today is within the avaiable weekdays
-      const organizationWorkingTimeWeekdays = action.payload.organizationWorkingTimeWeekdays;
-      const isTodayAvailable = organizationWorkingTimeWeekdays.includes(format(currentDate, 'EEEE').toLowerCase())
-
-      // Check if today is a holiday & if its allowed to work on holidays
-      let isHolidayAvailable = action.payload.organizationWorkingTimeNationalHolidays;
-      if (isHolidayAvailable != true) {
-         isHolidayAvailable = !(new Holidays(CURRENT_COUNTRY).isHoliday(format(currentDate, 'yyyy-MM-dd')) !== false);
-      }
-
-      // Check if the current time is still within the working time
-      let isWithinWorkingTime = false;
-      if (action.payload.organizationWorkingTimeStartISO && action.payload.organizationWorkingTimeEndISO) {
-          const currentTime = format(currentDate, 'HH:mm:ss');
-          const startTime = format(new Date(action.payload.organizationWorkingTimeStartISO), 'HH:mm:ss');
-          const endTime = format(new Date(action.payload.organizationWorkingTimeEndISO), 'HH:mm:ss');
-          if (currentTime >= startTime && currentTime <= endTime) {
-             isWithinWorkingTime = true;
-          }
-      }
-
-      state.isOrganizationAvaialble = isTodayAvailable && isHolidayAvailable && isWithinWorkingTime; 
     });
     builder.addCase(getGreeting.fulfilled, (state, action) => {
       if (!action.payload.isActive) return;
