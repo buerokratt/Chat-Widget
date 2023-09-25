@@ -2,7 +2,6 @@ import { UserContacts } from './../model/user-contacts-model';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Attachment, Message, } from '../model/message-model';
 import ChatService from '../services/chat-service';
-import Holidays from 'date-holidays';
 import { format } from 'date-fns';
 import { 
   AUTHOR_ROLES,
@@ -19,7 +18,6 @@ import {
   CHAT_BUBBLE_PROACTIVE_SECONDS,
   CHAT_SHOW_BUBBLE_MESSAGE,
   TERMINATE_STATUS,
-  CURRENT_COUNTRY
 } from '../constants';
 import { getFromSessionStorage, setToSessionStorage } from '../utils/session-storage-utils';
 import { Chat } from '../model/chat-model';
@@ -29,6 +27,7 @@ import {
   getInitialChatDimensions 
 } from '../utils/state-management-utils';
 import { setToLocalStorage } from '../utils/local-storage-utils';
+import getHolidays from '../utils/holidays';
 
 export interface EstimatedWaiting {
   positionInUnassignedChats: string;
@@ -148,11 +147,13 @@ const initialState: ChatState = {
   }
 };
 
-export const initChat = createAsyncThunk('chat/init', async (message: Message) =>
-  ChatService.init(message, {
+export const initChat = createAsyncThunk('chat/init', async (message: Message) =>  {
+  const {holidays, holidayNames} = getHolidays();
+  return ChatService.init(message, {
     endUserUrl: window.location.href.toString(),
-    endUserOs: navigator.userAgent.toString(),
-  }),
+    endUserOs: navigator.userAgent.toString()
+  },holidays, holidayNames);
+ }
 );
 
 export const getChat = createAsyncThunk('chat/getChat', async (_args, thunkApi) => {
@@ -234,7 +235,11 @@ export const getGreeting = createAsyncThunk('chat/getGreeting', async () => Chat
 
 export const getEmergencyNotice = createAsyncThunk('chat/getEmergencyNotice', async () => ChatService.getEmergencyNotice());
 
-export const sendNewMessage = createAsyncThunk('chat/sendNewMessage', (message: Message) => ChatService.sendNewMessage(message));
+export const sendNewMessage = createAsyncThunk('chat/sendNewMessage', (message: Message) => {
+  const {holidays, holidayNames} = getHolidays();
+  return ChatService.sendNewMessage(message, holidays, holidayNames);
+});
+
 export const sendMessagePreview = createAsyncThunk('chat/post-message-preview', (message: Message) => ChatService.sendMessagePreview(message));
 
 export const getEstimatedWaitingTime = createAsyncThunk('chat/getEstimatedWaitingTime', async () => ChatService.getEstimatedWaitingTime());
