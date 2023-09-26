@@ -62,7 +62,12 @@ export enum CHAT_EVENTS {
   CONTACT_INFORMATION = 'contact-information',
   CONTACT_INFORMATION_FULFILLED = 'contact-information-fulfilled',
   CONTACT_INFORMATION_REJECTED = 'contact-information-rejected',
+  UNAVAILABLE_CONTACT_INFORMATION_FULFILLED = 'unavailable-contact-information-fulfilled',
+  CONTACT_INFORMATION_SKIPPED = 'contact-information-skipped',
   MESSAGE_READ = 'message-read',
+  UNAVAILABLE_ORGANIZATION = 'unavailable_organization',
+  UNAVAILABLE_CSAS = 'unavailable_csas',
+  UNAVAILABLE_HOLIDAY = 'unavailable_holiday'
 }
 
 export enum TERMINATE_STATUS {

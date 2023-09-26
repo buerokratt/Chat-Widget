@@ -56,7 +56,9 @@ export interface ChatState {
   };
   loading: boolean;
   showContactForm: boolean;
+  showUnavailableContactForm: boolean;
   contactMsgId: string;
+  contactContentMessage: string;
   isChatRedirected: boolean;
   feedback: {
     isFeedbackConfirmationShown: boolean;
@@ -104,6 +106,8 @@ const initialState: ChatState = {
   eventMessagesToHandle: [],
   errorMessage: '',
   showContactForm: false,
+  showUnavailableContactForm: false,
+  contactContentMessage: '',
   isChatRedirected: false,
   estimatedWaiting: {
     positionInUnassignedChats: '',
@@ -187,7 +191,7 @@ export const sendFeedbackMessage = createAsyncThunk('chat/sendFeedbackMessage', 
   ChatService.sendFeedbackMessage({ chatId, userFeedback: args.userInput });
 });
 
-export const endChat = createAsyncThunk('chat/endChat', async (args: { event: CHAT_EVENTS | null}, thunkApi) => {
+export const endChat = createAsyncThunk('chat/endChat', async (args: { event: CHAT_EVENTS | null, isUpperCase: boolean}, thunkApi) => {
   const {
     chat: { chatStatus, chatId },
   } = thunkApi.getState() as { chat: ChatState };
@@ -199,7 +203,7 @@ export const endChat = createAsyncThunk('chat/endChat', async (args: { event: CH
       chatId,
       authorTimestamp: new Date().toISOString(),
       authorRole: AUTHOR_ROLES.END_USER,
-      event: args.event?.toUpperCase(),
+      event: args.isUpperCase ? args.event?.toUpperCase() : args.event ?? '',
     });
 });
 
@@ -293,6 +297,9 @@ export const chatSlice = createSlice({
     setShowContactForm: (state, action: PayloadAction<boolean>) => {
       state.showContactForm = action.payload;
     },
+    setShowUnavailableContactForm: (state, action: PayloadAction<boolean>) => {
+      state.showUnavailableContactForm = action.payload;
+    },
     queueMessage: (state, action: PayloadAction<Message>) => {
       state.messageQueue.push(action.payload);
     },
@@ -352,6 +359,21 @@ export const chatSlice = createSlice({
             state.showContactForm = true;
             state.contactMsgId = msg.id || '';
             break;
+          case CHAT_EVENTS.UNAVAILABLE_ORGANIZATION:
+            state.showUnavailableContactForm = true;
+            state.contactMsgId = msg.id || '';
+            state.contactContentMessage = msg.content ?? '';
+            break;  
+          case CHAT_EVENTS.UNAVAILABLE_CSAS:
+            state.showUnavailableContactForm = true;
+            state.contactMsgId = msg.id || '';
+            state.contactContentMessage = msg.content ?? '';
+            break;
+          case CHAT_EVENTS.UNAVAILABLE_HOLIDAY:
+            state.showUnavailableContactForm = true;
+            state.contactMsgId = msg.id || '';
+            state.contactContentMessage = msg.content ?? '';
+            break;    
           case CHAT_EVENTS.ANSWERED:
             state.chatStatus = CHAT_STATUS.ENDED;
             clearStateVariablesFromSessionStorage();
@@ -496,6 +518,7 @@ export const {
   setIsFeedbackConfirmationShown,
   setEmailAdress,
   setShowContactForm,
+  setShowUnavailableContactForm,
   setEstimatedWaitingTimeToZero,
   setIdleChat,
   setChat,
