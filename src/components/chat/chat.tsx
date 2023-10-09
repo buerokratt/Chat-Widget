@@ -10,6 +10,7 @@ import {
   CHAT_EVENTS,
   IDLE_CHAT_INTERVAL,
   AUTHOR_ROLES,
+  IDLE_CHAT_CHOICES_INTERVAL,
 } from "../../constants";
 import ChatContent from "../chat-content/chat-content";
 import ChatHeader from "../chat-header/chat-header";
@@ -152,6 +153,41 @@ const Chat = (): JSX.Element => {
     messages,
     showConfirmationModal,
     isChatEnded,
+    feedback.isFeedbackConfirmationShown,
+  ]);
+
+  useLayoutEffect(() => {
+    if (isChatEnded === false) {
+      if (messages.length > 0) {
+          const interval = setInterval(() => {
+            let lastActive;
+
+            if (idleChat.lastActive === "") {
+              lastActive = messages[messages.length - 1].authorTimestamp;
+            } else {
+              lastActive = idleChat.lastActive;
+            }
+            const differenceInSeconds = getIdleTime(lastActive);
+            if (
+              differenceInSeconds >=
+              IDLE_CHAT_INTERVAL + IDLE_CHAT_CHOICES_INTERVAL
+            ) {
+              dispatch(
+                endChat({
+                  event: CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS,
+                  isUpperCase: true,
+                })
+              );
+            }
+          }, (IDLE_CHAT_CHOICES_INTERVAL) * 1000);
+          return () => {
+            clearInterval(interval);
+          };
+      }
+    }
+  }, [
+    idleChat.isIdle,
+    showConfirmationModal,
     feedback.isFeedbackConfirmationShown,
   ]);
 
