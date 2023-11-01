@@ -12,16 +12,16 @@ const useGetChat = (): void => {
 
   useEffect(() => {
     if (!chatId || isChatEnded) return undefined;
-    const onMessage = (data: Chat) => {
-      dispatch(setChat(data));
-    };
 
-    const events = sse(`${RUUTER_ENDPOINTS.GET_CHAT_BY_ID}?id=${chatId}`, onMessage);
+    const events = sse(
+      `${RUUTER_ENDPOINTS.GET_CHAT_BY_ID}?id=${chatId}`, 
+      (data: Chat) => dispatch(setChat(data))
+    );
 
     return () => {
       events.close();
     };
-    
+
   }, [dispatch, lastReadMessageTimestamp, chatId, isChatEnded, isChatRedirected]);
 };
 
