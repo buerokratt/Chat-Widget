@@ -65,10 +65,8 @@ const Chat = (): JSX.Element => {
     idleChat,
     showContactForm,
     showUnavailableContactForm,
-    customerSupportId,
     feedback,
     messages,
-    isChatOpen,
     chatDimensions,
   } = useChatSelector();
   const { burokrattOnlineStatus, showConfirmationModal } = useAppSelector(
