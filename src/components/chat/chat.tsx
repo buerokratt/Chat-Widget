@@ -68,6 +68,7 @@ const Chat = (): JSX.Element => {
     feedback,
     messages,
     chatDimensions,
+    chatMode,
   } = useChatSelector();
   const { burokrattOnlineStatus, showConfirmationModal } = useAppSelector(
     (state) => state.widget
@@ -289,7 +290,8 @@ const Chat = (): JSX.Element => {
               {!showWidgetDetails &&
                 !showContactForm &&
                 !showUnavailableContactForm &&
-                !feedback.isFeedbackConfirmationShown && <ChatKeyPad />}
+                !feedback.isFeedbackConfirmationShown &&
+                chatMode === 'free' && <ChatKeyPad />}
               <ConfirmationModal />
             </>
           )}

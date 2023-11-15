@@ -9,10 +9,11 @@ import styles from './chat-content.module.scss';
 import WaitingTimeNotification from '../waiting-time-notification/waiting-time-notification';
 import { useAppDispatch } from '../../store';
 import { getEstimatedWaitingTime, setEstimatedWaitingTimeToZero } from '../../slices/chat-slice';
+import ChatFlowMessage from '../chat-message/chat-flow-message';
 
 const ChatContent = (): JSX.Element => {
   const OSref = useRef<OverlayScrollbarsComponent>(null);
-  const { messages,estimatedWaiting,customerSupportId } = useChatSelector();
+  const { messages, estimatedWaiting, customerSupportId } = useChatSelector();
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -42,11 +43,16 @@ const ChatContent = (): JSX.Element => {
           }}
         >
           {/* TODO: Logic is incorrect, commented out until it gets fixed */}
-            {/* {~~estimatedWaiting.durationInSeconds > 0 &&
+          {/* {~~estimatedWaiting.durationInSeconds > 0 &&
             ~~estimatedWaiting.positionInUnassignedChats > 0 &&
              <WaitingTimeNotification />} */}
-          {messages.map((message) => (
-            <ChatMessage
+          {messages.map((message) => message.type === 'flow' ? (
+            <ChatFlowMessage 
+              message={message}
+              key={`${message.authorTimestamp}-${message.created}-${message.id}`}
+              />
+          ):(
+            <ChatMessage 
               message={message}
               key={`${message.authorTimestamp}-${message.created}-${message.id}`}
             />

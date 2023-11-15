@@ -90,7 +90,8 @@ export interface ChatState {
       isSubmitted: boolean,
       isFailed: boolean,
     }
-  }
+  },
+  chatMode: 'free' | 'flow',
 }
 
 const initialState: ChatState = {
@@ -148,7 +149,8 @@ const initialState: ChatState = {
       isSubmitted: false,
       isFailed: false,
     }
-  }
+  },
+  chatMode: 'free'
 };
 
 export const initChat = createAsyncThunk('chat/init', async (message: Message) =>  {
