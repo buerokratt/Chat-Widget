@@ -18,6 +18,7 @@ import {
   CHAT_BUBBLE_PROACTIVE_SECONDS,
   CHAT_SHOW_BUBBLE_MESSAGE,
   TERMINATE_STATUS,
+  CHAT_MODES,
 } from '../constants';
 import { getFromSessionStorage, setToSessionStorage } from '../utils/session-storage-utils';
 import { Chat } from '../model/chat-model';
@@ -91,7 +92,7 @@ export interface ChatState {
       isFailed: boolean,
     }
   },
-  chatMode: 'free' | 'flow',
+  chatMode: CHAT_MODES,
 }
 
 const initialState: ChatState = {
@@ -150,7 +151,7 @@ const initialState: ChatState = {
       isFailed: false,
     }
   },
-  chatMode: 'free'
+  chatMode: CHAT_MODES.FREE
 };
 
 export const initChat = createAsyncThunk('chat/init', async (message: Message) =>  {
@@ -351,10 +352,10 @@ export const chatSlice = createSlice({
       state.messages.push(...receivedMessages);
       setToSessionStorage('newMessagesAmount', state.newMessagesAmount);
 
-      if(state.chatMode !== 'flow') {
+      if(state.chatMode !== CHAT_MODES.FLOW) {
         const containsButtonEvents = receivedMessages.find((msg) => msg.event === CHAT_EVENTS.BUTTONS);
         if(containsButtonEvents){
-          state.chatMode = 'flow';
+          state.chatMode = CHAT_MODES.FLOW;
         }
       }
     },
@@ -419,15 +420,21 @@ export const chatSlice = createSlice({
             clearStateVariablesFromSessionStorage();
             state.chatStatus = CHAT_STATUS.ENDED;
             break;
+          case CHAT_EVENTS.SWITCH_TO_FLOW_MODE:
+            state.chatMode = CHAT_MODES.FLOW;
+            break;
+          case CHAT_EVENTS.SWITCH_TO_FREE_MODE:
+            state.chatMode = CHAT_MODES.FREE;
+            break;
           default:
         }
       });
     },
     switchToFlowMode: (state) => {
-      state.chatMode = 'flow';
+      state.chatMode = CHAT_MODES.FLOW;
     },
     switchToFreeMode: (state) => {
-      state.chatMode = 'free';
+      state.chatMode = CHAT_MODES.FREE;
     },
   },
   extraReducers: (builder) => {

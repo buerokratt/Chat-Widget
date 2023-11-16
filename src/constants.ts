@@ -36,6 +36,11 @@ export const CHAT_BUBBLE_ANIMATION = 'shockwave';
 export const CHAT_INPUT_DEBOUNCE_TIMEOUT = 500;
 export const CURRENT_COUNTRY = 'EE';
 
+export enum CHAT_MODES {
+  FLOW = 'flow',
+  FREE = 'free',
+}
+
 export enum CHAT_STATUS {
   ENDED = 'ENDED',
   OPEN = 'OPEN',
@@ -70,6 +75,8 @@ export enum CHAT_EVENTS {
   UNAVAILABLE_CSAS = 'unavailable_csas',
   UNAVAILABLE_HOLIDAY = 'unavailable_holiday',
   BUTTONS = 'buttons',
+  SWITCH_TO_FLOW_MODE = 'switch-to-flow-mode',
+  SWITCH_TO_FREE_MODE = 'switch-to-free-mode',
 }
 
 export enum TERMINATE_STATUS {

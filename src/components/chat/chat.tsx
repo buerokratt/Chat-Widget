@@ -11,6 +11,7 @@ import {
   IDLE_CHAT_INTERVAL,
   AUTHOR_ROLES,
   IDLE_CHAT_CHOICES_INTERVAL,
+  CHAT_MODES,
 } from "../../constants";
 import ChatContent from "../chat-content/chat-content";
 import ChatHeader from "../chat-header/chat-header";
@@ -291,7 +292,7 @@ const Chat = (): JSX.Element => {
                 !showContactForm &&
                 !showUnavailableContactForm &&
                 !feedback.isFeedbackConfirmationShown &&
-                chatMode === 'free' && <ChatKeyPad />}
+                chatMode === CHAT_MODES.FREE && <ChatKeyPad />}
               <ConfirmationModal />
             </>
           )}
