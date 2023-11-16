@@ -9,7 +9,6 @@ import styles from './chat-content.module.scss';
 import WaitingTimeNotification from '../waiting-time-notification/waiting-time-notification';
 import { useAppDispatch } from '../../store';
 import { getEstimatedWaitingTime, setEstimatedWaitingTimeToZero } from '../../slices/chat-slice';
-import ChatFlowMessage from '../chat-message/chat-flow-message';
 
 const ChatContent = (): JSX.Element => {
   const OSref = useRef<OverlayScrollbarsComponent>(null);
@@ -46,17 +45,11 @@ const ChatContent = (): JSX.Element => {
           {/* {~~estimatedWaiting.durationInSeconds > 0 &&
             ~~estimatedWaiting.positionInUnassignedChats > 0 &&
              <WaitingTimeNotification />} */}
-          {messages.map((message) => message.type === 'flow' ? (
-            <ChatFlowMessage 
-              message={message}
-              key={`${message.authorTimestamp}-${message.created}-${message.id}`}
-              />
-          ):(
-            <ChatMessage 
+          {messages.map((message) => <ChatMessage 
               message={message}
               key={`${message.authorTimestamp}-${message.created}-${message.id}`}
             />
-          ))}
+          )}
         </OverlayScrollbarsComponent>
       </div>
     </AnimatePresence>

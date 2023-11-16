@@ -350,6 +350,13 @@ export const chatSlice = createSlice({
       state.newMessagesAmount += receivedMessages.length;
       state.messages.push(...receivedMessages);
       setToSessionStorage('newMessagesAmount', state.newMessagesAmount);
+
+      if(state.chatMode !== 'flow') {
+        const containsButtonEvents = receivedMessages.find((msg) => msg.event === CHAT_EVENTS.BUTTONS);
+        if(containsButtonEvents){
+          state.chatMode = 'flow';
+        }
+      }
     },
     handleStateChangingEventMessages: (state, action: PayloadAction<Message[]>) => {
       action.payload.forEach((msg) => {
@@ -415,6 +422,12 @@ export const chatSlice = createSlice({
           default:
         }
       });
+    },
+    switchToFlowMode: (state) => {
+      state.chatMode = 'flow';
+    },
+    switchToFreeMode: (state) => {
+      state.chatMode = 'free';
     },
   },
   extraReducers: (builder) => {
@@ -526,6 +539,8 @@ export const {
   setChat,
   addMessagesToDisplay,
   handleStateChangingEventMessages,
+  switchToFlowMode,
+  switchToFreeMode,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

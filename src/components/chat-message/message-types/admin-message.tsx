@@ -17,6 +17,7 @@ import {
   updateMessage,
 } from "../../../slices/chat-slice";
 import { useAppDispatch } from "../../../store";
+import ChatButtonGroup from "./chat-button-group";
 
 const leftAnimation = {
   animate: { opacity: 1, x: 0 },
@@ -24,9 +25,8 @@ const leftAnimation = {
   transition: { duration: 0.25, delay: 0.25 },
 };
 
-const AdminMessage = (props: { message: Message }): JSX.Element => {
+const AdminMessage = ({ message }: { message: Message }): JSX.Element => {
   const dispatch = useAppDispatch();
-  const { message } = props;
 
   const setNewFeedbackRating = (newRating: string): void => {
     const updatedMessage = {
@@ -44,25 +44,38 @@ const AdminMessage = (props: { message: Message }): JSX.Element => {
       transition={leftAnimation.transition}
     >
       <div className={classNames(styles.message, styles.admin)}>
-        {CLIENT_NAME_ENABLED && (
-          <div className={styles.name}>{message.authorRole}</div>
-        )}
+        {
+          CLIENT_NAME_ENABLED &&
+          message.event !== CHAT_EVENTS.BUTTONS && (
+            <div className={styles.name}>{message.authorRole}</div>
+          )
+        }
         <div className={styles.main}>
-          <div className={styles.icon}>
-            {message.event === CHAT_EVENTS.EMERGENCY_NOTICE ? (
-              <div className={styles.emergency}>!</div>
-            ) : (
-              <img src={RobotIcon} alt="Robot icon" />
-            )}
-          </div>
-          <div
-            className={`${styles.content} ${
-              message.event === CHAT_EVENTS.EMERGENCY_NOTICE &&
-              styles.emergency_content
-            }`}
-          >
-            <Linkifier message={decodeURIComponent(message.content ?? "")} />
-          </div>
+          {
+            message.event !== CHAT_EVENTS.BUTTONS && (
+              <div className={styles.icon}>
+                {message.event === CHAT_EVENTS.EMERGENCY_NOTICE ? (
+                  <div className={styles.emergency}>!</div>
+                ) : (
+                  <img src={RobotIcon} alt="Robot icon" />
+                )}
+              </div>
+            )
+          }
+          {
+              message.event === CHAT_EVENTS.BUTTONS
+                ? <ChatButtonGroup content={decodeURIComponent(message.content ?? "")} />
+                : (
+                  <div
+                    className={`${styles.content} ${
+                      message.event === CHAT_EVENTS.EMERGENCY_NOTICE &&
+                      styles.emergency_content
+                    }`}
+                  >
+                    <Linkifier message={decodeURIComponent(message.content ?? "")} />
+                  </div>
+                )
+          }
           <div
             className={classNames(
               styles.feedback,
@@ -73,7 +86,7 @@ const AdminMessage = (props: { message: Message }): JSX.Element => {
                 : styles.row
             )}
           >
-            {![CHAT_EVENTS.GREETING, CHAT_EVENTS.EMERGENCY_NOTICE].includes(
+            {![CHAT_EVENTS.GREETING, CHAT_EVENTS.EMERGENCY_NOTICE, CHAT_EVENTS.BUTTONS].includes(
               message.event as CHAT_EVENTS
             ) && (
               <div>

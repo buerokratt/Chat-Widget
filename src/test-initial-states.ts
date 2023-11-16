@@ -61,7 +61,8 @@ export const initialChatState: ChatState = {
       isSubmitted: false,
       isFailed: false,
     }
-  }
+  },
+  chatMode: 'free',
 };
 
 export const initialAuthState: AuthenticationState = {
