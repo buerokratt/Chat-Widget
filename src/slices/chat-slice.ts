@@ -352,12 +352,8 @@ export const chatSlice = createSlice({
       state.messages.push(...receivedMessages);
       setToSessionStorage('newMessagesAmount', state.newMessagesAmount);
 
-      if(state.chatMode !== CHAT_MODES.FLOW) {
-        const containsButtonEvents = receivedMessages.find((msg) => msg.event === CHAT_EVENTS.BUTTONS);
-        if(containsButtonEvents){
-          state.chatMode = CHAT_MODES.FLOW;
-        }
-      }
+      state.chatMode = receivedMessages[receivedMessages.length - 1]?.buttons
+        ? CHAT_MODES.FLOW : CHAT_MODES.FREE;
     },
     handleStateChangingEventMessages: (state, action: PayloadAction<Message[]>) => {
       action.payload.forEach((msg) => {
@@ -420,21 +416,9 @@ export const chatSlice = createSlice({
             clearStateVariablesFromSessionStorage();
             state.chatStatus = CHAT_STATUS.ENDED;
             break;
-          case CHAT_EVENTS.SWITCH_TO_FLOW_MODE:
-            state.chatMode = CHAT_MODES.FLOW;
-            break;
-          case CHAT_EVENTS.SWITCH_TO_FREE_MODE:
-            state.chatMode = CHAT_MODES.FREE;
-            break;
           default:
         }
       });
-    },
-    switchToFlowMode: (state) => {
-      state.chatMode = CHAT_MODES.FLOW;
-    },
-    switchToFreeMode: (state) => {
-      state.chatMode = CHAT_MODES.FREE;
     },
   },
   extraReducers: (builder) => {
@@ -546,8 +530,6 @@ export const {
   setChat,
   addMessagesToDisplay,
   handleStateChangingEventMessages,
-  switchToFlowMode,
-  switchToFreeMode,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

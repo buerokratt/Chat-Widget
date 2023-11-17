@@ -45,37 +45,26 @@ const AdminMessage = ({ message }: { message: Message }): JSX.Element => {
     >
       <div className={classNames(styles.message, styles.admin)}>
         {
-          CLIENT_NAME_ENABLED &&
-          message.event !== CHAT_EVENTS.BUTTONS && (
+          CLIENT_NAME_ENABLED && (
             <div className={styles.name}>{message.authorRole}</div>
           )
         }
         <div className={styles.main}>
-          {
-            message.event !== CHAT_EVENTS.BUTTONS && (
-              <div className={styles.icon}>
-                {message.event === CHAT_EVENTS.EMERGENCY_NOTICE ? (
-                  <div className={styles.emergency}>!</div>
-                ) : (
-                  <img src={RobotIcon} alt="Robot icon" />
-                )}
-              </div>
-            )
-          }
-          {
-              message.event === CHAT_EVENTS.BUTTONS
-                ? <ChatButtonGroup content={decodeURIComponent(message.content ?? "")} />
-                : (
-                  <div
-                    className={`${styles.content} ${
-                      message.event === CHAT_EVENTS.EMERGENCY_NOTICE &&
-                      styles.emergency_content
-                    }`}
-                  >
-                    <Linkifier message={decodeURIComponent(message.content ?? "")} />
-                  </div>
-                )
-          }
+          <div className={styles.icon}>
+            {message.event === CHAT_EVENTS.EMERGENCY_NOTICE ? (
+              <div className={styles.emergency}>!</div>
+            ) : (
+              <img src={RobotIcon} alt="Robot icon" />
+            )}
+          </div>
+          <div
+            className={`${styles.content} ${
+              message.event === CHAT_EVENTS.EMERGENCY_NOTICE &&
+              styles.emergency_content
+            }`}
+          >
+            <Linkifier message={decodeURIComponent(message.content ?? "")} />
+          </div>
           <div
             className={classNames(
               styles.feedback,
@@ -86,7 +75,7 @@ const AdminMessage = ({ message }: { message: Message }): JSX.Element => {
                 : styles.row
             )}
           >
-            {![CHAT_EVENTS.GREETING, CHAT_EVENTS.EMERGENCY_NOTICE, CHAT_EVENTS.BUTTONS].includes(
+            {![CHAT_EVENTS.GREETING, CHAT_EVENTS.EMERGENCY_NOTICE].includes(
               message.event as CHAT_EVENTS
             ) && (
               <div>
@@ -124,6 +113,7 @@ const AdminMessage = ({ message }: { message: Message }): JSX.Element => {
             )}
           </div>
         </div>
+        {message.buttons && <ChatButtonGroup message={message} />}
       </div>
     </motion.div>
   );

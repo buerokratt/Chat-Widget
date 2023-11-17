@@ -1,26 +1,34 @@
 
 import React, { useMemo, useState } from 'react';
 import { Message } from '../../../model/message-model';
-import { AUTHOR_ROLES } from '../../../constants';
+import { AUTHOR_ROLES, CHAT_MODES } from '../../../constants';
 import { useAppDispatch } from '../../../store';
 import { addMessage, initChat, queueMessage, sendNewMessage } from '../../../slices/chat-slice';
 import useChatSelector from '../../../hooks/use-chat-selector';
 import styles from '../chat-message.module.scss';
 
-const ChatButtonGroup = ({ content }: { content: string }): JSX.Element => {
-  const dispatch = useAppDispatch();
-  const { chatId, loading } = useChatSelector();
-  const [used, setUsed] = useState(false);
+type MessageButton = {
+  title: string;
+  payload: string;
+}
 
-  if(!content)
-    return <></>;
+const ChatButtonGroup = ({ message }: { message: Message }): JSX.Element => {
+  const dispatch = useAppDispatch();
+  const { chatId, loading, chatMode, messages } = useChatSelector();
   
-  const buttons = useMemo(() => JSON.parse(content), [content]);
+  const parsedButtons: MessageButton[] = useMemo(() => {
+    try {
+      return JSON.parse(decodeURIComponent(message.buttons!)) as MessageButton[];
+    } catch(e) {
+      console.error(e);
+      return [];
+    }
+  }, [message.buttons]);
   
-  const addNewMessageToState = (userInput: string): void => {
+  const addNewMessageToState = (buttonPayload: string): void => {
     const message: Message = {
       chatId,
-      content: encodeURIComponent(userInput),
+      content: encodeURIComponent(buttonPayload),
       authorTimestamp: new Date().toISOString(),
       authorRole: AUTHOR_ROLES.END_USER,
     };
@@ -36,20 +44,21 @@ const ChatButtonGroup = ({ content }: { content: string }): JSX.Element => {
     if (chatId) {
       dispatch(sendNewMessage(message));
     }
-
-    setUsed(true);
   }
 
+  const enabled = messages[messages.length - 1] === message && chatMode === CHAT_MODES.FLOW;
+
+
   return (
-    <div>
-      {buttons?.map((button: string) => (
+    <div className={styles.buttonsRow}>
+      {parsedButtons?.map(({ title, payload }) => (
         <button
           type="button"
-          className={`${styles['action-button']}`}
-          onClick={() => addNewMessageToState(button)}
-          disabled={used}
+          className={styles['action-button']}
+          onClick={() => addNewMessageToState(payload)}
+          disabled={!enabled}
         >
-          {button}
+          {title}
         </button>
       ))}
     </div>

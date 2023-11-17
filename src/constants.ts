@@ -73,10 +73,7 @@ export enum CHAT_EVENTS {
   MESSAGE_READ = 'message-read',
   UNAVAILABLE_ORGANIZATION = 'unavailable_organization',
   UNAVAILABLE_CSAS = 'unavailable_csas',
-  UNAVAILABLE_HOLIDAY = 'unavailable_holiday',
-  BUTTONS = 'buttons',
-  SWITCH_TO_FLOW_MODE = 'switch-to-flow-mode',
-  SWITCH_TO_FREE_MODE = 'switch-to-free-mode',
+  UNAVAILABLE_HOLIDAY = 'unavailable_holiday'
 }
 
 export enum TERMINATE_STATUS {
