@@ -134,7 +134,10 @@ const Chat = (): JSX.Element => {
             dispatch(setIdleChat({ isIdle: true }));
             if (showConfirmationModal) {
               dispatch(
-                endChat({ event: CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS, isUpperCase: true})
+                endChat({
+                  event: CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS,
+                  isUpperCase: true,
+                })
               );
             }
           }
@@ -159,30 +162,30 @@ const Chat = (): JSX.Element => {
   useLayoutEffect(() => {
     if (isChatEnded === false) {
       if (messages.length > 0) {
-          const interval = setInterval(() => {
-            let lastActive;
+        const interval = setInterval(() => {
+          let lastActive;
 
-            if (idleChat.lastActive === "") {
-              lastActive = messages[messages.length - 1].authorTimestamp;
-            } else {
-              lastActive = idleChat.lastActive;
-            }
-            const differenceInSeconds = getIdleTime(lastActive);
-            if (
-              differenceInSeconds >=
-              IDLE_CHAT_INTERVAL + IDLE_CHAT_CHOICES_INTERVAL
-            ) {
-              dispatch(
-                endChat({
-                  event: CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS,
-                  isUpperCase: true,
-                })
-              );
-            }
-          }, (IDLE_CHAT_CHOICES_INTERVAL) * 1000);
-          return () => {
-            clearInterval(interval);
-          };
+          if (idleChat.lastActive === "") {
+            lastActive = messages[messages.length - 1].authorTimestamp;
+          } else {
+            lastActive = idleChat.lastActive;
+          }
+          const differenceInSeconds = getIdleTime(lastActive);
+          if (
+            differenceInSeconds >=
+            IDLE_CHAT_INTERVAL + IDLE_CHAT_CHOICES_INTERVAL
+          ) {
+            dispatch(
+              endChat({
+                event: CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS,
+                isUpperCase: true,
+              })
+            );
+          }
+        }, IDLE_CHAT_CHOICES_INTERVAL * 1000);
+        return () => {
+          clearInterval(interval);
+        };
       }
     }
   }, [
@@ -193,16 +196,19 @@ const Chat = (): JSX.Element => {
 
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (chatId) {
+      if (chatId && !isTaraAuthentication()) {
         dispatch(
-          endChat({ event: CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS, isUpperCase: true })
+          endChat({
+            event: CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS,
+            isUpperCase: true,
+          })
         );
       }
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "F5" || (event.ctrlKey && event.key === "r")) {
-        if (chatId) {
+        if (chatId && !isTaraAuthentication()) {
           dispatch(
             endChat({
               event: CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS,
@@ -212,6 +218,9 @@ const Chat = (): JSX.Element => {
         }
       }
     };
+
+    const isTaraAuthentication = () =>
+      window.location.href.includes(window._env_.TIM_AUTHENTICATION_URL);
 
     window.addEventListener("beforeunload", handleBeforeUnload);
     window.addEventListener("keydown", handleKeyDown);

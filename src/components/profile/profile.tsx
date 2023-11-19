@@ -49,7 +49,7 @@ export const Profile = (): JSX.Element => {
 
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (chatId) {
+      if (chatId && !isTaraAuthentication()) {
         dispatch(
           endChat({
             event: CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS,
@@ -61,7 +61,7 @@ export const Profile = (): JSX.Element => {
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "F5" || (event.ctrlKey && event.key === "r")) {
-        if (chatId) {
+        if (chatId && !isTaraAuthentication()) {
           dispatch(
             endChat({
               event: CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS,
@@ -71,6 +71,9 @@ export const Profile = (): JSX.Element => {
         }
       }
     };
+
+    const isTaraAuthentication = () =>
+      window.location.href.includes(window._env_.TIM_AUTHENTICATION_URL);
 
     window.addEventListener("beforeunload", handleBeforeUnload);
     window.addEventListener("keydown", handleKeyDown);
