@@ -77,7 +77,7 @@ const AdminMessage = ({ message }: { message: Message }): JSX.Element => {
           >
             {![CHAT_EVENTS.GREETING, CHAT_EVENTS.EMERGENCY_NOTICE].includes(
               message.event as CHAT_EVENTS
-            ) && (
+            ) && !message.buttons && (
               <div>
                 <button
                   type="button"
