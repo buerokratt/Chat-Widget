@@ -353,7 +353,7 @@ export const chatSlice = createSlice({
       state.messages.push(...receivedMessages);
       setToSessionStorage('newMessagesAmount', state.newMessagesAmount);
 
-      state.chatMode = getChatModeBasedOnLastMessage(receivedMessages);
+      state.chatMode = getChatModeBasedOnLastMessage(state.messages);
     },
     handleStateChangingEventMessages: (state, action: PayloadAction<Message[]>) => {
       action.payload.forEach((msg) => {
