@@ -15,11 +15,11 @@ const useAuthentication = (): void => {
       window.location.href = window.location.origin + redirectPath;
     }
     if (!isAuthenticated || loggedInWithTaraJwt) dispatch(getUserinfo());
-  }, [isAuthenticated, loggedInWithTaraJwt, dispatch]);
+  }, [isAuthenticated, loggedInWithTaraJwt]);
 
   useEffect(() => {
     if (!isAuthenticated && !fetchingUserInfo) dispatch(loginWithTaraJwt());
-  }, [fetchingUserInfo, dispatch, isAuthenticated]);
+  }, [isAuthenticated, fetchingUserInfo]);
 };
 
 export default useAuthentication;

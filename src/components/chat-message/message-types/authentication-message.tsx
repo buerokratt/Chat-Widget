@@ -23,15 +23,6 @@ const AuthenticationMessage = (): JSX.Element => {
     window.location.assign(window._env_.TIM_AUTHENTICATION_URL);
   };
 
-  const testUserAuthentication = () => {
-    WidgetService.authenticateUser(
-      chatId ?? "",
-      Date.now().toString(10),
-      "Test",
-      "User"
-    );
-  };
-
   return (
     <>
       <div className="authenticationbox-explanation-text">
@@ -51,19 +42,6 @@ const AuthenticationMessage = (): JSX.Element => {
           <span>{t("notifications.authenticate.needs-authentication")}</span>
         )}
       </button>
-
-      {window._env_.ENVIRONMENT === "development" && (
-        <button
-          disabled={isChatEnded || isAuthenticated}
-          onClick={() => testUserAuthentication()}
-          type="button"
-          className={`${styles["event-button"]} ${
-            isAuthenticated ? styles.authenticated : ""
-          }`}
-        >
-          {"Test"}
-        </button>
-      )}
     </>
   );
 };
