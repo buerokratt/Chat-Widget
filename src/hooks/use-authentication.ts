@@ -10,15 +10,20 @@ const useAuthentication = (): void => {
 
   useEffect(() => {
     const redirectPath = sessionStorage.getItem(SESSION_STORAGE_TARA_LOGIN_REDIRECT);
-    if (redirectPath && redirectPath !== '') {
+    if (!!redirectPath) {
       sessionStorage.removeItem(SESSION_STORAGE_TARA_LOGIN_REDIRECT);
       window.location.href = window.location.origin + redirectPath;
     }
-    if (!isAuthenticated || loggedInWithTaraJwt) dispatch(getUserinfo());
+    
+    if (!isAuthenticated || loggedInWithTaraJwt) {
+      dispatch(getUserinfo());
+    }
   }, [isAuthenticated, loggedInWithTaraJwt]);
 
   useEffect(() => {
-    if (!isAuthenticated && !fetchingUserInfo) dispatch(loginWithTaraJwt());
+    if (!isAuthenticated && !fetchingUserInfo) {
+      dispatch(loginWithTaraJwt());
+    }
   }, [isAuthenticated, fetchingUserInfo]);
 };
 

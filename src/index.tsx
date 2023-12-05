@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import App from './App';
 import { store } from './store';
-import AuthCallback from './Auth';
+import AuthCallback from './AuthCallback';
 import './i18n';
 import './index.scss';
 
@@ -12,8 +12,8 @@ ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter>
       <Routes>
-        <Route path="/auth/callback" Component={AuthCallback} />
-        <Route index Component={App} />
+        <Route path='/' Component={App} />
+        <Route path='/auth/callback' Component={AuthCallback} />
       </Routes>
     </BrowserRouter>
   </Provider>,

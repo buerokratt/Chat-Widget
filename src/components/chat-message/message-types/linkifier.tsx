@@ -5,7 +5,7 @@ interface LinkifierProps {
   message: string | undefined;
 }
 
-const regex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
+const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
 
 const Linkifier: React.FC<LinkifierProps> = ({ message }) => (
   <div>
@@ -14,7 +14,7 @@ const Linkifier: React.FC<LinkifierProps> = ({ message }) => (
         attributes: { target: '_blank' },
         defaultProtocol: 'https',
         validate: {
-          url: (value: string) => regex.test(value),
+          url: (value: string) => URL_REGEX.test(value),
           email: false,
         },
       }}
