@@ -16,7 +16,7 @@ export const Profile = (): JSX.Element => {
   const { widgetConfig } = useWidgetSelector();
   const [delayFinished, setDelayFinished] = useState(false);
   const newMessagesAmount = getFromSessionStorage("newMessagesAmount");
-  const { isChatEnded, messages, isChatOpen, chatId } = useChatSelector();
+  const { chatId } = useChatSelector();
 
   const openChat = () => {
     dispatch(setIsChatOpen(true));

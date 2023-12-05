@@ -1,14 +1,9 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import {
-  AUTHOR_ROLES,
-  CHAT_EVENTS,
-  SESSION_STORAGE_TARA_LOGIN_REDIRECT,
-} from "../../../constants";
+import { SESSION_STORAGE_TARA_LOGIN_REDIRECT } from "../../../constants";
 import useChatSelector from "../../../hooks/use-chat-selector";
 import useAuthenticationSelector from "../../../hooks/use-authentication-selector";
 import styles from "../chat-message.module.scss";
-import WidgetService from "../../../services/widget-service";
 
 const AuthenticationMessage = (): JSX.Element => {
   const { t } = useTranslation();
@@ -30,8 +25,7 @@ const AuthenticationMessage = (): JSX.Element => {
       </div>
       <button
         disabled={isChatEnded || isAuthenticated}
-        onClick={() => authenticateUser()}
-        type="button"
+        onClick={authenticateUser}
         className={`${styles["event-button"]} ${
           isAuthenticated ? styles.authenticated : ""
         }`}
