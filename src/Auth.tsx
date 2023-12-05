@@ -1,16 +1,28 @@
 import { useEffect } from 'react';
-import queryString from 'query-string';
+import { useNavigate } from 'react-router-dom';
+import WidgetService from "./services/widget-service";
+import useChatSelector from './hooks/use-chat-selector';
+import useAuthenticationSelector from './hooks/use-authentication-selector';
 
 const AuthCallback = () => {
+  const { chatId } = useChatSelector();
+  const { userInfo } = useAuthenticationSelector();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const params = queryString.parse(window.location.search);
-    const token = params.token;
+    WidgetService.authenticateUser(
+      chatId ?? "",
+      userInfo.personalCode,
+      userInfo.firstName,
+      userInfo.lastName,
+    ).then(() => {
+      navigate('/', { replace: true });
+    });
   }, []);
 
   return (
     <div>
-      <h2>Handling Auth Callback...</h2>
+      <h2>please wait...</h2>
     </div>
   );
 };
