@@ -1,22 +1,14 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { SESSION_STORAGE_TARA_LOGIN_REDIRECT } from "../../../constants";
 import useChatSelector from "../../../hooks/use-chat-selector";
 import useAuthenticationSelector from "../../../hooks/use-authentication-selector";
 import styles from "../chat-message.module.scss";
+import authRedirectionService from "../../../services/auth-redirection-service";
 
 const AuthenticationMessage = (): JSX.Element => {
   const { t } = useTranslation();
   const { chatId, isChatEnded } = useChatSelector();
   const { isAuthenticated } = useAuthenticationSelector();
-
-  const authenticateUser = () => {
-    sessionStorage.setItem(
-      SESSION_STORAGE_TARA_LOGIN_REDIRECT,
-      window.location.pathname
-    );
-    window.location.assign(window._env_.TIM_AUTHENTICATION_URL);
-  };
 
   return (
     <>
@@ -25,7 +17,7 @@ const AuthenticationMessage = (): JSX.Element => {
       </div>
       <button
         disabled={isChatEnded || isAuthenticated}
-        onClick={authenticateUser}
+        onClick={authRedirectionService.redirectToTim}
         className={`${styles["event-button"]} ${
           isAuthenticated ? styles.authenticated : ""
         }`}
