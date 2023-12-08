@@ -6,7 +6,6 @@ import styles from "../chat-message.module.scss";
 import RobotIcon from "../../../static/icons/buerokratt.svg";
 import {
   CHAT_EVENTS,
-  CLIENT_NAME_ENABLED,
   MAXIMUM_MESSAGE_TEXT_LENGTH_FOR_ONE_ROW,
   RATING_TYPES,
 } from "../../../constants";
@@ -43,6 +42,8 @@ const AdminMessage = ({ message }: { message: Message }): JSX.Element => {
     return parseButtons(message).length > 0;
   }, [message.buttons]);
 
+  const showClientInfo = false;
+
   return (
     <motion.div
       animate={leftAnimation.animate}
@@ -51,7 +52,7 @@ const AdminMessage = ({ message }: { message: Message }): JSX.Element => {
     >
       <div className={classNames(styles.message, styles.admin)}>
         {
-          CLIENT_NAME_ENABLED && (
+          showClientInfo && (
             <div className={styles.name}>{message.authorRole}</div>
           )
         }
