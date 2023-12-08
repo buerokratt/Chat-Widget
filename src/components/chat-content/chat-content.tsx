@@ -8,11 +8,17 @@ import './os-custom-theme.scss';
 import styles from './chat-content.module.scss';
 import WaitingTimeNotification from '../waiting-time-notification/waiting-time-notification';
 import { useAppDispatch } from '../../store';
-import { getEstimatedWaitingTime, setEstimatedWaitingTimeToZero } from '../../slices/chat-slice';
+import { getEstimatedWaitingTime, getNameVisibility, getTitleVisibility, setEstimatedWaitingTimeToZero } from '../../slices/chat-slice';
 
 const ChatContent = (): JSX.Element => {
   const OSref = useRef<OverlayScrollbarsComponent>(null);
-  const { messages, estimatedWaiting, customerSupportId } = useChatSelector();
+  const { 
+    messages, 
+    estimatedWaiting, 
+    customerSupportId, 
+    nameVisibility, 
+    titleVisibility, 
+  } = useChatSelector();
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -26,6 +32,13 @@ const ChatContent = (): JSX.Element => {
     if (customerSupportId !== '') dispatch(setEstimatedWaitingTimeToZero());
     else if (estimatedWaiting.durationInSeconds === '') dispatch(getEstimatedWaitingTime());
   }, [estimatedWaiting.durationInSeconds, dispatch, customerSupportId]);
+
+  useEffect(() => {
+    if (customerSupportId !== '') {
+      dispatch(getNameVisibility());
+      dispatch(getTitleVisibility());
+    }
+  }, [customerSupportId]);
 
 
   return (
@@ -48,6 +61,8 @@ const ChatContent = (): JSX.Element => {
           {messages.map((message) => <ChatMessage 
               message={message}
               key={`${message.authorTimestamp}-${message.created}-${message.id}`}
+              nameVisibility={nameVisibility}
+              titleVisibility={titleVisibility}
             />
           )}
         </OverlayScrollbarsComponent>

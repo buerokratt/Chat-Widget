@@ -86,6 +86,8 @@ export interface ChatState {
     }
   },
   chatMode: CHAT_MODES,
+  nameVisibility: boolean,
+  titleVisibility: boolean,
 }
 
 const initialState: ChatState = {
@@ -144,7 +146,9 @@ const initialState: ChatState = {
       isFailed: false,
     }
   },
-  chatMode: CHAT_MODES.FREE
+  chatMode: CHAT_MODES.FREE,
+  nameVisibility: false,
+  titleVisibility: false,
 };
 
 export const initChat = createAsyncThunk('chat/init', async (message: Message) =>  {
@@ -256,6 +260,8 @@ export const downloadChat = createAsyncThunk("chat/downloadChat", async (isForwa
     ? ChatService.generateDownloadChatRequest(chatId, isForwardToEmail ? endUserContacts.mailAddress : null)
     : null;
 });
+export const getNameVisibility = createAsyncThunk('chat/getNameVisibility', async () => ChatService.getNameVisibility());
+export const getTitleVisibility = createAsyncThunk('chat/getTitleVisibility', async () => ChatService.getTitleVisibility());
 
 export const chatSlice = createSlice({
   name: 'chat',
@@ -443,6 +449,12 @@ export const chatSlice = createSlice({
         event: 'greeting',
         authorTimestamp: new Date().toISOString(),
       });
+    });
+    builder.addCase(getNameVisibility.fulfilled, (state, action) => {
+      state.nameVisibility = action.payload.isVisible;
+    });
+    builder.addCase(getTitleVisibility.fulfilled, (state, action) => {
+      state.titleVisibility = action.payload.isVisible;
     });
     builder.addCase(getEmergencyNotice.fulfilled, (state, action) => {
       state.emergencyNotice = {

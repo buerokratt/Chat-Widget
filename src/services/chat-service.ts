@@ -106,6 +106,14 @@ class ChatService {
   burokrattOnlineStatus(): Promise<boolean> {
     return http.get(RUUTER_ENDPOINTS.BUROKRATT_ONLINE_STATUS);
   }
+
+  getNameVisibility(): Promise<{ isVisible: boolean }> {
+    return http.get(RUUTER_ENDPOINTS.GET_NAME_VISIBILITY);
+  }
+
+  getTitleVisibility(): Promise<{ isVisible: boolean }> {
+    return http.get(RUUTER_ENDPOINTS.GET_TITLE_VISIBILITY);
+  }
 }
 
 export default new ChatService();

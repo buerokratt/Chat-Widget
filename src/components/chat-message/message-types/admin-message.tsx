@@ -26,7 +26,7 @@ const leftAnimation = {
   transition: { duration: 0.25, delay: 0.25 },
 };
 
-const AdminMessage = ({ message }: { message: Message }): JSX.Element => {
+const AdminMessage = ({ message, nameVisibility, titleVisibility }: { message: Message, nameVisibility: boolean, titleVisibility: boolean }): JSX.Element => {
   const dispatch = useAppDispatch();
 
   const setNewFeedbackRating = (newRating: string): void => {
@@ -42,8 +42,6 @@ const AdminMessage = ({ message }: { message: Message }): JSX.Element => {
     return parseButtons(message).length > 0;
   }, [message.buttons]);
 
-  const showClientInfo = false;
-
   return (
     <motion.div
       animate={leftAnimation.animate}
@@ -52,7 +50,7 @@ const AdminMessage = ({ message }: { message: Message }): JSX.Element => {
     >
       <div className={classNames(styles.message, styles.admin)}>
         {
-          showClientInfo && (
+          nameVisibility && (
             <div className={styles.name}>{message.authorRole}</div>
           )
         }

@@ -118,6 +118,8 @@ export enum RUUTER_ENDPOINTS {
   DOWNLOAD_CHAT = '/download-chat',
   SEND_ATTACHMENT = '/attachments/add',
   SEND_USER_CONTACTS = '/end-user-email-phone',
+  GET_NAME_VISIBILITY = '/get-name-visibility',
+  GET_TITLE_VISIBILITY = '/get-title-visibility',
 }
 
 export enum StyledButtonType {

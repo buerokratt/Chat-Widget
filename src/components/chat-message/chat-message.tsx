@@ -9,11 +9,13 @@ import AuthenticationMessage from './message-types/authentication-message';
 import PermissionMessage from './message-types/permission-message';
 import RedirectMessage from './message-types/redirect-message';
 
-const ChatMessage = (props: { message: Message }): JSX.Element => {
+const ChatMessage = (props: { message: Message, nameVisibility: boolean, titleVisibility: boolean }): JSX.Element => {
   const { t } = useTranslation();
   const {
     message,
     message: { authorRole, event },
+    nameVisibility,
+    titleVisibility,
   } = props;
 
   const endChatMessage = (
@@ -37,7 +39,14 @@ const ChatMessage = (props: { message: Message }): JSX.Element => {
   if (event === CHAT_EVENTS.REQUESTED_CHAT_FORWARD_REJECTED) return <EventMessage content={t('redirect.ask-permission-rejected')} />;
   if (event === CHAT_EVENTS.CONTACT_INFORMATION_FULFILLED || authorRole === AUTHOR_ROLES.END_USER) return <ClientMessage message={message} />;
   if (authorRole === AUTHOR_ROLES.END_USER) return <ClientMessage message={message} />;
-  return <AdminMessage aria-live="polite" message={message} />;
+  return (
+    <AdminMessage
+      aria-live="polite"
+      message={message} 
+      nameVisibility={nameVisibility} 
+      titleVisibility={titleVisibility}
+    />
+  );
 };
 
 export default ChatMessage;
