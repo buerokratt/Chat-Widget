@@ -18,6 +18,8 @@ import {
 import { useAppDispatch } from "../../../store";
 import ChatButtonGroup from "./chat-button-group";
 import { parseButtons } from '../../../utils/chat-utils';
+import useChatSelector from "../../../hooks/use-chat-selector";
+import { stat } from "fs";
 
 
 const leftAnimation = {
@@ -26,8 +28,9 @@ const leftAnimation = {
   transition: { duration: 0.25, delay: 0.25 },
 };
 
-const AdminMessage = ({ message, nameVisibility, titleVisibility }: { message: Message, nameVisibility: boolean, titleVisibility: boolean }): JSX.Element => {
+const AdminMessage = ({ message }: { message: Message }): JSX.Element => {
   const dispatch = useAppDispatch();
+  const { nameVisibility, titleVisibility } = useChatSelector();
 
   const setNewFeedbackRating = (newRating: string): void => {
     const updatedMessage = {
@@ -42,6 +45,8 @@ const AdminMessage = ({ message, nameVisibility, titleVisibility }: { message: M
     return parseButtons(message).length > 0;
   }, [message.buttons]);
 
+  const csaName = (message.authorFirstName + ' ' + message.authorLastName).trim();
+
   return (
     <motion.div
       animate={leftAnimation.animate}
@@ -50,7 +55,12 @@ const AdminMessage = ({ message, nameVisibility, titleVisibility }: { message: M
     >
       <div className={classNames(styles.message, styles.admin)}>
         {
-          nameVisibility && (
+          nameVisibility && csaName && (
+            <div className={styles.name}>{csaName}</div>
+          )
+        }
+        {
+          titleVisibility && message.authorRole && (
             <div className={styles.name}>{message.authorRole}</div>
           )
         }
