@@ -2,7 +2,7 @@ import { SESSION_STORAGE_TARA_LOGIN_REDIRECT } from "../constants";
 
 class AuthRedirectionService {
   redirectToTim () {
-    this.saveCurrentPathAsReidrectPath();
+    this.saveCurrentBrowserPath();
     window.location.assign(window._env_.TIM_AUTHENTICATION_URL);
   }
 
@@ -14,7 +14,7 @@ class AuthRedirectionService {
     }
   }
 
-  saveCurrentPathAsReidrectPath () {
+  saveCurrentBrowserPath () {
     sessionStorage.setItem(SESSION_STORAGE_TARA_LOGIN_REDIRECT, window.location.pathname);
   }
 
