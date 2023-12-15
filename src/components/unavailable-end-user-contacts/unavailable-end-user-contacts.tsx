@@ -59,7 +59,7 @@ const UnavailableEndUserContacts = (): JSX.Element => {
         chatId ?? "",
         endUserContacts.mailAddress,
         endUserContacts.phoneNr
-      );
+      ).catch(console.error);
 
       const newMsg = getContactFormFulfilledNewMessage(endUserContacts, chatId, t);
       dispatch(sendMessageWithNewEvent(newMsg));
