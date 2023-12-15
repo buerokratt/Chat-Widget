@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { InputText } from "primereact/inputtext";
@@ -7,13 +7,10 @@ import { useAppDispatch } from "../../store";
 import {
   AUTHOR_ROLES,
   CHAT_EVENTS,
-  EMAIL_REGEX,
-  PHONE_NR_REGEX,
   StyledButtonType,
 } from "../../constants";
 import {
   sendMessageWithNewEvent,
-  sendNewMessage,
   setShowUnavailableContactForm,
   setEmailAdress,
   setPhoneNumber,

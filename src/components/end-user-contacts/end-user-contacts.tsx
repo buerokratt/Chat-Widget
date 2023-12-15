@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { InputText } from "primereact/inputtext";
@@ -11,7 +11,6 @@ import {
 } from "../../constants";
 import {
   sendMessageWithNewEvent,
-  sendNewMessage,
   setShowContactForm,
   setEmailAdress,
   setPhoneNumber,
