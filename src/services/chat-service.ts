@@ -7,7 +7,6 @@ import { RUUTER_ENDPOINTS } from '../constants';
 import { EndUserTechnicalData } from '../model/chat-ini-model';
 import { EstimatedWaiting } from '../slices/chat-slice';
 import { EmergencyNoticeResponse } from '../model/emergency-notice-response-model';
-import { OrganizationWorkingTimeResponse } from '../model/organization-working-time-model';
 
 interface Document {
   _id: string;
