@@ -61,6 +61,7 @@ const EndUserContacts = (): JSX.Element => {
       dispatch(setShowContactForm(false));
       newMsg.content = "";
       dispatch(sendMessagePreview(newMsg));
+      dispatch(setShowContactForm(false));
     }
   };
 
@@ -79,7 +80,6 @@ const EndUserContacts = (): JSX.Element => {
                 id="email-input"
                 className="email-input"
                 placeholder={t("widget.contacts.contact.mail.placeholder")}
-                pattern={EMAIL_REGEX}
                 value={endUserContacts.mailAddress}
                 onChange={(e) => dispatch(setEmailAdress(e.target.value))}
               />
@@ -90,7 +90,6 @@ const EndUserContacts = (): JSX.Element => {
                 className="phone-nr-input"
                 id="phone-nr-input"
                 placeholder={t("widget.contacts.contact.phone.placeholder")}
-                pattern={PHONE_NR_REGEX}
                 value={endUserContacts.phoneNr}
                 onChange={(e) => dispatch(setPhoneNumber(e.target.value))}
               />
