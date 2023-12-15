@@ -57,7 +57,7 @@ const EndUserContacts = (): JSX.Element => {
       );
 
       const newMsg = getContactFormFulfilledNewMessage(endUserContacts, chatId, t);
-      dispatch(sendNewMessage(newMsg));
+      dispatch(sendMessageWithNewEvent(newMsg));
       dispatch(setShowContactForm(false));
       newMsg.content = "";
       dispatch(sendMessagePreview(newMsg));
