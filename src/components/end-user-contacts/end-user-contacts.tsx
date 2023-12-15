@@ -7,8 +7,6 @@ import { useAppDispatch } from "../../store";
 import {
   AUTHOR_ROLES,
   CHAT_EVENTS,
-  EMAIL_REGEX,
-  PHONE_NR_REGEX,
   StyledButtonType,
 } from "../../constants";
 import {
@@ -23,32 +21,14 @@ import {
 import { Message } from "../../model/message-model";
 import StyledButton from "../styled-components/styled-button";
 import WidgetService from "../../services/widget-service";
+import useMessageValidator from "../../hooks/use-message-validator";
+import { getContactFormFulfilledNewMessage } from "../../utils/chat-utils";
 
 const EndUserContacts = (): JSX.Element => {
   const { endUserContacts, chatId, contactMsgId } = useChatSelector();
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
-  const [invalidMessage, setInvalidMessage] = useState("");
-
-  const validateInput = () => {
-    if (!endUserContacts.phoneNr && !endUserContacts.mailAddress) {
-      setInvalidMessage(t("widget.contacts.contact.invalid.fields"));
-      return false;
-    }
-
-    if (!new RegExp(PHONE_NR_REGEX).test(endUserContacts.phoneNr)) {
-      setInvalidMessage(t("widget.contacts.contact.invalid.phone"));
-      return false;
-    }
-
-    if (!new RegExp(EMAIL_REGEX).test(endUserContacts.mailAddress)) {
-      setInvalidMessage(t("widget.contacts.contact.invalid.email"));
-      return false;
-    }
-
-    setInvalidMessage("");
-    return true;
-  };
+  const { validateInput, invalidMessage } = useMessageValidator();
 
   const declineForm = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -67,37 +47,16 @@ const EndUserContacts = (): JSX.Element => {
     dispatch(sendMessagePreview(newMsg));
   };
 
-  const submitForm = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const submitForm = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (validateInput()) {
-      let message;
-      if (endUserContacts.phoneNr && endUserContacts.mailAddress) {
-        message = t("chatMessage.email-and-phone-template", {
-          email: endUserContacts.mailAddress,
-          phoneNr: endUserContacts.phoneNr,
-        });
-      } else if (endUserContacts.mailAddress)
-        message = t("chatMessage.email-only-template", {
-          email: endUserContacts.mailAddress,
-        });
-      else
-        message = t("chatMessage.phone-only-template", {
-          phoneNr: endUserContacts.phoneNr,
-        });
-
-      WidgetService.sendContactInfo(
+    if (validateInput(endUserContacts)) {
+      await WidgetService.sendContactInfo(
         chatId ?? "",
         endUserContacts.mailAddress,
         endUserContacts.phoneNr
       );
-      const newMsg: Message = {
-        chatId,
-        authorRole: AUTHOR_ROLES.END_USER,
-        authorTimestamp: new Date().toISOString(),
-        content: message,
-        event: CHAT_EVENTS.CONTACT_INFORMATION_FULFILLED,
-        preview: "",
-      };
+
+      const newMsg = getContactFormFulfilledNewMessage(endUserContacts, chatId, t);
       dispatch(sendNewMessage(newMsg));
       dispatch(setShowContactForm(false));
       newMsg.content = "";
