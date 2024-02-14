@@ -35,15 +35,21 @@ export const getContactFormFulfilledNewMessage = (
       email: endUserContacts.mailAddress,
       phoneNr: endUserContacts.phoneNr,
     });
-  } else if (endUserContacts.mailAddress)
+  } else if (endUserContacts.mailAddress){
     message = t("chatMessage.email-only-template", {
       email: endUserContacts.mailAddress,
     });
-
-  else
+  } else {
     message = t("chatMessage.phone-only-template", {
       phoneNr: endUserContacts.phoneNr,
     });
+  }
+
+  if(endUserContacts.comment) {
+    message += ' ' + t("chatMessage.comment-template", {
+      comment: endUserContacts.comment,
+    });
+  }
 
   return {
     chatId,
