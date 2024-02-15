@@ -14,12 +14,13 @@ import {
   sendMessagePreview,
   endChat,
   setContactFormComment,
+  sendNewMessage,
 } from "../../slices/chat-slice";
 import { Message } from "../../model/message-model";
 import StyledButton from "../styled-components/styled-button";
 import WidgetService from "../../services/widget-service";
 import useMessageValidator from "../../hooks/use-message-validator";
-import { getContactFormFulfilledNewMessage } from "../../utils/chat-utils";
+import { getContactCommentNewMessage, getContactFormFulfilledNewMessage } from "../../utils/chat-utils";
 
 const UnavailableEndUserContacts = (): JSX.Element => {
   const { endUserContacts, chatId, contactMsgId, contactContentMessage } =
@@ -69,6 +70,12 @@ const UnavailableEndUserContacts = (): JSX.Element => {
       dispatch(setShowUnavailableContactForm(false));
       newMsg.content = "";
       dispatch(sendMessagePreview(newMsg));
+
+      if(endUserContacts.comment) {
+        const commentMsg = getContactCommentNewMessage(endUserContacts.comment, chatId, contactMsgId, t);
+        dispatch(sendNewMessage(commentMsg));
+      }
+
       dispatch(
         endChat({
           event: CHAT_EVENTS.UNAVAILABLE_CONTACT_INFORMATION_FULFILLED,

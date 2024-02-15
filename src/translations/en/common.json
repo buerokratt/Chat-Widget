@@ -26,7 +26,7 @@
   "chatMessage.email-only-template": "My email is {{email}}",
   "chatMessage.phone-only-template": "My phone number is {{phoneNr}}",
   "chatMessage.email-and-phone-template": "My email is {{email}} and phone number is {{phoneNr}}",
-  "chatMessage.comment-template": "and my question is: {{comment}}",
+  "chatMessage.comment-template": "User Question:\n{{comment}}",
   "header.button.minimize.label": "Minimize",
   "header.button.close.label": "Close",
   "header.button.detail.label": "Details",

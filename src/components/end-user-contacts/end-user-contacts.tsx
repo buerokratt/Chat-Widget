@@ -52,7 +52,7 @@ const EndUserContacts = (): JSX.Element => {
       ).catch(console.error);
 
       const newMsg = getContactFormFulfilledNewMessage(
-        { ...endUserContacts, comment: '' },
+        endUserContacts,
         chatId,
         contactMsgId,
         t

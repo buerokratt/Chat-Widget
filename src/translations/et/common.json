@@ -29,7 +29,7 @@
   "chatMessage.email-only-template": "Minu e-posti aadress on {{email}}",
   "chatMessage.phone-only-template": "Minu telefon on {{phoneNr}}",
   "chatMessage.email-and-phone-template": "Minu e-posti aadress on {{email}} ja telefoninumber {{phoneNr}}",
-  "chatMessage.comment-template": "ja minu küsimus on: {{comment}}",
+  "chatMessage.comment-template": "Kasutaja küsimus:\n{{comment}}",
   "header.button.minimize.label": "Minimeeri",
   "header.button.close.label": "Sulge",
   "header.button.detail.label": "Detailid",
