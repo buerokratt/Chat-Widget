@@ -74,5 +74,13 @@
   "widget.action.confirm": "Kinnita",
   "widget.action.download-chat": "Lae vestlus alla",
   "widget.action.forward-chat": "Edasta vestlus e-mailile",
-  "widget.action.forward-email": "Teie e-postiaadress"
+  "widget.action.forward-email": "Teie e-postiaadress",
+  "widget.form.phone": "Teie telefon",
+  "widget.form.email": "Teie e-postiaadress",
+  "widget.form.message": "Täpsusta siin oma küsimust",
+  "widget.form.info": "Edastatud kontaktandmed",
+  "widget.form.success": "Aitäh pöördumast, Teiega võetakse esimesel võimalusel ühendust",
+  "widget.form.error": "Saatmisel esines viga",
+  "widget.time.minutes": "minutit",
+  "widget.time.minute": "minut"
 }
