@@ -14,6 +14,7 @@ import {
   sendMessagePreview,
   sendNewMessage,
   setContactFormComment,
+  sendNewSilentMessage,
 } from "../../slices/chat-slice";
 import { Message } from "../../model/message-model";
 import StyledButton from "../styled-components/styled-button";
@@ -66,7 +67,7 @@ const EndUserContacts = (): JSX.Element => {
 
       if(endUserContacts.comment) {
         const commentMsg = getContactCommentNewMessage(endUserContacts.comment, chatId, contactMsgId, t);
-        dispatch(sendNewMessage(commentMsg));
+        dispatch(sendNewSilentMessage(commentMsg));
       }
       
       dispatch(setShowContactForm(false));
