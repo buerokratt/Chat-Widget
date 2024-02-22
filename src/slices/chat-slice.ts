@@ -12,14 +12,13 @@ import {
   TERMINATE_STATUS,
   CHAT_MODES,
 } from '../constants';
-import { getFromSessionStorage, setToSessionStorage } from '../utils/session-storage-utils';
 import { Chat } from '../model/chat-model';
 import { 
   clearStateVariablesFromSessionStorage, 
   findMatchingMessageFromMessageList, 
   getInitialChatDimensions 
 } from '../utils/state-management-utils';
-import { setToLocalStorage } from '../utils/local-storage-utils';
+import { getFromLocalStorage, setToLocalStorage } from '../utils/local-storage-utils';
 import getHolidays from '../utils/holidays';
 import { getChatModeBasedOnLastMessage } from '../utils/chat-utils';
 
@@ -285,7 +284,7 @@ export const chatSlice = createSlice({
       state.messages.push(action.payload);
     },
     setIsChatOpen: (state, action: PayloadAction<boolean>) => {
-      state.chatId = getFromSessionStorage(SESSION_STORAGE_CHAT_ID_KEY);
+      state.chatId = getFromLocalStorage(SESSION_STORAGE_CHAT_ID_KEY);
       state.isChatOpen = action.payload;
       state.newMessagesAmount = 0;
     },
@@ -367,7 +366,7 @@ export const chatSlice = createSlice({
       state.lastReadMessageTimestamp = new Date().toISOString();
       state.newMessagesAmount += receivedMessages.length;
       state.messages.push(...receivedMessages);
-      setToSessionStorage('newMessagesAmount', state.newMessagesAmount);
+      setToLocalStorage('newMessagesAmount', state.newMessagesAmount);
 
       state.chatMode = getChatModeBasedOnLastMessage(state.messages);
     },
