@@ -451,7 +451,7 @@ export const chatSlice = createSlice({
         start: action.payload.emergencyNoticeStartISO,
         end: action.payload.emergencyNoticeEndISO,
         text: action.payload.emergencyNoticeText,
-        isVisible: action.payload.isEmergencyNoticeVisible,
+        isVisible: action.payload.isEmergencyNoticeVisible === "true" ? true : false,
       };
     });
     builder.addCase(endChat.fulfilled, (state) => {
