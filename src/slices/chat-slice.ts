@@ -13,11 +13,11 @@ import {
   CHAT_MODES,
 } from '../constants';
 import { Chat } from '../model/chat-model';
-import { 
-  clearStateVariablesFromSessionStorage, 
-  findMatchingMessageFromMessageList, 
-  getInitialChatDimensions 
-} from '../utils/state-management-utils';
+import {
+  clearStateVariablesFromLocalStorage,
+  findMatchingMessageFromMessageList,
+  getInitialChatDimensions,
+} from "../utils/state-management-utils";
 import { getFromLocalStorage, setToLocalStorage } from '../utils/local-storage-utils';
 import getHolidays from '../utils/holidays';
 import { getChatModeBasedOnLastMessage } from '../utils/chat-utils';
@@ -396,7 +396,7 @@ export const chatSlice = createSlice({
           case TERMINATE_STATUS.CLIENT_LEFT_WITH_NO_RESOLUTION: 
           case TERMINATE_STATUS.OTHER:
           case TERMINATE_STATUS.RESPONSE_SENT_TO_CLIENT_EMAIL:
-            clearStateVariablesFromSessionStorage();
+            clearStateVariablesFromLocalStorage();
             state.chatStatus = CHAT_STATUS.ENDED;
             break;
           default:
@@ -453,7 +453,7 @@ export const chatSlice = createSlice({
       state.chatStatus = CHAT_STATUS.ENDED;
       state.feedback.isFeedbackMessageGiven = false;
       state.feedback.isFeedbackRatingGiven = false;
-      clearStateVariablesFromSessionStorage();
+      clearStateVariablesFromLocalStorage();
     });
     builder.addCase(sendChatNpmRating.rejected, (state) => {
       state.errorMessage = ERROR_MESSAGE;

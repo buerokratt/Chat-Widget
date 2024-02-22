@@ -58,7 +58,7 @@ export const isDisplayableMessages = (msg: Message): boolean => {
   return !nonDisplayableEvent.includes(msg.event!);
 }
 
-export const clearStateVariablesFromSessionStorage = (): void => {
+export const clearStateVariablesFromLocalStorage = (): void => {
   setToLocalStorage(SESSION_STORAGE_CHAT_ID_KEY, null);
   setToLocalStorage("newMessagesAmount", 0);
 };
