@@ -60,7 +60,7 @@ export const isDisplayableMessages = (msg: Message): boolean => {
 }
 
 export const clearStateVariablesFromSessionStorage = (): void => {
-  setToSessionStorage(SESSION_STORAGE_CHAT_ID_KEY, null);
+  setToSessionStorage(SESSION_STORAGE_CHAT_ID_KEY, "");
   setToSessionStorage('newMessagesAmount', 0);
 };
 

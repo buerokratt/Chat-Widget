@@ -1,5 +1,8 @@
 import React, { FC, useEffect, useLayoutEffect, useState } from "react";
-import { getFromSessionStorage } from "./utils/session-storage-utils";
+import {
+  getFromSessionStorage,
+  setToSessionStorage,
+} from "./utils/session-storage-utils";
 import { isOfficeHours } from "./utils/office-hours-utils";
 import Profile from "./components/profile/profile";
 import Chat from "./components/chat/chat";
@@ -17,6 +20,9 @@ import {
   getChat,
   getChatMessages,
   getEmergencyNotice,
+  getNameVisibility,
+  getTitleVisibility,
+  resetState,
   setChatId,
   setIsChatOpen,
 } from "./slices/chat-slice";
@@ -31,6 +37,7 @@ import { getWidgetConfig } from "./slices/widget-slice";
 import useGetWidgetConfig from "./hooks/use-get-widget-config";
 import useGetEmergencyNotice from "./hooks/use-get-emergency-notice";
 import { customJwtExtend } from "./slices/authentication-slice";
+import useMemoryStorage from "./hooks/use-memory-storage";
 
 declare global {
   interface Window {
@@ -64,6 +71,7 @@ const App: FC = () => {
   );
   const { burokrattOnlineStatus } = useAppSelector((state) => state.widget);
   const { chatStatus } = useAppSelector((state) => state.chat);
+  const [chatIdFromSessionStorage, setChatIdFromSessionStorage] = useState("");
 
   useLayoutEffect(() => {
     if (burokrattOnlineStatus === null)
@@ -94,6 +102,22 @@ const App: FC = () => {
   useGetNewMessages();
   useNewMessageNotification();
 
+  useMemoryStorage(
+    SESSION_STORAGE_CHAT_ID_KEY,
+    getFromSessionStorage(SESSION_STORAGE_CHAT_ID_KEY),
+    (value) => {
+      console.log("value", value);
+      setChatIdFromSessionStorage(value);
+      // dispatch(setChatId(value));
+      // dispatch(setIsChatOpen(true));
+      // if (value) {
+      //   setToSessionStorage(SESSION_STORAGE_CHAT_ID_KEY, value);
+      //   dispatch(setChatId(value));
+      //   dispatch(setIsChatOpen(true));
+      // }
+    }
+  );
+
   useLayoutEffect(() => {
     if (!displayWidget || !isChatOpen || !chatId) return;
     const interval = setInterval(() => {
@@ -108,14 +132,21 @@ const App: FC = () => {
     const sessionStorageChatId = getFromSessionStorage(
       SESSION_STORAGE_CHAT_ID_KEY
     );
-    if (sessionStorageChatId !== null) {
+    console.log("sessionStorageChatId", sessionStorageChatId);
+    if (sessionStorageChatId !== "" && sessionStorageChatId !== null) {
+      console.log("sessionStorageChatId", sessionStorageChatId);
       dispatch(setChatId(sessionStorageChatId));
       dispatch(setIsChatOpen(true));
+    } else {
+      dispatch(setChatId(""));
+      dispatch(setIsChatOpen(false));
     }
-  }, [dispatch]);
+  }, [dispatch, chatIdFromSessionStorage]);
 
   useEffect(() => {
     if (chatId && !messages.length) {
+      dispatch(getNameVisibility());
+      dispatch(getTitleVisibility());
       dispatch(getChat());
       dispatch(getChatMessages());
     }
