@@ -1,5 +1,4 @@
 import React, { FC, useEffect, useLayoutEffect, useState } from "react";
-import { getFromSessionStorage } from "./utils/session-storage-utils";
 import { isOfficeHours } from "./utils/office-hours-utils";
 import Profile from "./components/profile/profile";
 import Chat from "./components/chat/chat";
@@ -34,6 +33,7 @@ import { getWidgetConfig } from "./slices/widget-slice";
 import useGetWidgetConfig from "./hooks/use-get-widget-config";
 import useGetEmergencyNotice from "./hooks/use-get-emergency-notice";
 import { customJwtExtend } from "./slices/authentication-slice";
+import { getFromLocalStorage } from "./utils/local-storage-utils";
 
 declare global {
   interface Window {
@@ -60,7 +60,7 @@ const App: FC = () => {
   const { isChatOpen, messages, chatId, emergencyNotice } = useChatSelector();
   const { widgetConfig } = useWidgetSelector();
   const [displayWidget, setDisplayWidget] = useState(
-    !!getFromSessionStorage(SESSION_STORAGE_CHAT_ID_KEY) || isOfficeHours()
+    !!getFromLocalStorage(SESSION_STORAGE_CHAT_ID_KEY) || isOfficeHours()
   );
   const [onlineCheckInterval, setOnlineCheckInterval] = useState(
     ONLINE_CHECK_INTERVAL
@@ -85,7 +85,7 @@ const App: FC = () => {
   useInterval(
     () =>
       setDisplayWidget(
-        !!getFromSessionStorage(SESSION_STORAGE_CHAT_ID_KEY) || isOfficeHours()
+        !!getFromLocalStorage(SESSION_STORAGE_CHAT_ID_KEY) || isOfficeHours()
       ),
     OFFICE_HOURS_INTERVAL_TIMEOUT
   );
@@ -99,7 +99,7 @@ const App: FC = () => {
 
   useEffect(() => {
     const storageHandler = () => {
-      const storedData = getFromSessionStorage(SESSION_STORAGE_CHAT_ID_KEY);
+      const storedData = getFromLocalStorage(SESSION_STORAGE_CHAT_ID_KEY);
       console.log("storedData", storedData);
       if (storedData === null) {
         setChatId("");
@@ -143,7 +143,7 @@ const App: FC = () => {
   }, [messages]);
 
   useEffect(() => {
-    const sessionStorageChatId = getFromSessionStorage(
+    const sessionStorageChatId = getFromLocalStorage(
       SESSION_STORAGE_CHAT_ID_KEY
     );
     if (sessionStorageChatId) {
