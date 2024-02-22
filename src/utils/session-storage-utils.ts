@@ -3,9 +3,6 @@ export const getFromSessionStorage = (key: string): string | null => {
   return item ? JSON.parse(item) : null;
 };
 
-export const setToSessionStorage = (
-  key: string,
-  value: string | number | null
-): void => {
+export const setToSessionStorage = (key: string, value: string | number | null): void => {
   sessionStorage.setItem(key, JSON.stringify(value));
 };
