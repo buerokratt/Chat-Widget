@@ -1,8 +1,5 @@
 import React, { FC, useEffect, useLayoutEffect, useState } from "react";
-import {
-  getFromSessionStorage,
-  setToSessionStorage,
-} from "./utils/session-storage-utils";
+import { getFromSessionStorage } from "./utils/session-storage-utils";
 import { isOfficeHours } from "./utils/office-hours-utils";
 import Profile from "./components/profile/profile";
 import Chat from "./components/chat/chat";
@@ -37,7 +34,6 @@ import { getWidgetConfig } from "./slices/widget-slice";
 import useGetWidgetConfig from "./hooks/use-get-widget-config";
 import useGetEmergencyNotice from "./hooks/use-get-emergency-notice";
 import { customJwtExtend } from "./slices/authentication-slice";
-import useMemoryStorage from "./hooks/use-memory-storage";
 
 declare global {
   interface Window {
@@ -71,7 +67,6 @@ const App: FC = () => {
   );
   const { burokrattOnlineStatus } = useAppSelector((state) => state.widget);
   const { chatStatus } = useAppSelector((state) => state.chat);
-  const [chatIdFromSessionStorage, setChatIdFromSessionStorage] = useState("");
 
   useLayoutEffect(() => {
     if (burokrattOnlineStatus === null)
@@ -102,21 +97,40 @@ const App: FC = () => {
   useGetNewMessages();
   useNewMessageNotification();
 
-  useMemoryStorage(
-    SESSION_STORAGE_CHAT_ID_KEY,
-    getFromSessionStorage(SESSION_STORAGE_CHAT_ID_KEY),
-    (value) => {
-      console.log("value", value);
-      setChatIdFromSessionStorage(value);
-      // dispatch(setChatId(value));
-      // dispatch(setIsChatOpen(true));
-      // if (value) {
-      //   setToSessionStorage(SESSION_STORAGE_CHAT_ID_KEY, value);
-      //   dispatch(setChatId(value));
-      //   dispatch(setIsChatOpen(true));
-      // }
+  useEffect(() => {
+    const storageHandler = () => {
+      const storedData = getFromSessionStorage(SESSION_STORAGE_CHAT_ID_KEY);
+      console.log("storedData", storedData);
+      if (storedData === null) {
+        setChatId("");
+        dispatch(setChatId(""));
+        dispatch(setIsChatOpen(false));
+        dispatch(resetState());
+      }
+    };
+
+    window.addEventListener("storage", storageHandler);
+
+    return () => {
+      window.removeEventListener("storage", storageHandler);
+    };
+  }, [SESSION_STORAGE_CHAT_ID_KEY]);
+
+  useEffect(() => {
+    const sessions = localStorage.getItem("sessions");
+    if (sessions == null) {
+      localStorage.setItem("sessions", "1");
+    } else {
+      localStorage.setItem("sessions", `${parseInt(sessions) + 1}`);
     }
-  );
+
+    window.onunload = function (_) {
+      const newSessionsCount = localStorage.getItem("sessions");
+      if (newSessionsCount !== null) {
+        localStorage.setItem("sessions", `${parseInt(newSessionsCount) - 1}`);
+      }
+    };
+  }, []);
 
   useLayoutEffect(() => {
     if (!displayWidget || !isChatOpen || !chatId) return;
@@ -132,16 +146,11 @@ const App: FC = () => {
     const sessionStorageChatId = getFromSessionStorage(
       SESSION_STORAGE_CHAT_ID_KEY
     );
-    console.log("sessionStorageChatId", sessionStorageChatId);
-    if (sessionStorageChatId !== "" && sessionStorageChatId !== null) {
-      console.log("sessionStorageChatId", sessionStorageChatId);
+    if (sessionStorageChatId) {
       dispatch(setChatId(sessionStorageChatId));
       dispatch(setIsChatOpen(true));
-    } else {
-      dispatch(setChatId(""));
-      dispatch(setIsChatOpen(false));
     }
-  }, [dispatch, chatIdFromSessionStorage]);
+  }, [dispatch, chatId]);
 
   useEffect(() => {
     if (chatId && !messages.length) {
