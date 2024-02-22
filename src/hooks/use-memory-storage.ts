@@ -4,8 +4,8 @@ import {
   setToSessionStorage,
 } from "../utils/session-storage-utils";
 
-const TEMP = "current-timestamp-temp";
-const TRIGGER = "current-timestamp";
+const temp = "session-timestamp-temp";
+const trigger = "session-timestamp";
 
 const useMemoryStorage = (
   storageKey: string,
@@ -13,18 +13,18 @@ const useMemoryStorage = (
   callback: (data: any) => any
 ) => {
   useEffect(() => {
-    window.localStorage.setItem(TRIGGER, Date.now().toString());
+    window.localStorage.setItem(trigger, Date.now().toString());
 
     const storageHandler = ({ key, newValue }: StorageEvent) => {
-      if (key === TRIGGER) {
+      if (key === trigger) {
         const storedData = getFromSessionStorage(storageKey);
 
         if (storedData != null) {
-          window.localStorage.setItem(TEMP, storedData);
+          window.localStorage.setItem(temp, storedData);
         }
 
-        window.localStorage.removeItem(TEMP);
-      } else if (key === TEMP && newValue != null) {
+        window.localStorage.removeItem(temp);
+      } else if (key === temp && newValue != null) {
         setToSessionStorage(storageKey, newValue);
         callback(newValue);
       }
@@ -39,8 +39,8 @@ const useMemoryStorage = (
 
   useEffect(() => {
     if (data != null) {
-      window.localStorage.setItem(TEMP, data);
-      window.localStorage.removeItem(TEMP);
+      window.localStorage.setItem(temp, data);
+      window.localStorage.removeItem(temp);
     }
   }, [data]);
 };
