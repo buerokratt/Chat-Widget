@@ -1,20 +1,23 @@
 import { useEffect, useState } from 'react';
 import sse from '../services/sse-service';
+import useChatSelector from './use-chat-selector';
 
 const useQueueCountr = () => {
-  const [counter, setCounter] = useState();
+  const { chatId } = useChatSelector(); 
+  const [counter, setCounter] = useState<number>(0);
 
   useEffect(() => {
-    const onMessage = async (data: any) => {   
-      setCounter(data);
-    }
+    
+    if(!chatId) return;
 
-    const events = sse('/queue', onMessage);
+    const events = sse(`/queue/${chatId}`, (data: number) => {
+      setCounter(data);
+    });
 
     return () => {
       events?.close();
     };
-  }, []);
+  }, [chatId]);
 
   return [counter];
 };
