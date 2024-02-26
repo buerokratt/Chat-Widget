@@ -11,7 +11,6 @@ const useQueueCounter = () => {
     if(!chatId) return;
 
     const events = sse(`/queue/${chatId}`, (data: number) => {
-      console.log('sse ===> ',data)
       setCounter(data);
     });
 
