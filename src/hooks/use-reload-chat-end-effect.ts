@@ -12,12 +12,7 @@ const useReloadChatEndEffect = () => {
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
       const sessions = localStorage.getItem("sessions");
-      if (
-        chatId &&
-        isRedirectPathEmpty() &&
-        sessions &&
-        parseInt(sessions) === 1
-      ) {
+      if (chatId && isRedirectPathEmpty() && sessions && parseInt(sessions) === 1) {
         localStorage.setItem("sessions", "1");
         dispatch(
           endChat({
@@ -42,6 +37,6 @@ const useReloadChatEndEffect = () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [chatId]);
-};
+}
 
 export default useReloadChatEndEffect;
