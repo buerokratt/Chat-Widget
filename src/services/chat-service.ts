@@ -78,10 +78,8 @@ class ChatService {
     return http.post(RUUTER_ENDPOINTS.SEND_FEEDBACK_MESSAGE, { chatId, feedbackText: userFeedback });
   }
 
-  async getEstimatedWaitingTime(): Promise<any> { //TODO fix return type // Promise<Response>
-    const result = await http.get(RUUTER_ENDPOINTS.GET_WAITING_TIME);
-    //@ts-ignore 
-    return result.data.response;
+  getEstimatedWaitingTime(): Promise<any> { 
+    return http.post(RUUTER_ENDPOINTS.GET_WAITING_TIME);
   }
 
   sendMessageWithNewEvent(message: Message): Promise<void> {

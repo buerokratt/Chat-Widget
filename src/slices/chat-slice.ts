@@ -330,6 +330,7 @@ export const chatSlice = createSlice({
     },
     setEstimatedWaitingTimeToZero: (state) => {
       state.estimatedWaiting.durationInSeconds = '';
+      state.estimatedWaiting.positionInUnassignedChats = '';
     },
     setIdleChat: (state, action) => {
       state.idleChat = {
@@ -468,6 +469,10 @@ export const chatSlice = createSlice({
     });
     builder.addCase(getEstimatedWaitingTime.fulfilled, (state, action) => {
       state.estimatedWaiting = action.payload;
+      state.messages.push({
+        chatId: 'estimatedWaiting',
+        authorTimestamp: '',
+      });
     });
     builder.addCase(generateForwardingRequest.fulfilled, (state, action) => {
       if (action.payload[0].externalId) {

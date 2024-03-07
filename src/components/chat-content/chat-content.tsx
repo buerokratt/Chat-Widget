@@ -8,6 +8,7 @@ import { getEstimatedWaitingTime, getNameVisibility, getTitleVisibility, setEsti
 import 'overlayscrollbars/css/OverlayScrollbars.css';
 import './os-custom-theme.scss';
 import styles from './chat-content.module.scss';
+import WaitingTimeNotification from '../waiting-time-notification/waiting-time-notification';
 
 const ChatContent = (): JSX.Element => {
   const OSref = useRef<OverlayScrollbarsComponent>(null);
@@ -28,9 +29,10 @@ const ChatContent = (): JSX.Element => {
   useEffect(() => {
     if (customerSupportId !== '') {
       dispatch(setEstimatedWaitingTimeToZero());
+    } else if (estimatedWaiting.durationInSeconds === '') {
+      dispatch(getEstimatedWaitingTime());
     }
-    else if (estimatedWaiting.durationInSeconds === '') dispatch(getEstimatedWaitingTime());
-  }, [estimatedWaiting.durationInSeconds, dispatch, customerSupportId]);
+  }, [estimatedWaiting.durationInSeconds, customerSupportId]);
 
   useEffect(() => {
     if (!customerSupportId) {
@@ -52,10 +54,13 @@ const ChatContent = (): JSX.Element => {
             scrollbars: { visibility: 'auto', autoHide: 'leave' },
           }}
         >
-          {messages.map((message) => <ChatMessage 
-              message={message}
-              key={`${message.authorTimestamp}-${message.created}-${message.id}`}
-            />
+          {messages.map((message) => 
+            message.chatId === 'estimatedWaiting' 
+            ? <WaitingTimeNotification />
+            : <ChatMessage 
+                message={message}
+                key={`${message.authorTimestamp}-${message.created}-${message.id}`}
+              />
           )}
         </OverlayScrollbarsComponent>
       </div>
