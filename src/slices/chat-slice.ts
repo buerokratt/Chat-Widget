@@ -91,6 +91,11 @@ export interface ChatState {
   titleVisibility: boolean,
 }
 
+const initialEstimatedTime = {
+  positionInUnassignedChats: '',
+  durationInSeconds: '',
+}
+
 const initialState: ChatState = {
   chatId: null,
   isChatOpen: false,
@@ -107,10 +112,7 @@ const initialState: ChatState = {
   showUnavailableContactForm: false,
   contactContentMessage: '',
   isChatRedirected: false,
-  estimatedWaiting: {
-    positionInUnassignedChats: '',
-    durationInSeconds: '',
-  },
+  estimatedWaiting: initialEstimatedTime,
   idleChat: {
     isIdle: false,
     lastActive: '',
@@ -260,17 +262,12 @@ export const sendNewSilentMessage = createAsyncThunk('chat/sendNewSilentMessage'
 
 export const sendMessagePreview = createAsyncThunk('chat/post-message-preview', (message: Message) => ChatService.sendMessagePreview(message));
 
-export const getEstimatedWaitingTime = createAsyncThunk('chat/getEstimatedWaitingTime', 
-async (_args, thunkApi) => {
-  const {
-    chat: { chatId },
-  } = (thunkApi.getState() as { chat: ChatState }) || '';
+export const getEstimatedWaitingTime = createAsyncThunk('chat/getEstimatedWaitingTime', async (_args, thunkApi) => {
+  const { chat: { chatId } } = (thunkApi.getState() as { chat: ChatState }) || '';
   
-  if (chatId === null) return {
-    positionInUnassignedChats: '',
-    durationInSeconds: '',
-  };
-  return ChatService.getEstimatedWaitingTime(chatId);
+  return chatId 
+    ? ChatService.getEstimatedWaitingTime(chatId)
+    : initialEstimatedTime;
 });
 
 export const removeChatForwardingValue = createAsyncThunk('chat/removeChatForwardingValue', async () => ChatService.removeChatForwardingValue());
