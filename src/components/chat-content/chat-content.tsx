@@ -27,12 +27,16 @@ const ChatContent = (): JSX.Element => {
   }, [messages]);
 
   useEffect(() => {
-    if (customerSupportId !== '') {
-      dispatch(setEstimatedWaitingTimeToZero());
-    } else if (estimatedWaiting.durationInSeconds === '') {
-      dispatch(getEstimatedWaitingTime());
-    }
-  }, [estimatedWaiting.durationInSeconds, customerSupportId]);
+    const interval = setInterval(() => {
+      if(!customerSupportId) {
+        dispatch(getEstimatedWaitingTime());
+      } else {
+        dispatch(setEstimatedWaitingTimeToZero());
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [customerSupportId]);
 
   useEffect(() => {
     if (!customerSupportId) {
