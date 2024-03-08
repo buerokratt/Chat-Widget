@@ -260,7 +260,18 @@ export const sendNewSilentMessage = createAsyncThunk('chat/sendNewSilentMessage'
 
 export const sendMessagePreview = createAsyncThunk('chat/post-message-preview', (message: Message) => ChatService.sendMessagePreview(message));
 
-export const getEstimatedWaitingTime = createAsyncThunk('chat/getEstimatedWaitingTime', async () => ChatService.getEstimatedWaitingTime());
+export const getEstimatedWaitingTime = createAsyncThunk('chat/getEstimatedWaitingTime', 
+async (_args, thunkApi) => {
+  const {
+    chat: { chatId },
+  } = (thunkApi.getState() as { chat: ChatState }) || '';
+  
+  if (chatId === null) return {
+    positionInUnassignedChats: '',
+    durationInSeconds: '',
+  };
+  return ChatService.getEstimatedWaitingTime(chatId);
+});
 
 export const removeChatForwardingValue = createAsyncThunk('chat/removeChatForwardingValue', async () => ChatService.removeChatForwardingValue());
 
