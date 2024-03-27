@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useAppDispatch } from "../store";
 import { CHAT_EVENTS } from "../constants";
-import { addChatToTerminationQueue, endChat, removeChatFromTerminationQueue } from "../slices/chat-slice";
+import { addChatToTerminationQueue, removeChatFromTerminationQueue } from "../slices/chat-slice";
 import useChatSelector from "./use-chat-selector";
 import { isRedirectPathEmpty } from "../utils/auth-utils";
 
