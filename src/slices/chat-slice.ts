@@ -204,7 +204,7 @@ export const endChat = createAsyncThunk('chat/endChat', async (args: { event: CH
   } = thunkApi.getState() as { chat: ChatState };
   thunkApi.dispatch(resetState());
 
-  const endEvent = args.isUpperCase ? args.event?.toUpperCase() : args.event ?? ''
+  const endEvent = args.isUpperCase ? args.event?.toUpperCase() : args.event ?? '';
 
   return chatStatus === CHAT_STATUS.ENDED
     ? null
@@ -214,6 +214,38 @@ export const endChat = createAsyncThunk('chat/endChat', async (args: { event: CH
       authorRole: AUTHOR_ROLES.END_USER,
       event: endEvent,
     }, endEvent === CHAT_EVENTS.UNAVAILABLE_CONTACT_INFORMATION_FULFILLED ? "IDLE" : null);
+});
+
+export const addChatToTerminationQueue = createAsyncThunk('chat/addChatToTerminationQueue', async (args: { event: CHAT_EVENTS | null, isUpperCase: boolean}, thunkApi) => {
+  const { chat } = thunkApi.getState() as { chat: ChatState };
+
+  sessionStorage.setItem('previousChatState_state', JSON.stringify(chat));
+  sessionStorage.setItem('previousChatState_chat_id', getFromLocalStorage(SESSION_STORAGE_CHAT_ID_KEY));
+  sessionStorage.setItem('previousChatState_newMessagesAmount', getFromLocalStorage("newMessagesAmount"));
+  sessionStorage.setItem('terminationTime', Date.now().toString());
+  
+  thunkApi.dispatch(resetState());
+
+  const endEvent = args.isUpperCase ? args.event?.toUpperCase() : args.event ?? '';
+
+  return chat.chatStatus === CHAT_STATUS.ENDED
+    ? null
+    : ChatService.addChatToTerminationQueue({
+      chatId: chat.chatId,
+      authorTimestamp: new Date().toISOString(),
+      authorRole: AUTHOR_ROLES.END_USER,
+      event: endEvent,
+    }, endEvent === CHAT_EVENTS.UNAVAILABLE_CONTACT_INFORMATION_FULFILLED ? "IDLE" : null);
+});
+
+export const removeChatFromTerminationQueue = createAsyncThunk('chat/addChatToTerminationQueue', async (args, thunkApi) => {
+  const chat = JSON.parse(sessionStorage.getItem('previousChatState_state') ?? '{}');
+  setToLocalStorage(SESSION_STORAGE_CHAT_ID_KEY, sessionStorage.getItem('previousChatState_chat_id'));
+  setToLocalStorage('newMessagesAmount', sessionStorage.getItem('previousChatState_newMessagesAmount'));
+
+  thunkApi.dispatch(resetStateWithValue(chat));
+
+  return ChatService.removeChatFromTerminationQueue(chat.chatId);
 });
 
 export const resetChatState = createAsyncThunk('', async (args: { event: CHAT_EVENTS | null}, thunkApi) => {
@@ -290,6 +322,7 @@ export const chatSlice = createSlice({
   initialState,
   reducers: {
     resetState: () => initialState,
+    resetStateWithValue: (state, action?: PayloadAction<ChatState>) => action?.payload || initialState,
     setChatId: (state, action: PayloadAction<string>) => {
       state.chatId = action.payload;
     },
@@ -469,6 +502,12 @@ export const chatSlice = createSlice({
       state.feedback.isFeedbackRatingGiven = false;
       clearStateVariablesFromLocalStorage();
     });
+    builder.addCase(addChatToTerminationQueue.fulfilled, (state) => {
+      state.chatStatus = CHAT_STATUS.ENDED;
+      state.feedback.isFeedbackMessageGiven = false;
+      state.feedback.isFeedbackRatingGiven = false;
+      clearStateVariablesFromLocalStorage();
+    });
     builder.addCase(sendChatNpmRating.rejected, (state) => {
       state.errorMessage = ERROR_MESSAGE;
     });
@@ -540,6 +579,7 @@ export const {
   setChat,
   addMessagesToDisplay,
   handleStateChangingEventMessages,
+  resetStateWithValue,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;
