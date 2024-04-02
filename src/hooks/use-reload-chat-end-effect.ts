@@ -4,18 +4,7 @@ import { CHAT_EVENTS } from "../constants";
 import { addChatToTerminationQueue, removeChatFromTerminationQueue } from "../slices/chat-slice";
 import useChatSelector from "./use-chat-selector";
 import { isRedirectPathEmpty } from "../utils/auth-utils";
-
-const isLastSession = () => {
-  const sessions = localStorage.getItem("sessions");
-  return sessions && parseInt(sessions) === 1;
-}
-
-const wasPageReloaded = () => {
-  return window.performance
-    .getEntriesByType('navigation')
-    .map((nav) => (nav as PerformanceNavigationTiming).type)
-    .includes('reload');
-}
+import { wasPageReloaded, isLastSession } from "../utils/browser-utils";
 
 const isChatAboutToBeTerminated = () => {
   const terminationTime = sessionStorage.getItem('terminationTime');
@@ -28,9 +17,11 @@ const useReloadChatEndEffect = () => {
   const { chatId } = useChatSelector();
   const dispatch = useAppDispatch();
 
-  if(wasPageReloaded() && isChatAboutToBeTerminated()) {
-    dispatch(removeChatFromTerminationQueue())
-  }
+  useEffect(() => {
+    if(wasPageReloaded() && isChatAboutToBeTerminated()) {
+      dispatch(removeChatFromTerminationQueue())
+    }
+  }, []);
 
   useEffect(() => {
     const handleBeforeUnload = () => {
