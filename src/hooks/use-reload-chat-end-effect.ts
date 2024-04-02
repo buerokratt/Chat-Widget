@@ -4,14 +4,7 @@ import { CHAT_EVENTS } from "../constants";
 import { addChatToTerminationQueue, removeChatFromTerminationQueue } from "../slices/chat-slice";
 import useChatSelector from "./use-chat-selector";
 import { isRedirectPathEmpty } from "../utils/auth-utils";
-import { wasPageReloaded, isLastSession } from "../utils/browser-utils";
-
-const isChatAboutToBeTerminated = () => {
-  const terminationTime = sessionStorage.getItem('terminationTime');
-  if(terminationTime)
-    return 2000 < (Date.now() - parseInt(terminationTime));
-  return false;
-}
+import { wasPageReloaded, isLastSession, isChatAboutToBeTerminated } from "../utils/browser-utils";
 
 const useReloadChatEndEffect = () => {
   const { chatId } = useChatSelector();

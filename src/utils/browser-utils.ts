@@ -9,3 +9,10 @@ export const wasPageReloaded = () => {
     .map((nav) => (nav as PerformanceNavigationTiming).type)
     .includes('reload');
 }
+
+export const isChatAboutToBeTerminated = () => {
+  const terminationTime = sessionStorage.getItem('terminationTime');
+  if(terminationTime)
+    return 2000 < (Date.now() - parseInt(terminationTime));
+  return false;
+}
