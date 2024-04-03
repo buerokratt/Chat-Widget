@@ -219,10 +219,8 @@ export const endChat = createAsyncThunk('chat/endChat', async (args: { event: CH
 export const addChatToTerminationQueue = createAsyncThunk('chat/addChatToTerminationQueue', async (args: { event: CHAT_EVENTS | null, isUpperCase: boolean}, thunkApi) => {
   const { chat } = thunkApi.getState() as { chat: ChatState };
 
-  sessionStorage.setItem('previousChatState_state', JSON.stringify(chat));
-  sessionStorage.setItem('previousChatState_chat_id', getFromLocalStorage(SESSION_STORAGE_CHAT_ID_KEY));
-  sessionStorage.setItem('previousChatState_newMessagesAmount', getFromLocalStorage("newMessagesAmount"));
   sessionStorage.setItem('terminationTime', Date.now().toString());
+  sessionStorage.setItem('previousChatId', chat.chatId ?? '');
   
   thunkApi.dispatch(resetState());
 
@@ -239,13 +237,15 @@ export const addChatToTerminationQueue = createAsyncThunk('chat/addChatToTermina
 });
 
 export const removeChatFromTerminationQueue = createAsyncThunk('chat/addChatToTerminationQueue', async (args, thunkApi) => {
-  const chat = JSON.parse(sessionStorage.getItem('previousChatState_state') ?? '{}');
-  setToLocalStorage(SESSION_STORAGE_CHAT_ID_KEY, sessionStorage.getItem('previousChatState_chat_id'));
-  setToLocalStorage('newMessagesAmount', sessionStorage.getItem('previousChatState_newMessagesAmount'));
+  const chatId = sessionStorage.getItem('previousChatId');
+  sessionStorage.removeItem('previousChatId');
+  sessionStorage.removeItem('terminationTime');
+  
+  if(!chatId) return;
 
-  thunkApi.dispatch(resetStateWithValue(chat));
+  thunkApi.dispatch(resetStateWithValue(chatId));
 
-  return ChatService.removeChatFromTerminationQueue(chat.chatId);
+  return ChatService.removeChatFromTerminationQueue(chatId);
 });
 
 export const resetChatState = createAsyncThunk('', async (args: { event: CHAT_EVENTS | null}, thunkApi) => {
@@ -322,7 +322,9 @@ export const chatSlice = createSlice({
   initialState,
   reducers: {
     resetState: () => initialState,
-    resetStateWithValue: (state, action?: PayloadAction<ChatState>) => action?.payload || initialState,
+    resetStateWithValue: (state, action: PayloadAction<string>) => {
+      state.chatId = action.payload;
+    },
     setChatId: (state, action: PayloadAction<string>) => {
       state.chatId = action.payload;
     },

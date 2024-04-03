@@ -12,7 +12,9 @@ export const wasPageReloaded = () => {
 
 export const isChatAboutToBeTerminated = () => {
   const terminationTime = sessionStorage.getItem('terminationTime');
-  if(terminationTime)
-    return 2000 < (Date.now() - parseInt(terminationTime));
-  return false;
+
+  if(!terminationTime)
+    return false;
+
+  return 4000 > (Date.now() - parseInt(terminationTime));
 }
