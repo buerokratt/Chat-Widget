@@ -520,7 +520,7 @@ export const chatSlice = createSlice({
       state.estimatedWaiting = action.payload;
       state.messages.push({
         chatId: 'estimatedWaiting',
-        authorTimestamp: '',
+        authorTimestamp: new Date().toISOString(),
       });
     });
     builder.addCase(generateForwardingRequest.fulfilled, (state, action) => {
