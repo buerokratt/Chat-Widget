@@ -97,23 +97,23 @@ const App: FC = () => {
   useGetNewMessages();
   useNewMessageNotification();
 
-  useEffect(() => {
-    const storageHandler = () => {
-      const storedData = getFromLocalStorage(SESSION_STORAGE_CHAT_ID_KEY);
-      if (storedData === null) {
-        setChatId("");
-        dispatch(setChatId(""));
-        dispatch(setIsChatOpen(false));
-        dispatch(resetState());
-      }
-    };
+  // useEffect(() => {
+  //   const storageHandler = () => {
+  //     const storedData = getFromLocalStorage(SESSION_STORAGE_CHAT_ID_KEY);
+  //     if (storedData === null) {
+  //       setChatId("");
+  //       dispatch(setChatId(""));
+  //       dispatch(setIsChatOpen(false));
+  //       dispatch(resetState());
+  //     }
+  //   };
 
-    window.addEventListener("storage", storageHandler);
+  //   window.addEventListener("storage", storageHandler);
 
-    return () => {
-      window.removeEventListener("storage", storageHandler);
-    };
-  }, [SESSION_STORAGE_CHAT_ID_KEY]);
+  //   return () => {
+  //     window.removeEventListener("storage", storageHandler);
+  //   };
+  // }, [SESSION_STORAGE_CHAT_ID_KEY]);
 
   useEffect(() => {
     const sessions = localStorage.getItem("sessions");

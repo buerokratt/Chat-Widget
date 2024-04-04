@@ -21,6 +21,7 @@ import {
 import { getFromLocalStorage, setToLocalStorage } from '../utils/local-storage-utils';
 import getHolidays from '../utils/holidays';
 import { getChatModeBasedOnLastMessage } from '../utils/chat-utils';
+import { isChatAboutToBeTerminated, isLastSession, wasPageReloaded } from '../utils/browser-utils';
 
 export interface EstimatedWaiting {
   positionInUnassignedChats: string;
@@ -216,15 +217,13 @@ export const endChat = createAsyncThunk('chat/endChat', async (args: { event: CH
     }, endEvent === CHAT_EVENTS.UNAVAILABLE_CONTACT_INFORMATION_FULFILLED ? "IDLE" : null);
 });
 
-export const addChatToTerminationQueue = createAsyncThunk('chat/addChatToTerminationQueue', async (args: { event: CHAT_EVENTS | null, isUpperCase: boolean}, thunkApi) => {
+export const addChatToTerminationQueue = createAsyncThunk('chat/addChatToTerminationQueue', async (args, thunkApi) => {  
   const { chat } = thunkApi.getState() as { chat: ChatState };
 
   sessionStorage.setItem('terminationTime', Date.now().toString());
-  sessionStorage.setItem('previousChatId', chat.chatId ?? '');
+  localStorage.setItem('previousChatId', chat.chatId ?? '');
   
   thunkApi.dispatch(resetState());
-
-  const endEvent = args.isUpperCase ? args.event?.toUpperCase() : args.event ?? '';
 
   return chat.chatStatus === CHAT_STATUS.ENDED
     ? null
@@ -232,20 +231,25 @@ export const addChatToTerminationQueue = createAsyncThunk('chat/addChatToTermina
       chatId: chat.chatId,
       authorTimestamp: new Date().toISOString(),
       authorRole: AUTHOR_ROLES.END_USER,
-      event: endEvent,
-    }, endEvent === CHAT_EVENTS.UNAVAILABLE_CONTACT_INFORMATION_FULFILLED ? "IDLE" : null);
+      event: CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS.toUpperCase(),
+    });
 });
 
-export const removeChatFromTerminationQueue = createAsyncThunk('chat/addChatToTerminationQueue', async (args, thunkApi) => {
-  const chatId = sessionStorage.getItem('previousChatId');
-  sessionStorage.removeItem('previousChatId');
+export const removeChatFromTerminationQueue = createAsyncThunk('chat/removeChatFromTerminationQueue', async (args, thunkApi) => {
+  if(!wasPageReloaded() || !isChatAboutToBeTerminated()) {
+    return null;
+  }
+
+  console.log('removeChatFromTerminationQueue')
+
+  const chatId = localStorage.getItem('previousChatId');
+  setToLocalStorage(SESSION_STORAGE_CHAT_ID_KEY, chatId);
   sessionStorage.removeItem('terminationTime');
   
-  if(!chatId) return;
-
-  thunkApi.dispatch(resetStateWithValue(chatId));
-
-  return ChatService.removeChatFromTerminationQueue(chatId);
+  if(chatId) {
+    thunkApi.dispatch(resetStateWithValue(chatId));
+    return ChatService.removeChatFromTerminationQueue(chatId);
+  }
 });
 
 export const resetChatState = createAsyncThunk('', async (args: { event: CHAT_EVENTS | null}, thunkApi) => {
