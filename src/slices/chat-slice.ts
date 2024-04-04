@@ -240,8 +240,6 @@ export const removeChatFromTerminationQueue = createAsyncThunk('chat/removeChatF
     return null;
   }
 
-  console.log('removeChatFromTerminationQueue')
-
   const chatId = localStorage.getItem('previousChatId');
   setToLocalStorage(SESSION_STORAGE_CHAT_ID_KEY, chatId);
   sessionStorage.removeItem('terminationTime');
