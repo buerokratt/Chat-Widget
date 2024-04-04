@@ -120,11 +120,11 @@ class ChatService {
   }
 
   addChatToTerminationQueue(message: Message): Promise<void> {
-    return http.post(RUUTER_ENDPOINTS.ADD_CHAT_TO_TERMINATION_QUEUE, {message});
+    return http.post(RUUTER_ENDPOINTS.ADD_CHAT_TO_TERMINATION_QUEUE, message);
   }
 
   removeChatFromTerminationQueue(chatId: string): Promise<void> {
-    return http.post(RUUTER_ENDPOINTS.REMOVE_CHAT_FROM_TERMINATION_QUEUE, {chatId});
+    return http.post(RUUTER_ENDPOINTS.REMOVE_CHAT_FROM_TERMINATION_QUEUE, { chatId });
   }
 }
 

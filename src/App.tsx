@@ -97,23 +97,24 @@ const App: FC = () => {
   useGetNewMessages();
   useNewMessageNotification();
 
-  // useEffect(() => {
-  //   const storageHandler = () => {
-  //     const storedData = getFromLocalStorage(SESSION_STORAGE_CHAT_ID_KEY);
-  //     if (storedData === null) {
-  //       setChatId("");
-  //       dispatch(setChatId(""));
-  //       dispatch(setIsChatOpen(false));
-  //       dispatch(resetState());
-  //     }
-  //   };
+  useEffect(() => {
+    const storageHandler = () => {
+      const storedData = getFromLocalStorage(SESSION_STORAGE_CHAT_ID_KEY);
+      const previousChatId = getFromLocalStorage('previousChatId');
+      if (storedData === null && previousChatId === null) {
+        setChatId("");
+        dispatch(setChatId(""));
+        dispatch(setIsChatOpen(false));
+        dispatch(resetState());
+      }
+    };
 
-  //   window.addEventListener("storage", storageHandler);
+    window.addEventListener("storage", storageHandler);
 
-  //   return () => {
-  //     window.removeEventListener("storage", storageHandler);
-  //   };
-  // }, [SESSION_STORAGE_CHAT_ID_KEY]);
+    return () => {
+      window.removeEventListener("storage", storageHandler);
+    };
+  }, []);
 
   useEffect(() => {
     const sessions = localStorage.getItem("sessions");
@@ -149,7 +150,7 @@ const App: FC = () => {
       dispatch(setChatId(sessionStorageChatId));
       dispatch(setIsChatOpen(true));
     }
-  }, [dispatch, chatId]);
+  }, [chatId]);
 
   useEffect(() => {
     if (chatId && !messages.length) {

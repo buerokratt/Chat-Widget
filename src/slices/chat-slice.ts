@@ -505,6 +505,7 @@ export const chatSlice = createSlice({
       state.feedback.isFeedbackMessageGiven = false;
       state.feedback.isFeedbackRatingGiven = false;
       clearStateVariablesFromLocalStorage();
+      localStorage.removeItem('previousChatId');
     });
     builder.addCase(addChatToTerminationQueue.fulfilled, (state) => {
       state.chatStatus = CHAT_STATUS.ENDED;
