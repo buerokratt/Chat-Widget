@@ -225,9 +225,7 @@ export const addChatToTerminationQueue = createAsyncThunk('chat/addChatToTermina
   
   thunkApi.dispatch(resetState());
 
-  return chat.chatStatus === CHAT_STATUS.ENDED
-    ? null
-    : ChatService.addChatToTerminationQueue({
+  return ChatService.addChatToTerminationQueue({
       chatId: chat.chatId,
       authorTimestamp: new Date().toISOString(),
       authorRole: AUTHOR_ROLES.END_USER,
