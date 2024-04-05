@@ -10,7 +10,7 @@ const useReloadChatEndEffect = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(removeChatFromTerminationQueue())
+    dispatch(removeChatFromTerminationQueue());
   }, []);
 
   useEffect(() => {
