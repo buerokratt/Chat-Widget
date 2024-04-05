@@ -225,12 +225,9 @@ export const addChatToTerminationQueue = createAsyncThunk('chat/addChatToTermina
   
   thunkApi.dispatch(resetState());
 
-  return ChatService.addChatToTerminationQueue({
-      chatId: chat.chatId,
-      authorTimestamp: new Date().toISOString(),
-      authorRole: AUTHOR_ROLES.END_USER,
-      event: CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS.toUpperCase(),
-    });
+  if(chat.chatId) {
+    return ChatService.addChatToTerminationQueue(chat.chatId);
+  }
 });
 
 export const removeChatFromTerminationQueue = createAsyncThunk('chat/removeChatFromTerminationQueue', async (args, thunkApi) => {
