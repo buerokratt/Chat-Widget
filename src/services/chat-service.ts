@@ -2,10 +2,11 @@ import { UserContacts } from './../model/user-contacts-model';
 import http from './http-service';
 import { Attachment, Message } from '../model/message-model';
 import { Chat } from '../model/chat-model';
-import { RUUTER_ENDPOINTS } from '../constants';
+import { NOTIFICATION_NODE_ENDPOINTS, RUUTER_ENDPOINTS } from '../constants';
 import { EndUserTechnicalData } from '../model/chat-ini-model';
 import { EmergencyNoticeResponse } from '../model/emergency-notice-response-model';
 import { EstimatedWaiting } from '../slices/chat-slice';
+import { sendNotificationBackgroundRequest } from './notification-http-service';
 
 interface Document {
   _id: string;
@@ -119,12 +120,12 @@ class ChatService {
     return http.get(RUUTER_ENDPOINTS.GET_CSA_TITLE_VISIBILITY);
   }
 
-  addChatToTerminationQueue(chatId: string): Promise<void> {
-    return http.post(RUUTER_ENDPOINTS.ADD_CHAT_TO_TERMINATION_QUEUE, { chatId });
+  addChatToTerminationQueue(chatId: string): void {
+    sendNotificationBackgroundRequest(NOTIFICATION_NODE_ENDPOINTS.ADD_CHAT_TO_TERMINATION_QUEUE, { chatId });
   }
 
-  removeChatFromTerminationQueue(chatId: string): Promise<void> {
-    return http.post(RUUTER_ENDPOINTS.REMOVE_CHAT_FROM_TERMINATION_QUEUE, { chatId });
+  removeChatFromTerminationQueue(chatId: string): void {
+    sendNotificationBackgroundRequest(NOTIFICATION_NODE_ENDPOINTS.REMOVE_CHAT_FROM_TERMINATION_QUEUE, { chatId });
   }
 }
 

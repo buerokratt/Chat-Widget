@@ -120,6 +120,9 @@ export enum RUUTER_ENDPOINTS {
   SEND_USER_CONTACTS = '/end-user-email-phone',
   GET_CSA_NAME_VISIBILITY = '/name-visibility',
   GET_CSA_TITLE_VISIBILITY = '/title-visibility',
+}
+
+export enum NOTIFICATION_NODE_ENDPOINTS {
   ADD_CHAT_TO_TERMINATION_QUEUE = '/add-chat-to-termination-queue',
   REMOVE_CHAT_FROM_TERMINATION_QUEUE = '/remove-chat-from-termination-queue',
 }
