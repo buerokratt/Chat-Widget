@@ -20,7 +20,8 @@ const ConfirmationModalDownload = () => {
   const handleDownload = async (isForwardToEmail: boolean) => {
     if (
       isForwardToEmail &&
-      (endUserContacts.mailAddress === "" || !new RegExp(EMAIL_REGEX).test(endUserContacts.mailAddress))
+      (endUserContacts.mailAddress === "" ||
+        !new RegExp(EMAIL_REGEX).test(endUserContacts.mailAddress))
     ) {
       setInvalidMessage(t("widget.contacts.contact.invalid.email"));
       return false;
@@ -28,7 +29,10 @@ const ConfirmationModalDownload = () => {
 
     const response = await dispatch(downloadChat(isForwardToEmail));
     if (response.meta.requestStatus === "rejected") return false;
-    downloadRef.current?.download({ title: `chat-history.pdf`, data: (response.payload as any).data });
+    downloadRef.current?.download({
+      title: `chat-history.pdf`,
+      data: (response.payload as any).data,
+    });
     return true;
   };
 
@@ -37,9 +41,9 @@ const ConfirmationModalDownload = () => {
       {!showForwardForm ? (
         <>
           <Download ref={downloadRef} />
-          <a onClick={() => handleDownload(false)} className={styles.downloadLink}>
+          <button className={styles.downloadLink} onClick={() => handleDownload(false)}>
             {t("widget.action.download-chat")}
-          </a>
+          </button>
           {/* <a onClick={() => setShowForwardForm(true)} className={styles.downloadLink}>
             {t("widget.action.forward-chat")}
           </a> */}
@@ -60,7 +64,9 @@ const ConfirmationModalDownload = () => {
                 }}
               />
               <hr className={styles.divider} />
-              {invalidMessage && <p className={styles.missingFeedback}>{invalidMessage}</p>}
+              {invalidMessage && (
+                <p className={styles.missingFeedback}>{invalidMessage}</p>
+              )}
             </div>
             <div className={styles.downloadActions}>
               <Button
