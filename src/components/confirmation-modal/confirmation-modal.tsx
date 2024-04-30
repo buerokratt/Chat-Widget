@@ -40,9 +40,8 @@ export default function ConfirmationModal(): JSX.Element {
 
   return (
     <div className={styles.container}>
-      <div
+      <dialog
         className={styles.content}
-        role="dialog"
         aria-modal="true"
         aria-labelledby={t("widget.action.close-confirmation")}
       >
@@ -82,7 +81,7 @@ export default function ConfirmationModal(): JSX.Element {
             <ConfirmationModalDownload />
           </>
         )}
-      </div>
+      </dialog>
     </div>
   );
 }

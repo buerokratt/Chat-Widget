@@ -1,7 +1,4 @@
-import {
-  LOCAL_STORAGE_TARA_LOGIN_REDIRECT,
-  RUUTER_ENDPOINTS,
-} from "../constants";
+import { LOCAL_STORAGE_TARA_LOGIN_REDIRECT } from "../constants";
 import widgetService from "../services/widget-service";
 
 export function redirectToTim() {
