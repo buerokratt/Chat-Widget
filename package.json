@@ -28,7 +28,6 @@
     "react-i18next": "^11.14.2",
     "react-redux": "^7.2.5",
     "react-router-dom": "^6.20.1",
-    "react-scripts": "5.0.1",
     "react-transition-group": "^4.4.2",
     "redux": "^4.1.2",
     "resolve-url-loader": "^5.0.0",
@@ -64,6 +63,7 @@
     "eslint-config-react-app": "7.0.1",
     "husky": "^7.0.0",
     "prettier": "2.4.1",
+    "react-scripts": "5.0.1",
     "sass-loader": "^10.2.0",
     "style-loader": "^2.0.0",
     "svg-url-loader": "^7.1.1",
@@ -83,7 +83,7 @@
     "lint:fix": "npm run lint -- --fix",
     "prettier:check": "prettier --check \"{,src/**/,webpack/}*.{json,yml,html,js,ts,tsx,css,scss}\"",
     "prettier:format": "prettier --write \"{,src/**/,webpack/}*.{json,yml,html,js,ts,tsx,css,scss}\"",
-    "prepare": "husky install && chmod a+x .husky/pre-push .husky/pre-commit",
+    "prepare": " ",
     "webpack": "webpack"
   },
   "browserslist": {
