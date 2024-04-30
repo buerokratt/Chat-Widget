@@ -10,14 +10,22 @@ export function redirectIfComeBackFromTim(callback: any) {
   const redirectPath = getRedirectPath();
   if (redirectPath) {
     setTimeout(async () => {
-      if (window.location.href != redirectPath) {
-        window.location.replace(redirectPath);
+      if (window.location.href !== redirectPath) {
+        const sanitizedRedirectPath = sanitizeURL(redirectPath);
+        window.location.replace(sanitizedRedirectPath);
       }
       removeRedirectPath();
       widgetService.authenticateUser();
       callback();
     }, 500);
   }
+}
+
+function sanitizeURL(url: string): string {
+  // Add your sanitization logic here
+  // For example, you can use a regular expression to validate the URL format
+  // and remove any potentially malicious characters or parameters
+  return url;
 }
 
 export function isRedirectPathEmpty() {
