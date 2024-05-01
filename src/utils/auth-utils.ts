@@ -2,8 +2,7 @@ import { LOCAL_STORAGE_TARA_LOGIN_REDIRECT } from "../constants";
 import widgetService from "../services/widget-service";
 
 export function redirectToTim() {
-  saveCurrentBrowserPath();
-  window.location.assign(window._env_.TIM_AUTHENTICATION_URL);
+  saveCurrentBrowserPath();  window.location.assign(window._env_.TIM_AUTHENTICATION_URL);
 }
 
 export function redirectIfComeBackFromTim(callback: any) {
@@ -11,21 +10,16 @@ export function redirectIfComeBackFromTim(callback: any) {
   if (redirectPath) {
     setTimeout(async () => {
       if (window.location.href !== redirectPath) {
-        const sanitizedRedirectPath = sanitizeURL(redirectPath);
-        window.location.replace(sanitizedRedirectPath);
+        const allowedURLPattern = /(https?:\/\/)?([\da-z\.-]+)\.([a-z]{2,6})([/\w.-]+)+\/?/;
+        if (allowedURLPattern.test(redirectPath)) {
+           window.location.replace(redirectPath);
+        }
       }
       removeRedirectPath();
       widgetService.authenticateUser();
       callback();
     }, 500);
   }
-}
-
-function sanitizeURL(url: string): string {
-  // Add your sanitization logic here
-  // For example, you can use a regular expression to validate the URL format
-  // and remove any potentially malicious characters or parameters
-  return url;
 }
 
 export function isRedirectPathEmpty() {
