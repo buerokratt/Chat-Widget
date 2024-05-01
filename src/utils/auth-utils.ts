@@ -10,7 +10,7 @@ export function redirectIfComeBackFromTim(callback: any) {
   if (redirectPath) {
     setTimeout(async () => {
       if (window.location.href !== redirectPath) {
-        const allowedURLPattern = /(https?:\/\/)?([\da-z\.-]+)\.([a-z]{2,6})([/\w.-]+)+\/?/;
+        const allowedURLPattern = /(https?:\/\/)?([\da-z.-]+)\.([a-z]{2,6})([/\w.-]+)+\/?/;
         if (allowedURLPattern.test(redirectPath)) {
            window.location.replace(redirectPath);
         }
