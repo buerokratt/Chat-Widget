@@ -216,7 +216,7 @@ const ChatKeyPad = (): JSX.Element => {
         ) : (
           <>
             <button
-              onKeyPress={addNewMessageToState}
+              onKeyDown={addNewMessageToState}
               onClick={addNewMessageToState}
               className={styles.button}
               title={t("keypad.button.label")}
@@ -228,7 +228,7 @@ const ChatKeyPad = (): JSX.Element => {
 
             {userInputFile ? (
               <button
-                onKeyPress={() => null}
+                onKeyDown={() => null}
                 onClick={handleUploadClear}
                 className={styles.button_cancelUpload}
                 title={t("keypad.button.label")}
@@ -239,7 +239,7 @@ const ChatKeyPad = (): JSX.Element => {
               </button>
             ) : (
               <button
-                onKeyPress={() => null}
+                onKeyDown={() => null}
                 onClick={handleUploadClick}
                 className={styles.button}
                 title={t("keypad.button.label")}
