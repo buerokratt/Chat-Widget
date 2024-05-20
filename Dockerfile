@@ -20,4 +20,4 @@ COPY --chown=nginx:nginx ./nginx/http-nginx.conf /etc/nginx/conf.d/default.conf
 COPY --chown=nginx:nginx --from=build ./usr/app/dist /usr/share/nginx/html/widget
 COPY --chown=nginx:nginx ./public/favicon.ico /usr/share/nginx/html/widget
 EXPOSE 443
-CMD [ "/bin/bash", "-c", "nginx -g 'daemon off;'" ]
+CMD [ "nginx", "-c", "nginx -g 'daemon off;'" ]
