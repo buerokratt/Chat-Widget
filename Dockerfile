@@ -1,5 +1,5 @@
 ARG node_version=node:lts
-ARG nginx_version=nginx:1.25.4-alpine
+ARG nginx_version=nginx:alpine
 
 
 FROM $node_version as image
@@ -13,8 +13,11 @@ COPY . .
 RUN npm run webpack
 
 FROM $nginx_version
-COPY ./nginx/http-nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build ./usr/app/dist /usr/share/nginx/html/widget
-COPY ./public/favicon.ico /usr/share/nginx/html/widget
+RUN  touch /var/run/nginx.pid && \
+     chown -R nginx:nginx /var/cache/nginx /var/run/nginx.pid
+USER nginx
+COPY --chown=nginx:nginx ./nginx/http-nginx.conf /etc/nginx/conf.d/default.conf
+COPY --chown=nginx:nginx --from=build ./usr/app/dist /usr/share/nginx/html/widget
+COPY --chown=nginx:nginx ./public/favicon.ico /usr/share/nginx/html/widget
 EXPOSE 443
 CMD ["nginx", "-g", "daemon off;"]
