@@ -208,7 +208,7 @@ const ChatKeyPad = (): JSX.Element => {
               <img src={Send} alt="Send message icon" />
             </button>
 
-            {renderSendFileButton()}
+            {isHiddenFeatureEnabled && renderSendFileButton()}
           </>
         )}
       </div>
@@ -217,10 +217,6 @@ const ChatKeyPad = (): JSX.Element => {
   );
 
   function renderSendFileButton() {
-    if(!isHiddenFeatureEnabled) {
-      return <></>
-    }
-
     if(userInputFile) {
       return (
         <button
