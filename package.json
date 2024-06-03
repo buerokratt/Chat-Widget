@@ -11,7 +11,7 @@
     "cross-env": "^7.0.3",
     "date-fns": "^2.30.0",
     "date-holidays": "^3.22.0",
-    "framer-motion": "4.1.11-beta.5",
+    "framer-motion": "11.2.10",
     "i18next": "^21.2.4",
     "i18next-browser-languagedetector": "^6.1.2",
     "linkify-react": "^3.0.3",
