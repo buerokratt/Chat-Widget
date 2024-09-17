@@ -14,10 +14,8 @@ const rightAnimation = {
   transition: { duration: 0.25, delay: 0.25 },
 };
 
-const ClientMessage = (props: { message: Message }): JSX.Element => {
-  const {
-    message: { content },
-  } = props;
+const ClientMessage = (props: { message?: Message, content?: string }): JSX.Element => {
+  const content = props.message?.content || props.content;
 
   if (props.message?.file) {
     return (
