@@ -88,7 +88,11 @@ const AdminMessage = ({ message }: { message: Message }): JSX.Element => {
             }`}
           >
             <Linkifier message={decodeURIComponent(message.content ?? "")} />
-            {hasOptions && !message.content && t('widget.action.select')}
+            {!message.content && (
+              hasOptions || hasButtons 
+              ? t('widget.action.select') 
+              : <i>{t('widget.error.empty')}</i>
+            )}
           </div>
           <div
             className={classNames(
