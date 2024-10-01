@@ -19,7 +19,15 @@ const Linkifier: React.FC<LinkifierProps> = ({ message }) => (
         },
       }}
     >
-      {message || ''}
+      {message && (
+        <div>
+          {message
+            .split(/\*\*(.*?)\*\*/g)
+            .map((part, index) =>
+              index % 2 === 1 ? <strong style={{ fontFamily: "Aino Bold" }}>{part}</strong> : part
+            )}
+        </div>
+      )}
     </Linkify>
   </div>
 );
