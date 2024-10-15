@@ -51,7 +51,7 @@ const ClientMessage = (props: { message?: Message, content?: string }): JSX.Elem
           <img src={PersonIcon} alt="Person icon" />
         </div>
         <div className={styles.content}>
-          <Markdownify message={decodeURIComponent(content ?? "")} />
+          <Markdownify message={content ?? ""} />
         </div>
       </div>
     </motion.div>

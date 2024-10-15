@@ -87,7 +87,7 @@ const AdminMessage = ({ message }: { message: Message }): JSX.Element => {
               styles.emergency_content
             }`}
           >
-            <Markdownify message={decodeURIComponent(message.content ?? "")} />
+            <Markdownify message={message.content ?? ""} />
             {!message.content && (
               hasOptions || hasButtons 
               ? t('widget.action.select') 
