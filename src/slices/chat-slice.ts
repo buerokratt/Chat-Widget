@@ -485,16 +485,16 @@ export const chatSlice = createSlice({
           case CHAT_EVENTS.UNAVAILABLE_HOLIDAY:
           case CHAT_EVENTS.UNAVAILABLE_CSAS_ASK_CONTACTS:
           case CHAT_EVENTS.UNAVAILABLE_ORGANIZATION:
+            state.askForContactsIfNoCsa = true;
             state.showUnavailableContactForm = true;
             state.contactMsgId = msg.id ?? "";
             state.contactContentMessage = msg.content ?? "";
-            state.askForContactsIfNoCsa = true;
             break;
           case CHAT_EVENTS.UNAVAILABLE_CSAS:
+            state.askForContactsIfNoCsa = false;
             state.showUnavailableContactForm = true;
             state.contactMsgId = msg.id ?? "";
             state.contactContentMessage = msg.content ?? "";
-            state.askForContactsIfNoCsa = false;
             break;
           case CHAT_EVENTS.ANSWERED:
           case CHAT_EVENTS.TERMINATED:
