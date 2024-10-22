@@ -1,7 +1,7 @@
-import { ChatState } from './slices/chat-slice';
-import { AuthenticationState } from './slices/authentication-slice';
-import { Message } from './model/message-model';
-import { CHAT_STATUS, CHAT_WINDOW_WIDTH, CHAT_WINDOW_HEIGHT, CHAT_MODES } from './constants';
+import { ChatState } from "./slices/chat-slice";
+import { AuthenticationState } from "./slices/authentication-slice";
+import { Message } from "./model/message-model";
+import { CHAT_STATUS, CHAT_WINDOW_WIDTH, CHAT_WINDOW_HEIGHT, CHAT_MODES } from "./constants";
 
 export const initialChatState: ChatState = {
   endUserContacts: {
@@ -20,6 +20,7 @@ export const initialChatState: ChatState = {
   isChatOpen: false,
   showContactForm: false,
   showUnavailableContactForm: false,
+  askForContactsIfNoCsa: true,
   contactContentMessage: "",
   isChatRedirected: false,
   messages: [],
@@ -76,35 +77,35 @@ export const initialAuthState: AuthenticationState = {
   isAuthenticated: false,
   authenticationFailed: false,
   userInfo: {
-    jwtExpirationTimestamp: '',
-    firstName: '',
-    lastName: '',
-    personalCode: '',
+    jwtExpirationTimestamp: "",
+    firstName: "",
+    lastName: "",
+    personalCode: "",
   },
 };
 
 export const mockMessages: Message[] = [
   {
-    chatId: 'id',
-    content: 'hello world',
-    authorTimestamp: '2022-03-09T10:25:31.519Z',
+    chatId: "id",
+    content: "hello world",
+    authorTimestamp: "2022-03-09T10:25:31.519Z",
   },
 ];
 
 export const mockMessage = {
-  chatId: '123',
-  content: 'Hello World',
+  chatId: "123",
+  content: "Hello World",
   authorTimestamp: new Date().toISOString(),
 };
 
 export const mockMessage2 = {
-  chatId: '321',
-  content: 'bye',
+  chatId: "321",
+  content: "bye",
   authorTimestamp: new Date().toISOString(),
 };
 
 export const mockChat = {
-  id: '1',
-  customerSupportId: '9',
+  id: "1",
+  customerSupportId: "9",
   status: CHAT_STATUS.OPEN,
 };
