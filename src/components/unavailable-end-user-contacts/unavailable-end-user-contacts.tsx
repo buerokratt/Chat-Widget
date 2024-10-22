@@ -131,9 +131,11 @@ const UnavailableEndUserContacts = (): JSX.Element => {
             </div>
           )}
           {!askForContactsIfNoCsa && (
-            <StyledButton styleType={StyledButtonType.GRAY} onClick={skipForm}>
-              {t("header.button.close.label")}
-            </StyledButton>
+            <div className="form-footer">
+              <StyledButton styleType={StyledButtonType.GRAY} onClick={skipForm}>
+                {t("header.button.close.label")}
+              </StyledButton>
+            </div>
           )}
         </div>
       </form>
