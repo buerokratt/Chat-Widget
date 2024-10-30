@@ -447,7 +447,6 @@ export const chatSlice = createSlice({
       ]);
     },
     addMessageToTop: (state, action: PayloadAction<Message>) => {
-      console.log("addMessageToTop", action.payload);
       state.messages = [action.payload, ...state.messages];
     },
     setIsChatOpen: (state, action: PayloadAction<boolean>) => {
