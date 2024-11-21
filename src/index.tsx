@@ -12,11 +12,11 @@ ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter>
       <Routes>
-        <Route index element={<Navigate to="/" />} />
-        <Route path="/" element={<App />} />
+        <Route index element={<Navigate to="/byk-widget" />} />
+        <Route path="/byk-widget" element={<App />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
       </Routes>
     </BrowserRouter>
   </Provider>,
-  document.getElementById('byk-va'),
+  document.getElementById("byk-va")
 );
