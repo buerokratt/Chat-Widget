@@ -10,12 +10,7 @@ import './index.scss';
 
 ReactDOM.render(
   <Provider store={store}>
-    <BrowserRouter>
-      <Routes>
-        <Route path='/' Component={App} />
-        <Route path='/auth/callback' Component={AuthCallback} />
-      </Routes>
-    </BrowserRouter>
+    <App />
   </Provider>,
   document.getElementById('byk-va'),
 );
