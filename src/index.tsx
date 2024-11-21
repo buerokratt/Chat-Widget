@@ -13,8 +13,8 @@ ReactDOM.render(
     <BrowserRouter>
       <Routes>
         <Route index element={<Navigate to="/" />} />
-        <Route path="/" Component={App} />
-        <Route path="/auth/callback" Component={AuthCallback} />
+        <Route path="/" element={<App />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
       </Routes>
     </BrowserRouter>
   </Provider>,
