@@ -12,8 +12,8 @@ ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter>
       <Routes>
-        <Route index element={<Navigate to="/byk-widget" />} />
-        <Route path="/byk-widget" Component={App} />
+        <Route index element={<Navigate to="/" />} />
+        <Route path="/" Component={App} />
         <Route path="/auth/callback" Component={AuthCallback} />
       </Routes>
     </BrowserRouter>
