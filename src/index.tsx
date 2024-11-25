@@ -10,9 +10,8 @@ import './index.scss';
 
 ReactDOM.render(
   <Provider store={store}>
-    <BrowserRouter>
+    <BrowserRouter basename="/">
       <Routes>
-        <Route path="/" element={<Navigate to="/byk-widget" />} />
         <Route index element={<Navigate to="/byk-widget" />} />
         <Route path="/byk-widget" element={<App />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
