@@ -10,11 +10,13 @@ import './index.scss';
 
 ReactDOM.render(
   <Provider store={store}>
+    <BrowserRouter>
       <Routes>
         <Route index element={<Navigate to="/byk-widget" />} />
         <Route path="/byk-widget" element={<App />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
       </Routes>
+    </BrowserRouter>
   </Provider>,
   document.getElementById("byk-va")
 );
