@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useLayoutEffect, useState } from "react";
+import { useLocation } from "react-router-dom"; // Import useLocation
 import { isOfficeHours } from "./utils/office-hours-utils";
 import Profile from "./components/profile/profile";
 import Chat from "./components/chat/chat";
@@ -38,7 +39,7 @@ declare global {
     _env_: {
       RUUTER_API_URL: string;
       NOTIFICATION_NODE_URL: string;
-      ENVIRONMENT: "development"; // 'developement | production'
+      ENVIRONMENT: "development" | "production";
       TIM_AUTHENTICATION_URL: string;
       ORGANIZATION_NAME: string;
       TERMS_AND_CONDITIONS_LINK: string;
@@ -59,6 +60,7 @@ const App: FC = () => {
   const dispatch = useAppDispatch();
   const { isChatOpen, messages, chatId, emergencyNotice } = useChatSelector();
   const { widgetConfig } = useWidgetSelector();
+  const location = useLocation(); // Use useLocation to get the current route
   const [displayWidget, setDisplayWidget] = useState(
     !!getFromLocalStorage(SESSION_STORAGE_CHAT_ID_KEY) || isOfficeHours()
   );
@@ -110,30 +112,14 @@ const App: FC = () => {
   }, []);
 
   useEffect(() => {
-    const sessions = localStorage.getItem("sessions");
-    if (sessions == null) {
-      localStorage.setItem("sessions", "1");
-    } else {
-      localStorage.setItem("sessions", `${parseInt(sessions) + 1}`);
+    const subPath = location.pathname.split("/")[1]; // Extract subpath
+    console.log(`Detected subpath: ${subPath}`); // Debugging: log current subpath
+
+    // Optional: Adjust API base URLs or behavior based on subpath
+    if (window._env_) {
+      window._env_.RUUTER_API_URL = `${window.location.origin}/${subPath}/api`;
     }
-
-    window.onbeforeunload = function (_) {
-      const newSessionsCount = localStorage.getItem("sessions");
-      if (newSessionsCount !== null) {
-        localStorage.setItem("sessions", `${parseInt(newSessionsCount) - 1}`);
-      }
-    };
-  }, []);
-
-  useLayoutEffect(() => {
-    if (!displayWidget || !isChatOpen || !chatId) return;
-    const interval = setInterval(() => {
-      if (!displayWidget || !isChatOpen || !chatId) return;
-      dispatch(customJwtExtend());
-    }, EXTEND_JWT_COOKIE_IN_MS);
-
-    return () => clearInterval(interval);
-  }, [messages]);
+  }, [location]);
 
   useEffect(() => {
     const sessionStorageChatId = getFromLocalStorage(SESSION_STORAGE_CHAT_ID_KEY);
@@ -151,6 +137,16 @@ const App: FC = () => {
     if (emergencyNotice === null) dispatch(getEmergencyNotice());
     if (!widgetConfig.isLoaded) dispatch(getWidgetConfig());
   }, [chatId, dispatch, messages, widgetConfig]);
+
+  useLayoutEffect(() => {
+    if (!displayWidget || !isChatOpen || !chatId) return;
+    const interval = setInterval(() => {
+      if (!displayWidget || !isChatOpen || !chatId) return;
+      dispatch(customJwtExtend());
+    }, EXTEND_JWT_COOKIE_IN_MS);
+
+    return () => clearInterval(interval);
+  }, [messages]);
 
   useNameAndTitleVisibility();
 
