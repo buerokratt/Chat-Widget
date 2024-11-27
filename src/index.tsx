@@ -10,10 +10,11 @@ import './index.scss';
 
 ReactDOM.render(
   <Provider store={store}>
-    <BrowserRouter basename="/test">
+    <BrowserRouter>
       <Routes>
-        <Route path="/" Component={App} />
-        <Route path="/auth/callback" Component={AuthCallback} />
+        {/* Dynamically match any subpath */}
+        <Route path="/*" element={<App />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
       </Routes>
     </BrowserRouter>
   </Provider>,
