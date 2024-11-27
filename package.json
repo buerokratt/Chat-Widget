@@ -88,6 +88,7 @@
     "prepare": "husky install && chmod a+x .husky/pre-push .husky/pre-commit",
     "webpack": "webpack"
   },
+  "homepage": ".",
   "browserslist": {
     "production": [
       ">0.2%",
