@@ -10,6 +10,7 @@ module.exports = {
     filename: "widget_bundle.js",
     library: "$",
     libraryTarget: "umd",
+    publicPath: 'auto',
   },
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
@@ -25,7 +26,7 @@ module.exports = {
             cacheDirectory: true,
             presets: ["@babel/preset-env", "@babel/preset-react", "@babel/preset-typescript"],
             plugins: ["@babel/plugin-transform-runtime"],
-            publicPath: "/test/",
+            publicPath: 'auto',
           },
         },
       },
