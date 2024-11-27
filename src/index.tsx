@@ -1,10 +1,12 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import App from "./App";
-import AuthCallback from "./AuthCallback";
-import { Provider } from "react-redux";
-import { store } from "./store";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import App from './App';
+import { store } from './store';
+import AuthCallback from './AuthCallback';
+import './i18n';
+import './index.scss';
 
 // Automatically detect the subpath from the current location
 const getBasePath = () => {
