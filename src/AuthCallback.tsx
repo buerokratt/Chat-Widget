@@ -1,17 +1,15 @@
-import React, { useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
-  const location = useLocation();
 
   useEffect(() => {
-    const redirectTo = location.state?.from || '/';  
-    navigate(redirectTo, { replace: true });  
-  }, [location, navigate]);
+    navigate('/', { replace: true });
+  }, []);
 
   return (
-    <span>Processing authentication...</span>
+    <span>processing authentication...</span>
   );
 };
 
