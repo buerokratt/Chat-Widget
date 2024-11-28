@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import App from './App';
 import { store } from './store';
@@ -8,24 +8,38 @@ import AuthCallback from './AuthCallback';
 import './i18n';
 import './index.scss';
 
-// Automatically detect the subpath from the current location
 const getBasePath = () => {
   const { pathname } = window.location;
-  // Assume the app is served from the first segment of the path
   const basePath = pathname.split("/")[1];
   return `/${basePath}`;
 };
 
 const baseName = getBasePath();
 
+const Root = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname === '/auth/callback') {
+      setTimeout(() => {
+        window.location.reload();
+      }, 100); 
+    }
+  }, [location]);
+
+  return (
+    <Routes>
+      <Route path="/" Component={App} />
+      <Route path="/auth/callback" Component={AuthCallback} />
+    </Routes>
+  );
+};
+
 ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter basename={baseName}>
-      <Routes>
-        <Route path="/" Component={App} />
-        <Route path="/auth/callback" Component={AuthCallback} />
-      </Routes>
+      <Root />
     </BrowserRouter>
   </Provider>,
-  document.getElementById("byk-va"),
+  document.getElementById("byk-va")
 );
