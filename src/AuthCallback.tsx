@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    navigate('/', { replace: true });
-  }, []);
+    navigate(location.state?.from || '/', { replace: true });
+  }, [location, navigate]);
 
   return (
     <span>processing authentication...</span>
