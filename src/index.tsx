@@ -8,7 +8,6 @@ import AuthCallback from './AuthCallback';
 import './i18n';
 import './index.scss';
 
-
 const getBasePath = () => {
   const { pathname } = window.location;
   const basePath = pathname.split("/")[1];
@@ -21,8 +20,8 @@ ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter basename={baseName}>
       <Routes>
-        <Route path="/" Component={App} />
-        <Route path="/auth/callback" Component={AuthCallback} />
+        <Route path="/" element={<App />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
       </Routes>
     </BrowserRouter>
   </Provider>,
