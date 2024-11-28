@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const AuthCallback = () => {
@@ -6,11 +6,12 @@ const AuthCallback = () => {
   const location = useLocation();
 
   useEffect(() => {
-    navigate(location.state?.from || '/', { replace: true });
+    const redirectTo = location.state?.from || '/';  
+    navigate(redirectTo, { replace: true });  
   }, [location, navigate]);
 
   return (
-    <span>processing authentication...</span>
+    <span>Processing authentication...</span>
   );
 };
 
