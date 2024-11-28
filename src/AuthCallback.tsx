@@ -6,7 +6,8 @@ const AuthCallback = () => {
 
   useEffect(() => {
     navigate('/', { replace: true });
-  }, []);
+    window.location.reload();
+  }, [navigate]);
 
   return (
     <span>processing authentication...</span>
