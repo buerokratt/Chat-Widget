@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useLayoutEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { isOfficeHours } from "./utils/office-hours-utils";
 import Profile from "./components/profile/profile";
 import Chat from "./components/chat/chat";
@@ -34,13 +34,33 @@ import { customJwtExtend } from "./slices/authentication-slice";
 import { getFromLocalStorage } from "./utils/local-storage-utils";
 import useNameAndTitleVisibility from "./hooks/use-name-title-visibility";
 
+declare global {
+  interface Window {
+    _env_: {
+      RUUTER_API_URL: string;
+      NOTIFICATION_NODE_URL: string;
+      ENVIRONMENT: "development" | "production";
+      TIM_AUTHENTICATION_URL: string;
+      ORGANIZATION_NAME: string;
+      TERMS_AND_CONDITIONS_LINK: string;
+      OFFICE_HOURS: {
+        ENABLED: boolean;
+        TIMEZONE: string;
+        BEGIN: number;
+        END: number;
+        DAYS: number[];
+      };
+      ENABLE_HIDDEN_FEATURES: string;
+      IFRAME_TARGET_OIRGIN: string;
+    };
+  }
+}
+
 const App: FC = () => {
   const dispatch = useAppDispatch();
-  const { isAuthenticated, fetchingUserInfo } = useAppSelector((state) => state.authentication); 
   const { isChatOpen, messages, chatId, emergencyNotice } = useChatSelector();
   const { widgetConfig } = useWidgetSelector();
-  const location = useLocation();
-  const navigate = useNavigate(); // For navigation logic
+  const location = useLocation(); // Use useLocation to get the current route
   const [displayWidget, setDisplayWidget] = useState(
     !!getFromLocalStorage(SESSION_STORAGE_CHAT_ID_KEY) || isOfficeHours()
   );
@@ -92,9 +112,10 @@ const App: FC = () => {
   }, []);
 
   useEffect(() => {
-    const subPath = location.pathname.split("/")[1];
-    console.log(`Detected subpath: ${subPath}`);
+    const subPath = location.pathname.split("/")[1]; // Extract subpath
+    console.log(`Detected subpath: ${subPath}`); // Debugging: log current subpath
 
+    // Optional: Adjust API base URLs or behavior based on subpath
     if (window._env_) {
       window._env_.RUUTER_API_URL = `${window.location.origin}/${subPath}/api`;
     }
@@ -128,12 +149,6 @@ const App: FC = () => {
   }, [messages]);
 
   useNameAndTitleVisibility();
-
-  if (fetchingUserInfo) return <span>Loading authentication...</span>;
-  if (!isAuthenticated) {
-    navigate("/auth/callback", { replace: true }); 
-    return null; 
-  }
 
   if (burokrattOnlineStatus !== true) return <></>;
   if (displayWidget && widgetConfig.isLoaded) return isChatOpen ? <Chat /> : <Profile />;
