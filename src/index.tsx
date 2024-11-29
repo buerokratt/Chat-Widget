@@ -11,6 +11,7 @@ import './index.scss';
 const getBasePath = () => {
   const { pathname } = window.location;
   const basePath = pathname.split("/")[1];
+  console.log(basePath);
   return `/${basePath}`;
 };
 
@@ -20,7 +21,7 @@ ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter basename={baseName}>
       <Routes>
-        <Route path={baseName} Component={App} />
+        <Route path="/" element={<App />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
       </Routes>
     </BrowserRouter>
