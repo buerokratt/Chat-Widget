@@ -5,7 +5,7 @@ const AuthCallback = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    navigate('/', { replace: true });
+    navigate('/test', { replace: true });
   }, []);
 
   return (
