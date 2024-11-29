@@ -21,9 +21,7 @@ ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter basename={baseName}>
       <Routes>
-        <Route index element={<Navigate to="/" />} />
         <Route path="/" element={<App />} />
-        <Route path="/auth/callback" element={<AuthCallback />} />
       </Routes>
     </BrowserRouter>
   </Provider>,
