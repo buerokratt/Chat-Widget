@@ -20,7 +20,7 @@ ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter basename={baseName}>
       <Routes>
-        <Route path="/${basePath}" element={<App />} />
+        <Route path={baseName} Component={App} />
         <Route path="/auth/callback" element={<AuthCallback />} />
       </Routes>
     </BrowserRouter>
