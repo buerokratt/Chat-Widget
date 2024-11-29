@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import App from './App';
 import { store } from './store';
@@ -21,10 +21,11 @@ ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter basename={baseName}>
       <Routes>
+        <Route index element={<Navigate to="/" />} />
         <Route path="/" element={<App />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
       </Routes>
     </BrowserRouter>
   </Provider>,
-  document.getElementById("byk-va"),
+  document.getElementById("byk-va")
 );
