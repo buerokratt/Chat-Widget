@@ -1,5 +1,6 @@
 import { LOCAL_STORAGE_TARA_LOGIN_REDIRECT } from "../constants";
 import widgetService from "../services/widget-service";
+import {getFromSessionStorage, setToSessionStorage} from "./session-storage-utils";
 
 export function redirectToTim() {
   saveCurrentBrowserPath();
@@ -28,11 +29,11 @@ export function isRedirectPathEmpty() {
 }
 
 function saveCurrentBrowserPath() {
-  localStorage.setItem(LOCAL_STORAGE_TARA_LOGIN_REDIRECT, window.location.href);
+  setToSessionStorage(LOCAL_STORAGE_TARA_LOGIN_REDIRECT, window.location.href);
 }
 
 function getRedirectPath() {
-  return localStorage.getItem(LOCAL_STORAGE_TARA_LOGIN_REDIRECT);
+  return getFromSessionStorage(LOCAL_STORAGE_TARA_LOGIN_REDIRECT);
 }
 
 function removeRedirectPath() {

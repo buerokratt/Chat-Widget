@@ -30,8 +30,8 @@ import useWidgetSelector from "./hooks/use-widget-selector";
 import useGetWidgetConfig from "./hooks/use-get-widget-config";
 import useGetEmergencyNotice from "./hooks/use-get-emergency-notice";
 import { customJwtExtend } from "./slices/authentication-slice";
-import { getFromLocalStorage } from "./utils/local-storage-utils";
 import useNameAndTitleVisibility from "./hooks/use-name-title-visibility";
+import {getFromSessionStorage, setToSessionStorage} from "./utils/session-storage-utils";
 
 declare global {
   interface Window {
@@ -60,7 +60,7 @@ const App: FC = () => {
   const { isChatOpen, messages, chatId, emergencyNotice } = useChatSelector();
   const { widgetConfig } = useWidgetSelector();
   const [displayWidget, setDisplayWidget] = useState(
-    !!getFromLocalStorage(SESSION_STORAGE_CHAT_ID_KEY) || isOfficeHours()
+    !!getFromSessionStorage(SESSION_STORAGE_CHAT_ID_KEY) || isOfficeHours()
   );
   const [onlineCheckInterval, setOnlineCheckInterval] = useState(ONLINE_CHECK_INTERVAL);
   const { burokrattOnlineStatus } = useAppSelector((state) => state.widget);
@@ -75,7 +75,7 @@ const App: FC = () => {
   useInterval(() => dispatch(burokrattOnlineStatusRequest()), onlineCheckInterval);
 
   useInterval(
-    () => setDisplayWidget(!!getFromLocalStorage(SESSION_STORAGE_CHAT_ID_KEY) || isOfficeHours()),
+    () => setDisplayWidget(!!getFromSessionStorage(SESSION_STORAGE_CHAT_ID_KEY) || isOfficeHours()),
     OFFICE_HOURS_INTERVAL_TIMEOUT
   );
 
@@ -92,8 +92,8 @@ const App: FC = () => {
 
   useEffect(() => {
     const storageHandler = () => {
-      const storedData = getFromLocalStorage(SESSION_STORAGE_CHAT_ID_KEY);
-      const previousChatId = getFromLocalStorage("previousChatId");
+      const storedData = getFromSessionStorage(SESSION_STORAGE_CHAT_ID_KEY);
+      const previousChatId = getFromSessionStorage("previousChatId");
       if (storedData === null && previousChatId === null) {
         setChatId("");
         dispatch(setChatId(""));
@@ -110,17 +110,17 @@ const App: FC = () => {
   }, []);
 
   useEffect(() => {
-    const sessions = localStorage.getItem("sessions");
+    const sessions = getFromSessionStorage("sessions");
     if (sessions == null) {
-      localStorage.setItem("sessions", "1");
+      setToSessionStorage("sessions", "1");
     } else {
-      localStorage.setItem("sessions", `${parseInt(sessions) + 1}`);
+      setToSessionStorage("sessions", `${parseInt(sessions) + 1}`);
     }
 
     window.onbeforeunload = function (_) {
-      const newSessionsCount = localStorage.getItem("sessions");
+      const newSessionsCount = getFromSessionStorage("sessions");
       if (newSessionsCount !== null) {
-        localStorage.setItem("sessions", `${parseInt(newSessionsCount) - 1}`);
+        setToSessionStorage("sessions", `${parseInt(newSessionsCount) - 1}`);
       }
     };
   }, []);
@@ -136,7 +136,7 @@ const App: FC = () => {
   }, [messages]);
 
   useEffect(() => {
-    const sessionStorageChatId = getFromLocalStorage(SESSION_STORAGE_CHAT_ID_KEY);
+    const sessionStorageChatId = getFromSessionStorage(SESSION_STORAGE_CHAT_ID_KEY);
     if (sessionStorageChatId) {
       dispatch(setChatId(sessionStorageChatId));
       dispatch(setIsChatOpen(true));

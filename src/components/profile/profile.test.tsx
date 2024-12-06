@@ -7,7 +7,7 @@ import Profile from './profile';
 import chatReducer from '../../slices/chat-slice';
 import widgetReducer from '../../slices/widget-slice';
 import authenticationReducer from '../../slices/authentication-slice';
-import { setToLocalStorage } from '../../utils/local-storage-utils';
+import { setToSessionStorage } from '../../utils/session-storage-utils';
 
 let emptyStore: EnhancedStore;
 
@@ -47,7 +47,7 @@ describe('Profile component', () => {
   });
 
   it('renders new messages bubble', () => {
-    setToLocalStorage("newMessagesAmount", 1);
+    setToSessionStorage("newMessagesAmount", 1);
     render(
       <Provider store={emptyStore}>
         <Profile />

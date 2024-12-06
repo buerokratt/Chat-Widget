@@ -7,14 +7,14 @@ import { useAppDispatch } from "../../store";
 import styles from "./profile.module.scss";
 import useWidgetSelector from "../../hooks/use-widget-selector";
 import useReloadChatEndEffect from "../../hooks/use-reload-chat-end-effect";
-import { getFromLocalStorage } from "../../utils/local-storage-utils";
+import {getFromSessionStorage} from "../../utils/session-storage-utils";
 
 export const Profile = (): JSX.Element => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { widgetConfig } = useWidgetSelector();
   const [delayFinished, setDelayFinished] = useState(false);
-  const newMessagesAmount = getFromLocalStorage("newMessagesAmount");
+  const newMessagesAmount = getFromSessionStorage("newMessagesAmount");
 
   const openChat = () => {
     dispatch(setIsChatOpen(true));

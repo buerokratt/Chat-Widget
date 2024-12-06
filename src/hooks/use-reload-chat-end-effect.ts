@@ -4,6 +4,7 @@ import { addChatToTerminationQueue, removeChatFromTerminationQueue } from "../sl
 import useChatSelector from "./use-chat-selector";
 import { isRedirectPathEmpty } from "../utils/auth-utils";
 import { isLastSession } from "../utils/browser-utils";
+import {setToSessionStorage} from "../utils/session-storage-utils";
 
 const useReloadChatEndEffect = () => {
   const { chatId } = useChatSelector();
@@ -16,7 +17,7 @@ const useReloadChatEndEffect = () => {
   useEffect(() => {
     const handleBeforeUnload = () => {
       if (chatId && isRedirectPathEmpty() && isLastSession()) {
-        localStorage.setItem("sessions", "1");
+        setToSessionStorage("sessions", "1");
         dispatch(addChatToTerminationQueue());
       }
     };

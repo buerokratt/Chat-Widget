@@ -14,14 +14,10 @@ import {
 } from "../constants";
 import { Chat } from "../model/chat-model";
 import {
-  clearStateVariablesFromLocalStorage,
+  clearStateVariablesFromSessionStorage,
   findMatchingMessageFromMessageList,
   getInitialChatDimensions,
 } from "../utils/state-management-utils";
-import {
-  getFromLocalStorage,
-  setToLocalStorage,
-} from "../utils/local-storage-utils";
 import getHolidays from "../utils/holidays";
 import {
   filterDuplicatMessages,
@@ -31,6 +27,7 @@ import {
   isChatAboutToBeTerminated,
   wasPageReloaded,
 } from "../utils/browser-utils";
+import {getFromSessionStorage, setToSessionStorage} from "../utils/session-storage-utils";
 
 export interface EstimatedWaiting {
   positionInUnassignedChats: string;
@@ -283,7 +280,7 @@ export const addChatToTerminationQueue = createAsyncThunk(
     const { chat } = thunkApi.getState() as { chat: ChatState };
 
     sessionStorage.setItem("terminationTime", Date.now().toString());
-    localStorage.setItem("previousChatId", chat.chatId ?? "");
+    setToSessionStorage("previousChatId", chat.chatId ?? "");
 
     thunkApi.dispatch(resetState());
 
@@ -300,8 +297,8 @@ export const removeChatFromTerminationQueue = createAsyncThunk(
       return null;
     }
 
-    const chatId = localStorage.getItem("previousChatId");
-    setToLocalStorage(SESSION_STORAGE_CHAT_ID_KEY, chatId);
+    const chatId = sessionStorage.getItem("previousChatId");
+    setToSessionStorage(SESSION_STORAGE_CHAT_ID_KEY, chatId);
     sessionStorage.removeItem("terminationTime");
 
     if (chatId) {
@@ -461,13 +458,13 @@ export const chatSlice = createSlice({
       state.messages = [action.payload, ...state.messages];
     },
     setIsChatOpen: (state, action: PayloadAction<boolean>) => {
-      state.chatId = getFromLocalStorage(SESSION_STORAGE_CHAT_ID_KEY);
+      state.chatId = getFromSessionStorage(SESSION_STORAGE_CHAT_ID_KEY);
       state.isChatOpen = action.payload;
       state.newMessagesAmount = 0;
     },
     setChatDimensions: (state, action: PayloadAction<{ width: number; height: number }>) => {
       state.chatDimensions = action.payload;
-      setToLocalStorage(LOCAL_STORAGE_CHAT_DIMENSIONS_KEY, action.payload);
+      setToSessionStorage(LOCAL_STORAGE_CHAT_DIMENSIONS_KEY, action.payload);
     },
     clearMessageQueue: (state) => {
       state.messageQueue = [];
@@ -555,7 +552,7 @@ export const chatSlice = createSlice({
       state.lastReadMessageTimestamp = new Date().toISOString();
       state.newMessagesAmount += receivedMessages.length;
       state.messages = filterDuplicatMessages([...newMessagesList, ...receivedMessages]);
-      setToLocalStorage("newMessagesAmount", state.newMessagesAmount);
+      setToSessionStorage("newMessagesAmount", state.newMessagesAmount);
 
       state.chatMode = getChatModeBasedOnLastMessage(state.messages);
     },
@@ -599,7 +596,7 @@ export const chatSlice = createSlice({
           case TERMINATE_STATUS.CLIENT_LEFT_WITH_NO_RESOLUTION:
           case TERMINATE_STATUS.OTHER:
           case TERMINATE_STATUS.RESPONSE_SENT_TO_CLIENT_EMAIL:
-            clearStateVariablesFromLocalStorage();
+            clearStateVariablesFromSessionStorage();
             state.chatStatus = CHAT_STATUS.ENDED;
             break;
           default:
@@ -689,14 +686,14 @@ export const chatSlice = createSlice({
       state.chatStatus = CHAT_STATUS.ENDED;
       state.feedback.isFeedbackMessageGiven = false;
       state.feedback.isFeedbackRatingGiven = false;
-      clearStateVariablesFromLocalStorage();
+      clearStateVariablesFromSessionStorage();
       localStorage.removeItem("previousChatId");
     });
     builder.addCase(addChatToTerminationQueue.fulfilled, (state) => {
       state.chatStatus = CHAT_STATUS.ENDED;
       state.feedback.isFeedbackMessageGiven = false;
       state.feedback.isFeedbackRatingGiven = false;
-      clearStateVariablesFromLocalStorage();
+      clearStateVariablesFromSessionStorage();
     });
     builder.addCase(sendChatNpmRating.rejected, (state) => {
       state.errorMessage = ERROR_MESSAGE;

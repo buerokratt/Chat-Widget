@@ -1,5 +1,5 @@
 export const isLastSession = () => {
-  const sessions = localStorage.getItem("sessions");
+  const sessions = sessionStorage.getItem("sessions");
   return sessions && parseInt(sessions) === 1;
 }
 
