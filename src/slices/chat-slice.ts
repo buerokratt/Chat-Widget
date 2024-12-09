@@ -27,7 +27,7 @@ import {
   isChatAboutToBeTerminated,
   wasPageReloaded,
 } from "../utils/browser-utils";
-import {getFromSessionStorage, setToSessionStorage} from "../utils/session-storage-utils";
+import {getFromSessionStorage, removeFromSessionStorage, setToSessionStorage} from "../utils/session-storage-utils";
 
 export interface EstimatedWaiting {
   positionInUnassignedChats: string;
@@ -687,7 +687,7 @@ export const chatSlice = createSlice({
       state.feedback.isFeedbackMessageGiven = false;
       state.feedback.isFeedbackRatingGiven = false;
       clearStateVariablesFromSessionStorage();
-      localStorage.removeItem("previousChatId");
+      removeFromSessionStorage("previousChatId");
     });
     builder.addCase(addChatToTerminationQueue.fulfilled, (state) => {
       state.chatStatus = CHAT_STATUS.ENDED;

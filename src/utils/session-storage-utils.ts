@@ -12,3 +12,9 @@ export const setToSessionStorage = (key: string, value: any) : void => {
     sessionStorage.setItem(key, JSON.stringify(value));
   } catch { }
 };
+
+export const removeFromSessionStorage = (key: any): void => {
+    try {
+        sessionStorage.removeItem(key)
+    } catch {}
+}
