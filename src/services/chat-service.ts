@@ -45,7 +45,11 @@ class ChatService {
   }
 
   sendMessagePreview({ chatId, content }: Message): Promise<void> {
-    return http.post(RUUTER_ENDPOINTS.POST_MESSAGE_PREVIEW, { chatId, content });
+    return http.post(RUUTER_ENDPOINTS.POST_MESSAGE_PREVIEW, { chatId, content: content != "" ? '_' : '' });
+  }
+
+  redirectToBackoffice(message: Message, holidays: string[], holidayNames: string): Promise<Document> {
+    return http.post(RUUTER_ENDPOINTS.REDIRECT_TO_BACKOFFICE, { message, holidays, holidayNames });
   }
 
   getMessages(): Promise<Message[]> {

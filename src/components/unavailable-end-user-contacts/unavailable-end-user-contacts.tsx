@@ -21,9 +21,10 @@ import StyledButton from "../styled-components/styled-button";
 import WidgetService from "../../services/widget-service";
 import useMessageValidator from "../../hooks/use-message-validator";
 import { getContactCommentNewMessage, getContactFormFulfilledNewMessage } from "../../utils/chat-utils";
+import Markdownify from "../chat-message/message-types/Markdownify";
 
 const UnavailableEndUserContacts = (): JSX.Element => {
-  const { endUserContacts, chatId, contactMsgId, contactContentMessage, askForContactsIfNoCsa } = useChatSelector();
+  const { endUserContacts, chatId, contactMsgId, contactContentMessage, askForContacts } = useChatSelector();
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const { validateInput, invalidMessage } = useMessageValidator();
@@ -82,9 +83,9 @@ const UnavailableEndUserContacts = (): JSX.Element => {
     <UnavailableEndUserContactsStyle>
       <form>
         <div className="container">
-          <h3 className="form-header">{contactContentMessage}</h3>
+          <h3 className="form-header"><Markdownify message={contactContentMessage}></Markdownify></h3>
           {invalidMessage && <p className="missing-feeback">{invalidMessage}</p>}
-          {askForContactsIfNoCsa && (
+          {askForContacts && (
             <div className="form-body">
               <div className="email-group">
                 <h5> {t("widget.contacts.contact.mail.label")}</h5>
@@ -120,7 +121,7 @@ const UnavailableEndUserContacts = (): JSX.Element => {
               </div>
             </div>
           )}
-          {askForContactsIfNoCsa && (
+          {askForContacts && (
             <div className="form-footer">
               <StyledButton styleType={StyledButtonType.GRAY} onClick={skipForm}>
                 {t("widget.contacts.contact.skip.label")}
@@ -130,7 +131,7 @@ const UnavailableEndUserContacts = (): JSX.Element => {
               </StyledButton>
             </div>
           )}
-          {!askForContactsIfNoCsa && (
+          {!askForContacts && (
             <div className="form-footer">
               <StyledButton styleType={StyledButtonType.GRAY} onClick={skipForm}>
                 {t("header.button.close.label")}

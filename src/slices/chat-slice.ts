@@ -67,8 +67,11 @@ export interface ChatState {
   loading: boolean;
   showContactForm: boolean;
   showUnavailableContactForm: boolean;
-  askForContactsIfNoCsa: boolean;
+  showAskToForwardToCsaForm: boolean;
+  askForContacts: boolean;
   contactMsgId: string;
+  forwardToCsaMessage: string;
+  forwardToCsaMessageId: string;
   contactContentMessage: string;
   isChatRedirected: boolean;
   feedback: {
@@ -124,7 +127,10 @@ const initialState: ChatState = {
   errorMessage: "",
   showContactForm: false,
   showUnavailableContactForm: false,
-  askForContactsIfNoCsa: true,
+  showAskToForwardToCsaForm: false,
+  forwardToCsaMessageId: "",
+  askForContacts: true,
+  forwardToCsaMessage: "",
   contactContentMessage: "",
   isChatRedirected: false,
   estimatedWaiting: initialEstimatedTime,
@@ -375,6 +381,14 @@ export const sendNewSilentMessage = createAsyncThunk(
   }
 );
 
+export const redirectToBackoffice = createAsyncThunk(
+  "chat/forwards/forward-to-backoffice",
+  (message: Message) => {
+    const { holidays, holidayNames } = getHolidays();
+    return ChatService.redirectToBackoffice(message, holidays, holidayNames);
+  }
+);
+
 export const sendMessagePreview = createAsyncThunk(
   "chat/postMessagePreview",
   (message: Message) => ChatService.sendMessagePreview(message)
@@ -441,10 +455,7 @@ export const chatSlice = createSlice({
       state.chatId = action.payload;
     },
     addMessage: (state, action: PayloadAction<Message>) => {
-      state.messages = filterDuplicatMessages([
-        ...state.messages,
-        action.payload,
-      ]);
+      state.messages = filterDuplicatMessages([...state.messages, action.payload]);
     },
     addMessageToTop: (state, action: PayloadAction<Message>) => {
       state.messages = [action.payload, ...state.messages];
@@ -454,10 +465,7 @@ export const chatSlice = createSlice({
       state.isChatOpen = action.payload;
       state.newMessagesAmount = 0;
     },
-    setChatDimensions: (
-      state,
-      action: PayloadAction<{ width: number; height: number }>
-    ) => {
+    setChatDimensions: (state, action: PayloadAction<{ width: number; height: number }>) => {
       state.chatDimensions = action.payload;
       setToLocalStorage(LOCAL_STORAGE_CHAT_DIMENSIONS_KEY, action.payload);
     },
@@ -480,6 +488,9 @@ export const chatSlice = createSlice({
     setShowUnavailableContactForm: (state, action: PayloadAction<boolean>) => {
       state.showUnavailableContactForm = action.payload;
     },
+    setShowAskToForwardToCsaForm: (state, action: PayloadAction<boolean>) => {
+      state.showAskToForwardToCsaForm = action.payload;
+    },
     queueMessage: (state, action: PayloadAction<Message>) => {
       state.messageQueue.push(action.payload);
     },
@@ -496,9 +507,7 @@ export const chatSlice = createSlice({
       }
     },
     updateMessage: (state, action: PayloadAction<Message>) => {
-      state.messages = state.messages.map((message) =>
-        message.id === action.payload.id ? action.payload : message
-      );
+      state.messages = state.messages.map((message) => (message.id === action.payload.id ? action.payload : message));
     },
     setIsFeedbackConfirmationShown: (state, action: PayloadAction<boolean>) => {
       state.feedback.isFeedbackConfirmationShown = action.payload;
@@ -533,62 +542,58 @@ export const chatSlice = createSlice({
       if (!receivedMessages.length) return;
 
       const newMessagesList = state.messages.map((existingMessage) => {
-        const matchingMessage = findMatchingMessageFromMessageList(
-          existingMessage,
-          receivedMessages
-        );
+        const matchingMessage = findMatchingMessageFromMessageList(existingMessage, receivedMessages);
         if (!matchingMessage) return existingMessage;
-        receivedMessages = receivedMessages.filter(
-          (rMsg) => rMsg.id !== matchingMessage.id
-        );
+        receivedMessages = receivedMessages.filter((rMsg) => rMsg.id !== matchingMessage.id);
         return { ...existingMessage, ...matchingMessage };
       });
 
-      if (
-        newMessagesList.length + receivedMessages.length ===
-        state.messages.length
-      ) {
+      if (newMessagesList.length + receivedMessages.length === state.messages.length) {
         return;
       }
 
       state.lastReadMessageTimestamp = new Date().toISOString();
       state.newMessagesAmount += receivedMessages.length;
-      state.messages = filterDuplicatMessages([
-        ...newMessagesList,
-        ...receivedMessages,
-      ]);
+      state.messages = filterDuplicatMessages([...newMessagesList, ...receivedMessages]);
       setToLocalStorage("newMessagesAmount", state.newMessagesAmount);
 
       state.chatMode = getChatModeBasedOnLastMessage(state.messages);
     },
-    handleStateChangingEventMessages: (
-      state,
-      action: PayloadAction<Message[]>
-    ) => {
+    handleStateChangingEventMessages: (state, action: PayloadAction<Message[]>) => {
       action.payload.forEach((msg) => {
         switch (msg.event) {
           case CHAT_EVENTS.ASK_PERMISSION_IGNORED:
-            state.messages = state.messages.map((message) =>
-              message.id === msg.id ? msg : message
-            );
+            state.messages = state.messages.map((message) => (message.id === msg.id ? msg : message));
             break;
           case CHAT_EVENTS.CONTACT_INFORMATION:
             state.showContactForm = true;
             state.contactMsgId = msg.id ?? "";
             break;
-          case CHAT_EVENTS.UNAVAILABLE_HOLIDAY:
+          case CHAT_EVENTS.UNAVAILABLE_HOLIDAY_ASK_CONTACTS:
           case CHAT_EVENTS.UNAVAILABLE_CSAS_ASK_CONTACTS:
-          case CHAT_EVENTS.UNAVAILABLE_ORGANIZATION:
-            state.askForContactsIfNoCsa = true;
+          case CHAT_EVENTS.UNAVAILABLE_ORGANIZATION_ASK_CONTACTS:
+            state.askForContacts = true;
             state.showUnavailableContactForm = true;
             state.contactMsgId = msg.id ?? "";
             state.contactContentMessage = msg.content ?? "";
             break;
+          case CHAT_EVENTS.UNAVAILABLE_HOLIDAY:
           case CHAT_EVENTS.UNAVAILABLE_CSAS:
-            state.askForContactsIfNoCsa = false;
+          case CHAT_EVENTS.UNAVAILABLE_ORGANIZATION:
+            state.askForContacts = false;
             state.showUnavailableContactForm = true;
             state.contactMsgId = msg.id ?? "";
             state.contactContentMessage = msg.content ?? "";
+            break;
+          case CHAT_EVENTS.ASK_TO_FORWARD_TO_CSA:
+            state.showAskToForwardToCsaForm = true;
+            state.forwardToCsaMessageId = msg.id ?? "";
+            state.forwardToCsaMessage = msg.content ?? "";
+            break;
+          case CHAT_EVENTS.APPROVED_VALIDATION:
+            state.messages = state.messages.map((message) =>
+              message.id === msg.id ? { ...message, content: msg.content, event: CHAT_EVENTS.APPROVED_VALIDATION } : message
+            );
             break;
           case CHAT_EVENTS.ANSWERED:
           case CHAT_EVENTS.TERMINATED:
@@ -607,9 +612,7 @@ export const chatSlice = createSlice({
       });
     },
     removeEstimatedWaitingMessage: (state) => {
-      const estimatedMsgIndex = state.messages.findIndex(
-        (msg) => msg.id === "estimatedWaiting"
-      );
+      const estimatedMsgIndex = state.messages.findIndex((msg) => msg.id === "estimatedWaiting");
       if (estimatedMsgIndex === -1) return;
       state.messages[estimatedMsgIndex].content = "hidden";
     },
@@ -709,9 +712,7 @@ export const chatSlice = createSlice({
     builder.addCase(getEstimatedWaitingTime.fulfilled, (state, action) => {
       state.estimatedWaiting = action.payload;
 
-      const estimatedMsg = state.messages.find(
-        (msg) => msg.id === "estimatedWaiting"
-      );
+      const estimatedMsg = state.messages.find((msg) => msg.id === "estimatedWaiting");
       if (estimatedMsg) return;
 
       state.messages.push({
@@ -776,6 +777,7 @@ export const {
   setContactFormComment,
   setShowContactForm,
   setShowUnavailableContactForm,
+  setShowAskToForwardToCsaForm,
   setEstimatedWaitingTimeToZero,
   setIdleChat,
   setChat,
