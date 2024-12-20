@@ -85,32 +85,23 @@ const Chat = (): JSX.Element => {
 
   const { burokrattOnlineStatus, showConfirmationModal } = useAppSelector((state) => state.widget);
 
-  // todo below
-  const [viewportHeight, setViewportHeight] = useState<number | undefined>(undefined);
   const chatRef = useRef<HTMLDivElement>(null);
 
+  // Prevent chat from being cut off on iOS devices when on-screen keyboard is open
   useEffect(() => {
-    function handleResize() {
-      // todo only iOS
-      setViewportHeight(window.visualViewport?.height);
-      // console.log('testing', window.visualViewport);
+    const vv = window.visualViewport;
+    const currentRef = chatRef.current;
 
-      if (chatRef.current) {
-        // headerRef.current.style.top = `${window.visualViewport?.height ?? 0 - headerRef.current.offsetHeight}px`;
-        // console.log('headerRef.current.style.top', headerRef.current?.style.top);
-        // console.log('headerRef.current.style.top', headerRef.current?.style.top);
-        // headerRef.current.style.bottom = `${window.visualViewport?.height ?? 0 - 300}px`;
-        console.log('testing', window.visualViewport);
-        // todo simpler and inside if
-        chatRef.current.style.height = `${window.visualViewport?.height ?? 0}px`;
-        // headerRef.current.style.top = 'unset';
-        // chatRef.current.style.top = `${window.visualViewport?.offsetTop ?? 0}px`;
-        // console.log('headerRef.current.style.bottom', chatRef.current?.style.bottom);
+    function setChatHeight() {
+      if (currentRef && vv && /iPhone|iPad|iPod/.test(window.navigator.userAgent)) {
+        currentRef.style.height = `${vv.height}px`;
       }
     }
-    window.visualViewport?.addEventListener('resize', handleResize);
-    handleResize();
-    return () => window.visualViewport?.removeEventListener('resize', handleResize);
+
+    vv?.addEventListener('resize', setChatHeight);
+    setChatHeight();
+
+    return () => vv?.removeEventListener('resize', setChatHeight);
   }, []);
 
   useEffect(() => {
