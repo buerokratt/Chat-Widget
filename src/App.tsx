@@ -154,10 +154,9 @@ const App: FC = () => {
 
   useNameAndTitleVisibility();
 
-  // if (burokrattOnlineStatus !== true) return <></>;
-  // if (displayWidget && widgetConfig.isLoaded) return isChatOpen ? <Chat /> : <Profile />;
-  // return <></>;
-  return isChatOpen ? <Chat /> : <Profile />;
+  if (burokrattOnlineStatus !== true) return <></>;
+  if (displayWidget && widgetConfig.isLoaded) return isChatOpen ? <Chat /> : <Profile />;
+  return <></>;
 };
 
 export default App;
