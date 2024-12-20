@@ -207,6 +207,7 @@ const Chat = (): JSX.Element => {
         enable={RESIZABLE_HANDLES}
         onResizeStop={handleChatResize}
       >
+        {/* todo disable animation partially? */}
         <motion.div
           className={`${styles.chat} ${isAuthenticated ? styles.authenticated : ""}`}
           animate={{ y: 0 }}
@@ -216,33 +217,37 @@ const Chat = (): JSX.Element => {
             isDetailSelected={showWidgetDetails}
             detailHandler={() => setShowWidgetDetails(!showWidgetDetails)}
           />
-          {messageQueue.length >= 5 && <WarningNotification warningMessage={t("chat.error-message")} />}
-          {burokrattOnlineStatus !== true && <OnlineStatusNotification />}
-          {showWidgetDetails && <WidgetDetails />}
-          {!showWidgetDetails && showContactForm && <EndUserContacts />}
-          {!showWidgetDetails && showUnavailableContactForm && <UnavailableEndUserContacts />}
-          {!showWidgetDetails && !showContactForm && !showUnavailableContactForm && showAskToForwardToCsaForm && <AskForwardToCsa />}
-          {!showWidgetDetails && !showContactForm && !showUnavailableContactForm && !showAskToForwardToCsaForm && <ChatContent />}
-          {idleChat.isIdle && <IdleChatNotification />}
-          {showResponseError && <ResponseErrorNotification />}
-          {showFeedbackResult ? (
-            <ChatFeedbackConfirmation />
-          ) : (
-            <>
-              {!showWidgetDetails &&
-                !showContactForm &&
-                !showUnavailableContactForm &&
-                !feedback.isFeedbackConfirmationShown &&
-                isChatEnded &&
-                chatId && <ChatFeedback />}
-              {!showWidgetDetails &&
-                !showContactForm &&
-                !showUnavailableContactForm &&
-                !feedback.isFeedbackConfirmationShown &&
-                chatMode === CHAT_MODES.FREE && <ChatKeyPad />}
-              <ConfirmationModal />
-            </>
-          )}
+          <div
+            className={styles.messages}
+          >
+            {messageQueue.length >= 5 && <WarningNotification warningMessage={t("chat.error-message")} />}
+            {burokrattOnlineStatus !== true && <OnlineStatusNotification />}
+            {showWidgetDetails && <WidgetDetails />}
+            {!showWidgetDetails && showContactForm && <EndUserContacts />}
+            {!showWidgetDetails && showUnavailableContactForm && <UnavailableEndUserContacts />}
+            {!showWidgetDetails && !showContactForm && !showUnavailableContactForm && showAskToForwardToCsaForm && <AskForwardToCsa />}
+            {!showWidgetDetails && !showContactForm && !showUnavailableContactForm && !showAskToForwardToCsaForm && <ChatContent />}
+            {idleChat.isIdle && <IdleChatNotification />}
+            {showResponseError && <ResponseErrorNotification />}
+            {showFeedbackResult ? (
+              <ChatFeedbackConfirmation />
+            ) : (
+              <>
+                {!showWidgetDetails &&
+                  !showContactForm &&
+                  !showUnavailableContactForm &&
+                  !feedback.isFeedbackConfirmationShown &&
+                  isChatEnded &&
+                  chatId && <ChatFeedback />}
+                {!showWidgetDetails &&
+                  !showContactForm &&
+                  !showUnavailableContactForm &&
+                  !feedback.isFeedbackConfirmationShown &&
+                  chatMode === CHAT_MODES.FREE && <ChatKeyPad />}
+                <ConfirmationModal />
+              </>
+            )}
+          </div>
         </motion.div>
       </Resizable>
     </div>
