@@ -18,33 +18,15 @@
 }
 
 .chat {
-  // display: flex;
-  // flex-direction: column;
-  // font-family: $font-chat;
+  display: flex;
+  flex-direction: column;
+  font-family: $font-chat;
   background: #ffffff;
   box-shadow: 0 4px 4px $color-gray;
   height: 100%;
   border-radius: 8px;
-  // font-size: 14px;
-  // line-height: 1.5;
-  // margin-top: 54px;
-
-  // b, strong {
-  //   font-family: $font-chat-bold;
-  // }
-}
-
-.messages {
-  display: flex;
-  flex-direction: column;
-  font-family: $font-chat;
-  // background: #ffffff;
-  // box-shadow: 0 4px 4px $color-gray;
-  height: calc(100% - 54px);
-  // border-radius: 8px;
   font-size: 14px;
   line-height: 1.5;
-  margin-top: 54px;
 
   b, strong {
     font-family: $font-chat-bold;

@@ -1,4 +1,4 @@
-import React, { memo, MouseEventHandler, useEffect, useRef, useState } from 'react';
+import React, { memo, MouseEventHandler } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import styled from 'styled-components';
@@ -17,19 +17,6 @@ interface ChatHeaderType {
   isDetailSelected: boolean;
 }
 
-function useVisualViewportHeight() {
-  const [viewportHeight, setViewportHeight] = useState<number | undefined>(undefined);
-  useEffect(() => {
-    function handleResize() {
-      setViewportHeight(window.visualViewport?.height);
-    }
-    window.visualViewport?.addEventListener('resize', handleResize);
-    handleResize();
-    return () => window.visualViewport?.removeEventListener('resize', handleResize);
-  }, []);
-  return viewportHeight;
-}
-
 const ChatHeader = (props: ChatHeaderType): JSX.Element => {
   const { detailHandler, isDetailSelected } = props;
   const { t } = useTranslation();
@@ -37,36 +24,10 @@ const ChatHeader = (props: ChatHeaderType): JSX.Element => {
   const { isAuthenticated } = useAuthenticationSelector();
   const minimizeChat = () => dispatch(setIsChatOpen(false));
   const dispatch = useAppDispatch();
-  // const viewportHeight = useVisualViewportHeight();
-  const [viewportHeight, setViewportHeight] = useState<number | undefined>(undefined);
-  const headerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleResize() {
-      // todo only iOS
-      setViewportHeight(window.visualViewport?.height);
-      if (headerRef.current) {
-        // headerRef.current.style.top = `${window.visualViewport?.height ?? 0 - headerRef.current.offsetHeight}px`;
-        // console.log('headerRef.current.style.top', headerRef.current?.style.top);
-        // console.log('headerRef.current.style.top', headerRef.current?.style.top);
-        // headerRef.current.style.bottom = `${window.visualViewport?.height ?? 0 - 300}px`;
-        console.log('testing', window.visualViewport);
-        // headerRef.current.style.top = 'unset';
-        // todo simpler and inside if
-        headerRef.current.style.top = `${window.visualViewport?.offsetTop ?? 0}px`;
-        console.log('headerRef.current.style.bottom', headerRef.current?.style.bottom);
-      }
-    }
-    window.visualViewport?.addEventListener('resize', handleResize);
-    handleResize();
-    return () => window.visualViewport?.removeEventListener('resize', handleResize);
-  }, []);
-
-  // console.log('viewportHeight', viewportHeight);
 
   return (
     <ChatHeaderStyles>
-      <div className={`${styles.header}`} ref={headerRef}>
+      <div className={`${styles.header}`}>
         <motion.button
           whileHover={{ scale: 1.2 }}
           className={`${styles.detailsButton} hamburger-icon ${isDetailSelected ? 'active' : ''}`}
@@ -83,7 +44,7 @@ const ChatHeader = (props: ChatHeaderType): JSX.Element => {
               <img src={Shield} alt={t('image.alt.text.shield.icon')} />
             </div>
           )}
-          {t('widget.title')}LOL
+          {t('widget.title')}
         </div>
         <div className={styles.actions}>
           <button title={t('header.button.minimize.label')} onClick={minimizeChat} aria-label={t('header.button.minimize.label')} type="button">
