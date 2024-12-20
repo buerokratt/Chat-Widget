@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { memo, useEffect, useLayoutEffect, useState } from "react";
+import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Resizable, ResizeCallback } from "re-resizable";
 import useChatSelector from "../../hooks/use-chat-selector";
@@ -84,6 +84,34 @@ const Chat = (): JSX.Element => {
   const [isFocused, setIsFocused] = useState(true);
 
   const { burokrattOnlineStatus, showConfirmationModal } = useAppSelector((state) => state.widget);
+
+  // todo below
+  const [viewportHeight, setViewportHeight] = useState<number | undefined>(undefined);
+  const chatRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleResize() {
+      // todo only iOS
+      setViewportHeight(window.visualViewport?.height);
+      // console.log('testing', window.visualViewport);
+
+      if (chatRef.current) {
+        // headerRef.current.style.top = `${window.visualViewport?.height ?? 0 - headerRef.current.offsetHeight}px`;
+        // console.log('headerRef.current.style.top', headerRef.current?.style.top);
+        // console.log('headerRef.current.style.top', headerRef.current?.style.top);
+        // headerRef.current.style.bottom = `${window.visualViewport?.height ?? 0 - 300}px`;
+        console.log('testing', window.visualViewport);
+        // todo simpler and inside if
+        chatRef.current.style.height = `${window.visualViewport?.height ?? 0}px`;
+        // headerRef.current.style.top = 'unset';
+        // chatRef.current.style.top = `${window.visualViewport?.offsetTop ?? 0}px`;
+        // console.log('headerRef.current.style.bottom', chatRef.current?.style.bottom);
+      }
+    }
+    window.visualViewport?.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.visualViewport?.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (feedback.isFeedbackRatingGiven && feedback.isFeedbackMessageGiven && !feedback.isFeedbackConfirmationShown) {
@@ -211,6 +239,7 @@ const Chat = (): JSX.Element => {
           className={`${styles.chat} ${isAuthenticated ? styles.authenticated : ""}`}
           animate={{ y: 0 }}
           style={{ y: 400 }}
+          ref={chatRef}
         >
           <ChatHeader
             isDetailSelected={showWidgetDetails}
