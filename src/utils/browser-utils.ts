@@ -2,7 +2,6 @@ import {CHAT_SESSIONS} from "../constants";
 
 export const isLastSession = (): boolean => {
   const currentState = JSON.parse(localStorage.getItem(CHAT_SESSIONS.SESSION_STATE_KEY) as string) || { ids: [], count: 0 };
-  localStorage.setItem('deb2', currentState.count.toString())
   return currentState.count <= 1;
 }
 
