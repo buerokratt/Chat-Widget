@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import { motion } from "framer-motion";
 import classNames from "classnames";
 import { Message } from "../../../model/message-model";
@@ -10,7 +10,6 @@ import {
   RATING_TYPES,
   isHiddenFeatureEnabled,
 } from "../../../constants";
-import Linkifier from "./linkifier";
 import Thumbs from "../../../static/icons/thumbs.svg";
 import {
   sendMessageWithRating,
@@ -18,8 +17,11 @@ import {
 } from "../../../slices/chat-slice";
 import { useAppDispatch } from "../../../store";
 import ChatButtonGroup from "./chat-button-group";
-import { parseButtons } from "../../../utils/chat-utils";
+import ChatOptionGroup from "./chat-option-group";
+import { parseButtons, parseOptions } from "../../../utils/chat-utils";
 import useChatSelector from "../../../hooks/use-chat-selector";
+import { useTranslation } from "react-i18next";
+import Markdownify from "./Markdownify";
 
 const leftAnimation = {
   animate: { opacity: 1, x: 0 },
@@ -28,7 +30,10 @@ const leftAnimation = {
 };
 
 const AdminMessage = ({ message }: { message: Message }): JSX.Element => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const messageRef = useRef<HTMLDivElement>(null);
+  const [isTall, setIsTall] = useState(false);
   const { nameVisibility, titleVisibility } = useChatSelector();
 
   const setNewFeedbackRating = (newRating: string): void => {
@@ -40,9 +45,20 @@ const AdminMessage = ({ message }: { message: Message }): JSX.Element => {
     dispatch(sendMessageWithRating(updatedMessage));
   };
 
+  useEffect(() => {
+    if (messageRef.current) {
+      const height = messageRef.current.offsetHeight;
+      setIsTall(height > 42);
+    }
+  }, [message]);
+
   const hasButtons = useMemo(() => {
     return parseButtons(message).length > 0;
   }, [message.buttons]);
+
+  const hasOptions = useMemo(() => {
+    return parseOptions(message).length > 0;
+  }, [message.options]);
 
   const csaName = useMemo(() => (
     (message.authorFirstName ?? "") +
@@ -56,8 +72,11 @@ const AdminMessage = ({ message }: { message: Message }): JSX.Element => {
       animate={leftAnimation.animate}
       initial={leftAnimation.initial}
       transition={leftAnimation.transition}
+      ref={messageRef}
     >
-      <div className={classNames(styles.message, styles.admin)}>
+      <div className={classNames(styles.message, styles.admin, styles.content, {
+        [styles.tall]: isTall
+      })}>
         {nameVisibility && csaName && message.event != CHAT_EVENTS.GREETING && (
           <div className={styles.name}>{csaName}</div>
         )}
@@ -80,7 +99,12 @@ const AdminMessage = ({ message }: { message: Message }): JSX.Element => {
               styles.emergency_content
             }`}
           >
-            <Linkifier message={decodeURIComponent(message.content ?? "")} />
+            <Markdownify message={message.content ?? ""} />
+            {!message.content && (
+              hasOptions || hasButtons 
+              ? t('widget.action.select') 
+              : <i>{t('widget.error.empty')}</i>
+            )}
           </div>
           <div
             className={classNames(
@@ -95,7 +119,8 @@ const AdminMessage = ({ message }: { message: Message }): JSX.Element => {
             {![CHAT_EVENTS.GREETING, CHAT_EVENTS.EMERGENCY_NOTICE].includes(
               message.event as CHAT_EVENTS
             ) &&
-              !hasButtons && isHiddenFeatureEnabled && (
+              !hasButtons && !hasOptions &&
+              isHiddenFeatureEnabled && (
                 <div>
                   <button
                     type="button"
@@ -132,6 +157,7 @@ const AdminMessage = ({ message }: { message: Message }): JSX.Element => {
           </div>
         </div>
         {hasButtons && <ChatButtonGroup message={message} />}
+        {hasOptions && <ChatOptionGroup message={message} />}
       </div>
     </motion.div>
   );
