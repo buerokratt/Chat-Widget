@@ -33,7 +33,7 @@ import {
 } from "../utils/browser-utils";
 import {
   browserName,
-  browserVersion,
+  fullBrowserVersion,
   osName,
   osVersion,
   parseUserAgent,
@@ -192,7 +192,7 @@ export const initChat = createAsyncThunk(
   async (message: Message) => {
     const { holidays, holidayNames } = getHolidays();
     const userAgent = parseUserAgent(navigator.userAgent);
-    const agentInfo = `Agent: ${browserName} (v${browserVersion}), OS: ${osName} (v${osVersion}), device: ${userAgent.device.vendor} (${userAgent.device.model})`;
+    const agentInfo = `Agent: ${browserName} (v${fullBrowserVersion}), OS: ${osName} (v${osVersion}), device: ${userAgent.device.vendor} (${userAgent.device.model})`;
     return ChatService.init(
       message,
       {
