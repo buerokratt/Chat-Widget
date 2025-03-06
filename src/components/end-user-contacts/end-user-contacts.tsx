@@ -75,84 +75,80 @@ const EndUserContacts = (): JSX.Element => {
 
     return (
         <div className="byk-chat">
-            <EndUserContactsStyle>
-                <form>
-                    <div className="container">
-                        <h3 className="form-header">{t("widget.contacts.contact.header")}</h3>
-                        {invalidMessage && (
-                            <p className="missing-feeback">{invalidMessage}</p>
-                        )}
-                        <div className="form-body">
-                            <div className="email-group">
-                                <h5> {t("widget.contacts.contact.mail.label")}</h5>
-                                <InputText
-                                    id="email-input"
-                                    className="email-input"
-                                    placeholder={t("widget.contacts.contact.mail.placeholder")}
-                                    value={endUserContacts.mailAddress}
-                                    onChange={(e) => dispatch(setEmailAdress(e.target.value))}
-                                />
-                            </div>
-                            <div className="phone-nr-group">
-                                <h5>{t("widget.contacts.contact.phone.label")}</h5>
-                                <InputText
-                                    className="phone-nr-input"
-                                    id="phone-nr-input"
-                                    placeholder={t("widget.contacts.contact.phone.placeholder")}
-                                    value={endUserContacts.phoneNr}
-                                    onChange={(e) => dispatch(setPhoneNumber(e.target.value))}
-                                />
-                            </div>
-                            <div className="comment-group">
-                                <h5>{t("widget.contacts.contact.comment.label")}</h5>
-                                <TextAreaStyle
-                                    rows={4}
-                                    id="comment-input"
-                                    className="comment-input"
-                                    name="comment"
-                                    placeholder={t('widget.contacts.contact.comment.placeholder')}
-                                    value={endUserContacts.comment}
-                                    onChange={(e) => dispatch(setContactFormComment(e.target.value))}
-                                />
-                            </div>
+            <form>
+                <div className="container">
+                    <h3 className="form-header">{t("widget.contacts.contact.header")}</h3>
+                    {invalidMessage && (
+                        <p className="missing-feeback">{invalidMessage}</p>
+                    )}
+                    <div className="form-body">
+                        <div className="email-group">
+                            <h5> {t("widget.contacts.contact.mail.label")}</h5>
+                            <InputText
+                                id="email-input"
+                                className="email-input"
+                                placeholder={t("widget.contacts.contact.mail.placeholder")}
+                                value={endUserContacts.mailAddress}
+                                onChange={(e) => dispatch(setEmailAdress(e.target.value))}
+                            />
                         </div>
-                        <div className="form-footer">
-                            <StyledButton
-                                styleType={StyledButtonType.GRAY}
-                                onClick={declineForm}
-                            >
-                                {t("widget.contacts.contact.close.label")}
-                            </StyledButton>
-                            <StyledButton
-                                styleType={StyledButtonType.GRAY}
-                                onClick={submitForm}
-                            >
-                                {t("widget.contacts.contact.submit.label")}
-                            </StyledButton>
+                        <div className="phone-nr-group">
+                            <h5>{t("widget.contacts.contact.phone.label")}</h5>
+                            <InputText
+                                className="phone-nr-input"
+                                id="phone-nr-input"
+                                placeholder={t("widget.contacts.contact.phone.placeholder")}
+                                value={endUserContacts.phoneNr}
+                                onChange={(e) => dispatch(setPhoneNumber(e.target.value))}
+                            />
+                        </div>
+                        <div className="comment-group">
+                            <h5>{t("widget.contacts.contact.comment.label")}</h5>
+                            <TextAreaStyle
+                                rows={4}
+                                id="comment-input"
+                                className="comment-input"
+                                name="comment"
+                                placeholder={t('widget.contacts.contact.comment.placeholder')}
+                                value={endUserContacts.comment}
+                                onChange={(e) => dispatch(setContactFormComment(e.target.value))}
+                            />
                         </div>
                     </div>
-                </form>
-            </EndUserContactsStyle>
+                    <div className="form-footer">
+                        <StyledButton
+                            styleType={StyledButtonType.GRAY}
+                            onClick={declineForm}
+                        >
+                            {t("widget.contacts.contact.close.label")}
+                        </StyledButton>
+                        <StyledButton
+                            styleType={StyledButtonType.GRAY}
+                            onClick={submitForm}
+                        >
+                            {t("widget.contacts.contact.submit.label")}
+                        </StyledButton>
+                    </div>
+                </div>
+            </form>
         </div>
     );
 };
 
 const TextAreaStyle = styled.textarea`
-    :global(.byk-chat) {
-        width: 100%;
-        outline: 0;
-        border: 0;
-        background: transparent;
-        resize: vertical;
-        overflow: auto;
-        resize: none;
-    }
+    width: 100%;
+    outline: 0;
+    border: 0;
+    background: transparent;
+    resize: vertical;
+    overflow: auto;
+    resize: none;
 `;
 
 const EndUserContactsStyle = styled.div`
-    :global(.byk-chat) {
-        height: 100%;
+    height: 100%;
 
+    :global(.byk-chat) {
         input,
         textarea {
             border: 0;
@@ -166,7 +162,7 @@ const EndUserContactsStyle = styled.div`
         }
 
         .form-header {
-            margin -bottom: 1rem;
+            margin-bottom: 1rem;
         }
 
         .form-footer {
