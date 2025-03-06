@@ -35,12 +35,10 @@ const ChatKeypadCharCounter = (props: ChatKeypadCharCounterType): ReactElement =
     const currentCount = userInput.length;
 
     return (
-        <div className="byk-chat">
-            <ChatKeypadCharCounterStyle warning={currentCount >= charWarningLimit}
-                                        isVisible={currentCount >= charVisibilityLimit}>
-                {currentCount}/{maxCharLimit}
-            </ChatKeypadCharCounterStyle>
-        </div>
+        <ChatKeypadCharCounterStyle warning={currentCount >= charWarningLimit}
+                                    isVisible={currentCount >= charVisibilityLimit}>
+            {currentCount}/{maxCharLimit}
+        </ChatKeypadCharCounterStyle>
     );
 };
 

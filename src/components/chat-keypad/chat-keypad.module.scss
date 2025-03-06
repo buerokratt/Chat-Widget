@@ -1,7 +1,7 @@
 @import '../../scss/main';
 @import "normalize.css";
 
-//:global(.byk-chat) {
+:global(.byk-chat) {
   .keypad {
     display: flex;
     align-items: center;
@@ -73,4 +73,4 @@
     height: 32px;
     cursor: pointer;
   }
-//}
+}
