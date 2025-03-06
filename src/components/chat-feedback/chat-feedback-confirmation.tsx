@@ -8,7 +8,6 @@ const ChatFeedbackConfirmation = (): JSX.Element => {
     const {t} = useTranslation();
 
     return (
-        <div className="byk-chat">
             <FeedbackConfirmationStyle>
                 <div className="smile-icon">
                     <img src={SmileIcon} alt="Smile icon"/>
@@ -16,14 +15,11 @@ const ChatFeedbackConfirmation = (): JSX.Element => {
                 </div>
                 <TimeoutBar timeout={`${FEEDBACK_CONFIRMATION_TIMEOUT}ms`}/>
             </FeedbackConfirmationStyle>
-        </div>
     );
 };
 export default ChatFeedbackConfirmation;
 
 const FeedbackConfirmationStyle = styled.div`
-    :global(.byk-chat) {
-
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -40,31 +36,28 @@ const FeedbackConfirmationStyle = styled.div`
             justify-content: center;
             align-items: center;
         }
-    }
 `;
 
 const TimeoutBar = styled.div<{ timeout: string }>`
-    :global(.byk-chat) {
-        position: relative;
-        margin-bottom: -1rem;
-        width: 100%;
-        display: flex;
+    position: relative;
+    margin-bottom: -1rem;
+    width: 100%;
+    display: flex;
 
-        ::after {
-            animation: timeout ${(props) => props.timeout} forwards linear;
-            background-color: #003cff;
-            content: '';
-            height: 1rem;
-            position: absolute;
+    ::after {
+        animation: timeout ${(props) => props.timeout} forwards linear;
+        background-color: #003cff;
+        content: '';
+        height: 1rem;
+        position: absolute;
+    }
+
+    @keyframes timeout {
+        from {
+            width: 100%;
         }
-
-        @keyframes timeout {
-            from {
-                width: 100%;
-            }
-            to {
-                width: 0;
-            }
+        to {
+            width: 0;
         }
     }
 `;
