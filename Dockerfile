@@ -9,6 +9,8 @@ COPY ./package*.json ./
 FROM image AS build
 RUN npm pkg set scripts.prepare=" "
 RUN npm install --legacy-peer-deps
+RUN npm install --save-dev typescript@5.1.6 @types/babel__traverse@latest
+RUN node -v && npx tsc -v && npm list @types/babel__traverse
 COPY . .
 RUN npm run webpack
 
