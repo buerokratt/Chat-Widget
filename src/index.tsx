@@ -9,7 +9,8 @@ import "./index.scss";
 
 const getBasePath = () => {
   const { pathname } = window.location;
-  if (!pathname || pathname === "/") return "/";
+  console.log(pathname);
+//  if (!pathname || pathname === "/") return "/";
   const basePath = pathname.split("/")[1];
   return `/${basePath}`;
 };
