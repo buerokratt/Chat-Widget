@@ -1,4 +1,4 @@
-ARG node_version=node:18-alpine
+ARG node_version=node:lts
 ARG nginx_version=nginx:1.26.0-alpine
 
 
@@ -9,6 +9,7 @@ COPY ./package*.json ./
 FROM image AS build
 RUN npm pkg set scripts.prepare=" "
 RUN npm install --legacy-peer-deps
+RUN npm install --save-dev typescript @types/babel__traverse
 COPY . .
 RUN npm run webpack
 
