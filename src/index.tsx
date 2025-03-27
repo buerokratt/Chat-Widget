@@ -10,7 +10,7 @@ import "./index.scss";
 const getBasePath = () => {
   const { pathname } = window.location;
   console.log(pathname);
-//  if (!pathname || pathname === "/") return "/";
+   if (!pathname || pathname === "/") return "/";
   const basePath = pathname.split("/")[1];
   return `/${basePath}`;
 };
@@ -21,7 +21,7 @@ ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter basename={baseName}>
       <Routes>
-        <Route path="/" element={<App />} />
+        <Route path="/*" element={<App />} />
       </Routes>
     </BrowserRouter>
   </Provider>,
