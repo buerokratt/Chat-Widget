@@ -1,4 +1,4 @@
-ARG node_version=node:lts
+ARG node_version=node:18-alpine
 ARG nginx_version=nginx:1.26.0-alpine
 
 
