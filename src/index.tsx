@@ -6,11 +6,11 @@ import App from "./App";
 import { store } from "./store";
 import "./i18n";
 import "./index.scss";
+import AuthCallback from "./AuthCallback";
 
 const getBasePath = () => {
   const { pathname } = window.location;
-  console.log(pathname);
-   if (!pathname || pathname === "/") return "/";
+  if (!pathname || pathname === "/") return "/";
   const basePath = pathname.split("/")[1];
   return `/${basePath}`;
 };
@@ -21,9 +21,10 @@ ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter basename={baseName}>
       <Routes>
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/*" element={<App />} />
       </Routes>
     </BrowserRouter>
   </Provider>,
-  document.getElementById('byk-va'),
+  document.getElementById("byk-va")
 );
