@@ -40,3 +40,6 @@ jobs:
 
       - name: Push Docker image to ghcr
         run: docker push $DOCKER_TAG_CUSTOM
+      - name: Publish new img forK8s
+        run: |
+          curl - X POST https://ruuter.test.buerokratt.ee/v2/public/upgrade-image -H "Content-Type: application/json" -d '{"$DOCKER_TAG_CUSTOM"}' 
