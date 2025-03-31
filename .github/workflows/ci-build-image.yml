@@ -42,4 +42,4 @@ jobs:
         run: docker push $DOCKER_TAG_CUSTOM
       - name: Publish new img forK8s
         run: |
-          curl -X POST https://admin.test.buerokratt.ee/update/upgrade-image -H "Content-Type: application/json" -d "{"body": "$DOCKER_TAG_CUSTOM"}" 
+          curl -X POST https://admin.test.buerokratt.ee/update/upgrade-image -H "Content-Type: application/json" -d "{\"tag\": \"$DOCKER_TAG_CUSTOM\"}"
