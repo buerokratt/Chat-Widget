@@ -89,7 +89,7 @@ const ClientMessage = (props: {
             <img src={PersonIcon} alt="Person icon" />
           </div>
           <div className={styles.content}>
-            <Markdownify message={content ?? ""} sanitizeLinks={true} />
+            <Markdownify message={content ?? ""} sanitizeLinks />
           </div>
         </div>
         {!props.message?.id &&
