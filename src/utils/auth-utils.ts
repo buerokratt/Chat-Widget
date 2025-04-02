@@ -2,7 +2,8 @@ import { LOCAL_STORAGE_TARA_LOGIN_REDIRECT } from "../constants";
 import widgetService from "../services/widget-service";
 
 export function redirectToTim() {
-  saveCurrentBrowserPath();  window.location.assign(window._env_.TIM_AUTHENTICATION_URL);
+  saveCurrentBrowserPath();
+  window.location.assign(window._env_.TIM_AUTHENTICATION_URL);
 }
 
 export function redirectIfComeBackFromTim(callback: any) {
@@ -16,7 +17,7 @@ export function redirectIfComeBackFromTim(callback: any) {
         }
       }
       removeRedirectPath();
-      widgetService.authenticateUser();
+      await widgetService.authenticateUser();
       callback();
     }, 500);
   }

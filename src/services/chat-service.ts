@@ -6,6 +6,7 @@ import { RUUTER_ENDPOINTS } from "../constants";
 import { EndUserTechnicalData } from "../model/chat-ini-model";
 import { EmergencyNoticeResponse } from "../model/emergency-notice-response-model";
 import { EstimatedWaiting } from "../slices/chat-slice";
+import notificationHttp from "./notification-service";
 
 interface Document {
   _id: string;
@@ -45,7 +46,11 @@ class ChatService {
   }
 
   sendMessagePreview({ chatId, content }: Message): Promise<void> {
-    return http.post(RUUTER_ENDPOINTS.POST_MESSAGE_PREVIEW, { chatId, content });
+    return http.post(RUUTER_ENDPOINTS.POST_MESSAGE_PREVIEW, { chatId, content: content != "" ? '_' : '' });
+  }
+
+  redirectToBackoffice(message: Message, holidays: string[], holidayNames: string): Promise<Document> {
+    return http.post(RUUTER_ENDPOINTS.REDIRECT_TO_BACKOFFICE, { message, holidays, holidayNames });
   }
 
   getMessages(): Promise<Message[]> {
@@ -76,12 +81,30 @@ class ChatService {
     return http.get(RUUTER_ENDPOINTS.GET_EMERGENCY_NOTICE);
   }
 
-  sendNpmRating({ chatId, npmRating }: { chatId: string; npmRating: number }): Promise<void> {
-    return http.post(RUUTER_ENDPOINTS.SEND_NPM_RATING, { chatId, feedbackRating: npmRating });
+  sendNpmRating({
+    chatId,
+    npmRating,
+  }: {
+    chatId: string;
+    npmRating: number;
+  }): Promise<void> {
+    return http.post(RUUTER_ENDPOINTS.SEND_NPM_RATING, {
+      chatId,
+      feedbackRating: npmRating,
+    });
   }
 
-  sendFeedbackMessage({ userFeedback, chatId }: { userFeedback: string; chatId: string }): Promise<void> {
-    return http.post(RUUTER_ENDPOINTS.SEND_FEEDBACK_MESSAGE, { chatId, feedbackText: userFeedback });
+  sendFeedbackMessage({
+    userFeedback,
+    chatId,
+  }: {
+    userFeedback: string;
+    chatId: string;
+  }): Promise<void> {
+    return http.post(RUUTER_ENDPOINTS.SEND_FEEDBACK_MESSAGE, {
+      chatId,
+      feedbackText: userFeedback,
+    });
   }
 
   getEstimatedWaitingTime(chatId: string): Promise<EstimatedWaiting> {
@@ -100,7 +123,10 @@ class ChatService {
     return http.post(RUUTER_ENDPOINTS.GENERATE_FORWARDING_REQUEST);
   }
 
-  generateDownloadChatRequest(chatId: string, email: string | null): Promise<string> {
+  generateDownloadChatRequest(
+    chatId: string,
+    email: string | null
+  ): Promise<string> {
     return http.post(RUUTER_ENDPOINTS.DOWNLOAD_CHAT, { chatId, email });
   }
 
@@ -108,12 +134,12 @@ class ChatService {
     return http.post(RUUTER_ENDPOINTS.SEND_ATTACHMENT, attachment);
   }
 
-  sendUserContacts({ chatId, endUserEmail, endUserPhone }: UserContacts): Promise<void> {
+  sendUserContacts({
+    chatId,
+    endUserEmail,
+    endUserPhone,
+  }: UserContacts): Promise<void> {
     return http.post(RUUTER_ENDPOINTS.SEND_CONTACT_INFO);
-  }
-
-  burokrattOnlineStatus(): Promise<boolean> {
-    return http.get(RUUTER_ENDPOINTS.BUROKRATT_ONLINE_STATUS);
   }
 
   async getNameVisibility(): Promise<string> {
@@ -124,12 +150,19 @@ class ChatService {
     return http.get(RUUTER_ENDPOINTS.GET_CSA_TITLE_VISIBILITY);
   }
 
-  addChatToTerminationQueue(chatId: string): Promise<void> {
-    return http.post(RUUTER_ENDPOINTS.ADD_CHAT_TO_TERMINATION_QUEUE, { chatId });
+  addChatToTerminationQueue(chatId: string): void {
+    // navigator.sendBeacon is the only reliable way to send a request when the page is being unloaded
+    // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
+    navigator.sendBeacon(
+      `${window._env_.NOTIFICATION_NODE_URL}${RUUTER_ENDPOINTS.ADD_CHAT_TO_TERMINATION_QUEUE}`,
+      JSON.stringify({ chatId })
+    );
   }
 
   removeChatFromTerminationQueue(chatId: string): Promise<void> {
-    return http.post(RUUTER_ENDPOINTS.REMOVE_CHAT_FROM_TERMINATION_QUEUE, { chatId });
+    return http.post(RUUTER_ENDPOINTS.REMOVE_CHAT_FROM_TERMINATION_QUEUE, {
+      chatId,
+    });
   }
 }
 

@@ -7,17 +7,18 @@ import styles from './chat-content.module.scss';
 import WaitingTimeNotification from '../waiting-time-notification/waiting-time-notification';
 import 'overlayscrollbars/css/OverlayScrollbars.css';
 import './os-custom-theme.scss';
+import LoadingMessage from '../chat-message/message-types/loading-message';
 
 const ChatContent = (): JSX.Element => {
   const OSref = useRef<OverlayScrollbarsComponent>(null);
-  const { messages } = useChatSelector();
+  const { messages, failedMessages, showLoadingMessage } = useChatSelector();
 
   useEffect(() => {
     if (OSref.current) {
       const instance = OSref.current.osInstance();
       instance?.scroll({ y: '100%' }, 200);
     }
-  }, [messages]);
+  }, [messages, failedMessages]);
 
   return (
     <AnimatePresence initial={false}>
@@ -32,7 +33,7 @@ const ChatContent = (): JSX.Element => {
             scrollbars: { visibility: 'auto', autoHide: 'leave' },
           }}
         >
-          {messages.map((message) => {
+          {messages.map((message, index) => {
             if(message.id === "estimatedWaiting" && message.content === "hidden")
               return <></>;
             if(message.id === "estimatedWaiting")
@@ -42,9 +43,11 @@ const ChatContent = (): JSX.Element => {
               <ChatMessage 
                 message={message}
                 key={`${message.authorTimestamp}-${message.created}-${message.id}`}
+                previousMessage={index > 0 ? messages[index - 1] : undefined}
               />
             );
           })}
+          {showLoadingMessage && <LoadingMessage/>}
         </OverlayScrollbarsComponent>
       </div>
     </AnimatePresence>

@@ -1,6 +1,8 @@
-export const isLastSession = () => {
-  const sessions = localStorage.getItem("sessions");
-  return sessions && parseInt(sessions) === 1;
+import {CHAT_SESSIONS} from "../constants";
+
+export const isLastSession = (): boolean => {
+  const currentState = JSON.parse(localStorage.getItem(CHAT_SESSIONS.SESSION_STATE_KEY) as string) || { ids: [], count: 0 };
+  return currentState.count <= 1;
 }
 
 export const wasPageReloaded = () => {
@@ -8,6 +10,15 @@ export const wasPageReloaded = () => {
     .getEntriesByType('navigation')
     .map((nav) => (nav as PerformanceNavigationTiming).type)
     .includes('reload');
+}
+
+export const wasPageReloadedNavigate = () => {
+  return window.performance
+      .getEntriesByType('navigation')
+      .some((nav) => {
+        const type = (nav as PerformanceNavigationTiming).type;
+        return type === "reload" || type === "navigate";
+      });
 }
 
 export const isChatAboutToBeTerminated = () => {

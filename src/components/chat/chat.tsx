@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { memo, useEffect, useLayoutEffect, useState } from "react";
+import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Resizable, ResizeCallback } from "re-resizable";
 import useChatSelector from "../../hooks/use-chat-selector";
@@ -40,8 +40,11 @@ import getIdleTime from "../../utils/getIdleTime";
 import { Message } from "../../model/message-model";
 import UnavailableEndUserContacts from "../unavailable-end-user-contacts/unavailable-end-user-contacts";
 import useReloadChatEndEffect from "../../hooks/use-reload-chat-end-effect";
-import useQueueCounter from "../../hooks/use-queue-counter";
 import useWindowDimensions from "../../hooks/useWindowDimensions";
+import ResponseErrorNotification from "../response-error-notification/response-error-notification";
+import useTabActive from "../../hooks/useTabActive";
+import { use } from "i18next";
+import AskForwardToCsa from "../ask-forward-to-csa-modal/ask-forward-to-csa-modal";
 
 const RESIZABLE_HANDLES = {
   topLeft: true,
@@ -56,7 +59,6 @@ const RESIZABLE_HANDLES = {
 
 const Chat = (): JSX.Element => {
   const dispatch = useAppDispatch();
-  const [submittingMessageRead, setSubmittingMessageRead] = useState(false);
   const [showWidgetDetails, setShowWidgetDetails] = useState(false);
   const [showFeedbackResult, setShowFeedbackResult] = useState(false);
   const { t } = useTranslation();
@@ -69,15 +71,38 @@ const Chat = (): JSX.Element => {
     idleChat,
     showContactForm,
     showUnavailableContactForm,
+    showAskToForwardToCsaForm,
     feedback,
     messages,
     chatDimensions,
     chatMode,
+    showResponseError,
   } = useChatSelector();
+
+  const isTabActive = useTabActive();
+
+  const [isFocused, setIsFocused] = useState(true);
 
   const { burokrattOnlineStatus, showConfirmationModal } = useAppSelector((state) => state.widget);
 
-  const queueCount = useQueueCounter();
+  const chatRef = useRef<HTMLDivElement>(null);
+
+  // Prevent chat from being cut off on iOS devices when on-screen keyboard is open
+  useEffect(() => {
+    const vv = window.visualViewport;
+    const currentRef = chatRef.current;
+
+    function setChatHeight() {
+      if (currentRef && vv && /iPhone|iPad|iPod/.test(window.navigator.userAgent)) {
+        currentRef.style.height = `${vv.height}px`;
+      }
+    }
+
+    vv?.addEventListener('resize', setChatHeight);
+    setChatHeight();
+
+    return () => vv?.removeEventListener('resize', setChatHeight);
+  }, []);
 
   useEffect(() => {
     if (feedback.isFeedbackRatingGiven && feedback.isFeedbackMessageGiven && !feedback.isFeedbackConfirmationShown) {
@@ -165,26 +190,30 @@ const Chat = (): JSX.Element => {
 
   useReloadChatEndEffect();
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (
-      !submittingMessageRead &&
+      isTabActive &&
+      isFocused &&
       messages.length > 0 &&
+      !messages[messages.length - 1].event &&
       messages[messages.length - 1].authorRole === AUTHOR_ROLES.BACKOFFICE_USER
     ) {
-      setSubmittingMessageRead(true);
       const message: Message = {
         chatId,
-        content: CHAT_EVENTS.MESSAGE_READ,
         authorRole: AUTHOR_ROLES.END_USER,
         authorTimestamp: new Date().toISOString(),
         event: CHAT_EVENTS.MESSAGE_READ,
-        preview: "",
       };
-      dispatch(sendNewMessage(message)).then((_) => {
-        setSubmittingMessageRead(false);
-      });
+      dispatch(sendNewMessage(message));
     }
-  }, [dispatch, messages]);
+  }, [isTabActive, isFocused, messages]);
+
+  window.onfocus = function () {
+    setIsFocused(true);
+  };
+  window.onblur = function () {
+    setIsFocused(false);
+  };
 
   return (
     <div className={styles.chatWrapper}>
@@ -201,21 +230,21 @@ const Chat = (): JSX.Element => {
           className={`${styles.chat} ${isAuthenticated ? styles.authenticated : ""}`}
           animate={{ y: 0 }}
           style={{ y: 400 }}
+          ref={chatRef}
         >
           <ChatHeader
             isDetailSelected={showWidgetDetails}
             detailHandler={() => setShowWidgetDetails(!showWidgetDetails)}
           />
           {messageQueue.length >= 5 && <WarningNotification warningMessage={t("chat.error-message")} />}
-          {queueCount > 0 && (
-            <WarningNotification warningMessage={t("notifications.queue-number", { number: queueCount })} />
-          )}
           {burokrattOnlineStatus !== true && <OnlineStatusNotification />}
           {showWidgetDetails && <WidgetDetails />}
           {!showWidgetDetails && showContactForm && <EndUserContacts />}
           {!showWidgetDetails && showUnavailableContactForm && <UnavailableEndUserContacts />}
-          {!showWidgetDetails && !showContactForm && !showUnavailableContactForm && <ChatContent />}
+          {!showWidgetDetails && !showContactForm && !showUnavailableContactForm && showAskToForwardToCsaForm && <AskForwardToCsa />}
+          {!showWidgetDetails && !showContactForm && !showUnavailableContactForm && !showAskToForwardToCsaForm && <ChatContent />}
           {idleChat.isIdle && <IdleChatNotification />}
+          {showResponseError && <ResponseErrorNotification />}
           {showFeedbackResult ? (
             <ChatFeedbackConfirmation />
           ) : (

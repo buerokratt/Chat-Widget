@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import { CHAT_EVENTS } from "../constants";
-import { getEmergencyNotice, addMessage } from "../slices/chat-slice";
+import { getEmergencyNotice, addMessageToTop } from "../slices/chat-slice";
 import { useAppDispatch } from "../store";
 import useChatSelector from "./use-chat-selector";
+import { format } from "date-fns";
 
 const useGetEmergencyNotice = (): void => {
   const { emergencyNotice, messages, chatId } = useChatSelector();
@@ -16,9 +17,14 @@ const useGetEmergencyNotice = (): void => {
 
     if (!messages.map((m) => m.event).includes(CHAT_EVENTS.EMERGENCY_NOTICE)) {
       if (!emergencyNotice.isVisible) return;
-      if (new Date(emergencyNotice.start) <= new Date() && new Date(emergencyNotice.end) >= new Date()) {
+      const formatDate = (date: Date) => new Date(format(date, "yyyy-MM-dd"));
+      const startDate = formatDate(new Date(emergencyNotice.start));
+      const endDate = formatDate(new Date(emergencyNotice.end));
+      const currentDate = formatDate(new Date());
+
+      if (startDate <= currentDate && endDate >= currentDate) {
         dispatch(
-          addMessage({
+          addMessageToTop({
             chatId,
             event: CHAT_EVENTS.EMERGENCY_NOTICE,
             content: emergencyNotice.text,
