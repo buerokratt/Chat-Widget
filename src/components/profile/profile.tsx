@@ -39,12 +39,12 @@ export const Profile = (): JSX.Element => {
         if (delayFinished && widgetConfig.animation === "jump") return "profile__jump";
         if (delayFinished && widgetConfig.animation === "wiggle") return "profile__wiggle";
         if (delayFinished && widgetConfig.animation === "shockwave") return "profile__shockwave";
+        return "profile__shockwave";
     };
 
     return (
         <ProfileStyles>
             <ProfileStyles className="profile__wrapper">
-                <ProfileStyles>
                 <motion.button
                     className={`profile ${getActiveProfileClass()}`}
                     variants={variants}
@@ -62,10 +62,9 @@ export const Profile = (): JSX.Element => {
                 >
                     <img src={Buerokratt} alt="Buerokratt logo" width={45} className="logo" loading="eager"/>
                 </motion.button>
-                </ProfileStyles>
                 {widgetConfig.showMessage && (
                     <div
-                        className={`profile profile__greeting_message ${delayFinished && "profile__greeting_message__active"}`}
+                        className={`profile__greeting_message ${delayFinished && "profile__greeting_message__active"}`}
                     >
                         {widgetConfig.bubbleMessageText}
                     </div>

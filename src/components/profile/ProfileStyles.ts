@@ -71,12 +71,6 @@ export const ProfileStyles = styled.div `
         border: 2px solid ${colors.primary};
         margin: 1rem 1rem;
         box-sizing: border-box;
-
-        .profile__wrapper {
-            position: fixed;
-            bottom: 0;
-            right: 0;
-        }
     }
 
     .bubble {
