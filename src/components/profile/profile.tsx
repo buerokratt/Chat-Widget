@@ -44,7 +44,6 @@ export const Profile = (): JSX.Element => {
 
     return (
         <ShadowWrapper>
-            <div>
                 <div className="profile__wrapper">
                     <motion.button
                         className={`profile ${getActiveProfileClass()}`}
@@ -74,7 +73,6 @@ export const Profile = (): JSX.Element => {
                         <span className="bubble">{newMessagesAmount}</span>
                     ) : null}
                 </div>
-            </div>
         </ShadowWrapper>
     );
 };

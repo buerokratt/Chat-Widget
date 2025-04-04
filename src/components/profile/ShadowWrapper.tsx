@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import {createPortal} from "react-dom";
-import {colors} from "../../styling/style_settings";
+import {colors, fontChat} from "../../styling/style_settings";
 
 type ShadowWrapperProps = {
     children: React.ReactNode;
@@ -24,19 +24,14 @@ const ShadowWrapper = ({children}: ShadowWrapperProps) => {
                     <>
                         <style>
                             {`
-                /* You can place your component styles here */
-                .profile__wrapper {
+    .profile__wrapper {
         position: fixed;
         bottom: 0;
-        top: unset !important;
-        background-color: unset !important;
         right: 0;
     }
-
     .profile__shockwave {
         animation: shockwaveJump 1s ease-out infinite;
     }
-
     .profile__shockwave:after {
         content: "";
         position: absolute;
@@ -48,15 +43,12 @@ const ShadowWrapper = ({children}: ShadowWrapperProps) => {
         animation: shockwave 1s 0.65s ease-out;
         animation-iteration-count: inherit;
     }
-
     .profile__jump {
         animation: 0.4s jump ease infinite alternate;
     }
-
     .profile__wiggle {
         animation: 1s wiggle ease infinite;
     }
-
     .profile__greeting_message {
         white-space: nowrap;
         padding: 0.25rem 0.5rem;
@@ -67,17 +59,15 @@ const ShadowWrapper = ({children}: ShadowWrapperProps) => {
         font-family: 'ADAM', sans-serif;
         line-height: 1.5;
         top: 50%;
-        right: calc(100% - 6px) !important;
+        right: calc(100% - 6px);
         opacity: 0;
         transform: translateY(100%);
         transition: all 250ms;
     }
-
     .profile__greeting_message__active {
         opacity: 1;
         transform: translateY(-50%);
     }
-
     .profile {
         display: flex;
         align-items: center;
@@ -90,8 +80,12 @@ const ShadowWrapper = ({children}: ShadowWrapperProps) => {
         border: 2px solid ${colors.primary};
         margin: 1rem 1rem;
         box-sizing: border-box;
+        .profile__wrapper {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+        }
     }
-
     .bubble {
         padding: 0.1rem 0.4rem 0.1rem 0.4rem;
         position: relative;
@@ -99,10 +93,9 @@ const ShadowWrapper = ({children}: ShadowWrapperProps) => {
         left: -18px;
         background-color: ${colors.primary};
         color: #ffffff;
-        font-family: 'Aino Regular', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+        font-family: ${fontChat};
         border-radius: 50%;
     }
-
     @keyframes shockwaveJump {
         0% {
             transform: scale(1);
@@ -123,7 +116,6 @@ const ShadowWrapper = ({children}: ShadowWrapperProps) => {
             transform: scale(1);
         }
     }
-
     @keyframes shockwave {
         0% {
             transform: scale(1);
@@ -136,7 +128,6 @@ const ShadowWrapper = ({children}: ShadowWrapperProps) => {
             transform: scale(2.25);
         }
     }
-
     @keyframes jump {
         0% {
             transform: scale(1);
@@ -147,7 +138,6 @@ const ShadowWrapper = ({children}: ShadowWrapperProps) => {
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
     }
-
     @keyframes wiggle {
         0% {
             transform: rotate(-3deg);
@@ -170,7 +160,6 @@ const ShadowWrapper = ({children}: ShadowWrapperProps) => {
             box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
         }
     }
-
     .logo {
         filter: brightness(0) invert(1);
         image-rendering: auto;
