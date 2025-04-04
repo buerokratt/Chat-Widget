@@ -7,7 +7,7 @@ import {useAppDispatch} from "../../store";
 import useWidgetSelector from "../../hooks/use-widget-selector";
 import useReloadChatEndEffect from "../../hooks/use-reload-chat-end-effect";
 import {getFromLocalStorage} from "../../utils/local-storage-utils";
-import {ProfileStyles} from "./ProfileStyles";
+import ShadowWrapper from "./ShadowWrapper";
 
 export const Profile = (): JSX.Element => {
     const {t} = useTranslation();
@@ -43,37 +43,39 @@ export const Profile = (): JSX.Element => {
     };
 
     return (
-        <ProfileStyles>
-            <ProfileStyles className="profile__wrapper">
-                <motion.button
-                    className={`profile ${getActiveProfileClass()}`}
-                    variants={variants}
-                    initial="initial"
-                    animate="animate"
-                    style={{
-                        animationIterationCount: widgetConfig.proactiveSeconds,
-                        backgroundColor: widgetConfig.color,
-                    }}
-                    aria-label={t("profile.button.open-chat")}
-                    title={t("profile.button.open-chat")}
-                    onKeyDown={openChat}
-                    onClick={openChat}
-                    tabIndex={0}
-                >
-                    <img src={Buerokratt} alt="Buerokratt logo" width={45} className="logo" loading="eager"/>
-                </motion.button>
-                {widgetConfig.showMessage && (
-                    <div
-                        className={`profile__greeting_message ${delayFinished && "profile__greeting_message__active"}`}
+        <ShadowWrapper>
+            <div>
+                <div className="profile__wrapper">
+                    <motion.button
+                        className={`profile ${getActiveProfileClass()}`}
+                        variants={variants}
+                        initial="initial"
+                        animate="animate"
+                        style={{
+                            animationIterationCount: widgetConfig.proactiveSeconds,
+                            backgroundColor: widgetConfig.color,
+                        }}
+                        aria-label={t("profile.button.open-chat")}
+                        title={t("profile.button.open-chat")}
+                        onKeyDown={openChat}
+                        onClick={openChat}
+                        tabIndex={0}
                     >
-                        {widgetConfig.bubbleMessageText}
-                    </div>
-                )}
-                {newMessagesAmount !== null && parseInt(newMessagesAmount, 10) > 0 ? (
-                    <span className="bubble">{newMessagesAmount}</span>
-                ) : null}
-            </ProfileStyles>
-        </ProfileStyles>
+                        <img src={Buerokratt} alt="Buerokratt logo" width={45} className="logo" loading="eager"/>
+                    </motion.button>
+                    {widgetConfig.showMessage && (
+                        <div
+                            className={`profile__greeting_message ${delayFinished && "profile__greeting_message__active"}`}
+                        >
+                            {widgetConfig.bubbleMessageText}
+                        </div>
+                    )}
+                    {newMessagesAmount !== null && parseInt(newMessagesAmount, 10) > 0 ? (
+                        <span className="bubble">{newMessagesAmount}</span>
+                    ) : null}
+                </div>
+            </div>
+        </ShadowWrapper>
     );
 };
 
