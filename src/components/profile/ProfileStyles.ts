@@ -20,6 +20,10 @@ export const ProfileStyles = styled.div `
         top: unset !important;
         background-color: unset !important;
         right: 0;
+        
+        > div {
+            right: calc(100% - 6px) !important;
+        }
     }
 
     .profile__shockwave {
