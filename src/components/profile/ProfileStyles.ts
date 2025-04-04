@@ -18,6 +18,7 @@ export const ProfileStyles = styled.div `
         position: fixed;
         bottom: 0;
         top: unset !important;
+        background-color: unset !important;
         right: 0;
     }
 
@@ -49,7 +50,7 @@ export const ProfileStyles = styled.div `
         font-family: 'ADAM', sans-serif;
         line-height: 1.5;
         top: 50%;
-        right: calc(100% - 6px);
+        right: calc(100% - 6px) !important;
         opacity: 0;
         transform: translateY(100%);
         transition: all 250ms;
