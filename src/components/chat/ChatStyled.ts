@@ -6,6 +6,7 @@ export const ChatStyles = styled.div`
         z-index: 99;
         position: fixed;
         margin: 1em;
+        top: unset !important;
         right: 0;
         bottom: 0;
     }
