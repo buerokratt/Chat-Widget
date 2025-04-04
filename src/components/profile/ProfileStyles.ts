@@ -17,6 +17,7 @@ export const ProfileStyles = styled.div `
     .profile__wrapper {
         position: fixed;
         bottom: 0;
+        top: unset !important;
         right: 0;
     }
 
