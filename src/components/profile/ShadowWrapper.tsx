@@ -25,7 +25,7 @@ const ShadowWrapper = ({children}: ShadowWrapperProps) => {
                         <style>
                             {`
     .profile__wrapper {
-        position: fixed;
+        position: unset;
         bottom: 0;
         right: 0;
     }
