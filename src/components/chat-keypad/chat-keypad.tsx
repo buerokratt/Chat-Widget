@@ -245,6 +245,7 @@ const ChatKeyPad = (): JSX.Element => {
 
   const disableIosWindowScroll = () => {
     if (isIphone()) {
+      // todo https://stackoverflow.com/questions/13278087/determine-vertical-direction-of-a-touchmove
       window.addEventListener("touchmove", preventWindowScrolling, {
         passive: false,
       });
