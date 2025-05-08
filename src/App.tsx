@@ -94,6 +94,9 @@ const App: FC = () => {
       document.getElementsByTagName("body")[0].style.overflow = isChatOpen
         ? "hidden"
         : "auto";
+      document.getElementsByTagName("body")[0].style.maxHeight = isChatOpen
+        ? "100svh"
+        : "auto";
     }
 
     window.parent.postMessage(
