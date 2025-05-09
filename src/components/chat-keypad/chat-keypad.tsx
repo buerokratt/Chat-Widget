@@ -41,7 +41,6 @@ import { Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import { isIphone } from "../../utils/browser-utils";
 import classNames from "classnames";
-import { t } from "i18next";
 
 // todo breaks scrolling on page when closed from X button
 // Hacky workaround for iOS bug
@@ -59,8 +58,6 @@ const preventWindowScrolling = (e: TouchEvent, direction: "up" | "down") => {
   const top = contentElement.getBoundingClientRect().top;
   //   const bottom = contentElement.getBoundingClientRect().bottom;
 
-  // todo screen size
-  /// todo static values w/o overflow: top 54, bottom 246
   //   console.log("top", top);
   //   console.log("bottom", bottom);
   //   console.log("scrollHeight", contentElement.scrollHeight);
@@ -72,6 +69,8 @@ const preventWindowScrolling = (e: TouchEvent, direction: "up" | "down") => {
     target.closest(".os-host-flexbox") &&
     // AND the content element is overflowing
     isContentLargerThanHost &&
+    // The hack to prevent glitchy iOS scrolling
+    // 54 is the height of header
     ((direction === "up" && top > 0) || (direction === "down" && top < 54))
   ) {
     return;
@@ -92,6 +91,7 @@ const ChatKeyPad = (): JSX.Element => {
   const hiddenFileInputRef = useRef<HTMLInputElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [dynamicStyle, setdynamicStyle] = useState("");
+  const touchStartYRef = useRef<number>(0);
 
   const handleUploadClick = () => {
     hiddenFileInputRef.current?.click();
@@ -239,42 +239,35 @@ const ChatKeyPad = (): JSX.Element => {
     four_lines: dynamicStyle === "fourLines",
   });
 
-  const disableIosWindowScroll = () => {
-    if (isIphone()) {
-      let touchStartY = 0;
-      window.addEventListener("touchstart", (e) => {
-        touchStartY = e.touches[0].clientY;
-      });
-      window.addEventListener(
-        "touchmove",
-        (e) => {
-          const touchEndY = e.touches[0].clientY;
-          //   if (touchEndY > touchStartY) {
-          //     console.log("attempting scrolling down");
-          //   } else {
-          //     console.log("attempting scrolling up");
-          //   }
-          preventWindowScrolling(e, touchEndY > touchStartY ? "down" : "up");
-        },
-        { passive: false }
-      );
-    }
-  };
+  // Create stable references to the event handlers
+  // So that we can remove them later with window.removeEventListener
+  const touchStartHandler = useCallback((e: TouchEvent) => {
+    touchStartYRef.current = e.touches[0].clientY;
+  }, []);
 
-  const enableIosWindowScroll = () => {
+  const touchMoveHandler = useCallback((e: TouchEvent) => {
+    const touchEndY = e.touches[0].clientY;
+    preventWindowScrolling(
+      e,
+      touchEndY > touchStartYRef.current ? "down" : "up"
+    );
+  }, []);
+
+  const disableIosWindowScroll = useCallback(() => {
     if (isIphone()) {
-      window.removeEventListener(
-        "touchmove",
-        (e) => preventWindowScrolling(e, "up"),
-        false
-      );
-      window.removeEventListener(
-        "touchmove",
-        (e) => preventWindowScrolling(e, "down"),
-        false
-      );
+      window.addEventListener("touchstart", touchStartHandler);
+      window.addEventListener("touchmove", touchMoveHandler, {
+        passive: false,
+      });
     }
-  };
+  }, [touchStartHandler, touchMoveHandler]);
+
+  const enableIosWindowScroll = useCallback(() => {
+    if (isIphone()) {
+      window.removeEventListener("touchstart", touchStartHandler);
+      window.removeEventListener("touchmove", touchMoveHandler, false);
+    }
+  }, [touchStartHandler, touchMoveHandler]);
 
   return (
     <ChatKeypadStyled>
