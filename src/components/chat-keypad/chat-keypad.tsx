@@ -55,20 +55,14 @@ const preventWindowScrolling = (e: TouchEvent, direction: "up" | "down") => {
   )[0] as HTMLElement;
 
   const top = contentElement.getBoundingClientRect().top;
-  //   const bottom = contentElement.getBoundingClientRect().bottom;
-
-  //   console.log("top", top);
-  //   console.log("bottom", bottom);
-  //   console.log("scrollHeight", contentElement.scrollHeight);
-  //   console.log("hostElement.scrollHeight", hostElement.scrollHeight);
-  const isContentLargerThanHost =
+  const isContentOverflowing =
     contentElement.scrollHeight > hostElement.scrollHeight;
   if (
     // Allow scrolling if the target is inside ChatContent
     target.closest(".os-host-flexbox") &&
-    // AND the content element is overflowing
-    isContentLargerThanHost &&
-    // The hack to prevent glitchy iOS scrolling
+    // AND the content element is overflowing the chat host element
+    isContentOverflowing &&
+    // AND the hack to prevent glitchy iOS scrolling
     // 54 is the height of header
     ((direction === "up" && top > 0) || (direction === "down" && top < 54))
   ) {
