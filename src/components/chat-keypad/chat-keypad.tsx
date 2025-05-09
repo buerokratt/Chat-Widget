@@ -47,51 +47,33 @@ import { t } from "i18next";
 // Hacky workaround for iOS bug
 // Prevents unnecessary window scrolling when the on-screen keyboard is open
 const preventWindowScrolling = (e: TouchEvent, direction: "up" | "down") => {
+  console.log("preventWindowScrolling", direction);
   const target = e.target as HTMLElement;
-  //   console.log("event", e);
-  //   console.log("target.closest", target.closest(".os-host-flexbox"));
   const contentElement = document.getElementsByClassName(
     "os-content"
   )[0] as HTMLElement;
   const hostElement = document.getElementsByClassName(
     "os-host-flexbox"
   )[0] as HTMLElement;
-  //   console.log(
-  //     "host",
-  //     hostElement.scrollHeight,
-  //     hostElement.offsetHeight,
-  //     hostElement.clientHeight
-  //   );
-  //   console.log(
-  //     "content",
-  //     contentElement.scrollHeight,
-  //     contentElement.offsetHeight,
-  //     contentElement.clientHeight,
-  //     // contentElement.offsetTop,
-  //     contentElement.getBoundingClientRect()
-  //   );
-  // ALLOW scroll if condition is met
+
   const top = contentElement.getBoundingClientRect().top;
-  const bottom = contentElement.getBoundingClientRect().bottom;
+  //   const bottom = contentElement.getBoundingClientRect().bottom;
 
   // todo screen size
   /// todo static values w/o overflow: top 54, bottom 246
-  console.log("top", top);
-  console.log("bottom", bottom);
-  console.log("scrollHeight", contentElement.scrollHeight);
-  console.log("hostElement.scrollHeight", hostElement.scrollHeight);
+  //   console.log("top", top);
+  //   console.log("bottom", bottom);
+  //   console.log("scrollHeight", contentElement.scrollHeight);
+  //   console.log("hostElement.scrollHeight", hostElement.scrollHeight);
   const isContentLargerThanHost =
     contentElement.scrollHeight > hostElement.scrollHeight;
   if (
     // Allow scrolling if the target is inside ChatContent
     target.closest(".os-host-flexbox") &&
+    // AND the content element is overflowing
     isContentLargerThanHost &&
     ((direction === "up" && top > 0) || (direction === "down" && top < 54))
-    // || (direction === "down" && bottom > -Infinity)
-    // And the content element is overflowing
-    // contentElement.scrollHeight > hostElement.scrollHeight
   ) {
-    console.log("scroll ALLOWED");
     return;
   }
 
@@ -267,11 +249,11 @@ const ChatKeyPad = (): JSX.Element => {
         "touchmove",
         (e) => {
           const touchEndY = e.touches[0].clientY;
-          if (touchEndY > touchStartY) {
-            console.log("attempting scrolling down");
-          } else {
-            console.log("attempting scrolling up");
-          }
+          //   if (touchEndY > touchStartY) {
+          //     console.log("attempting scrolling down");
+          //   } else {
+          //     console.log("attempting scrolling up");
+          //   }
           preventWindowScrolling(e, touchEndY > touchStartY ? "down" : "up");
         },
         { passive: false }
@@ -279,20 +261,20 @@ const ChatKeyPad = (): JSX.Element => {
     }
   };
 
-  //   const enableIosWindowScroll = () => {
-  //     if (isIphone()) {
-  //       window.removeEventListener(
-  //         "touchmove",
-  //         (e) => preventWindowScrolling(e, "up"),
-  //         false
-  //       );
-  //       window.removeEventListener(
-  //         "touchmove",
-  //         (e) => preventWindowScrolling(e, "down"),
-  //         false
-  //       );
-  //     }
-  //   };
+  const enableIosWindowScroll = () => {
+    if (isIphone()) {
+      window.removeEventListener(
+        "touchmove",
+        (e) => preventWindowScrolling(e, "up"),
+        false
+      );
+      window.removeEventListener(
+        "touchmove",
+        (e) => preventWindowScrolling(e, "down"),
+        false
+      );
+    }
+  };
 
   return (
     <ChatKeypadStyled>
@@ -325,7 +307,7 @@ const ChatKeyPad = (): JSX.Element => {
             adjustHeight();
           }}
           onFocus={disableIosWindowScroll}
-          //   onBlur={enableIosWindowScroll}
+          onBlur={enableIosWindowScroll}
         />
         <input
           type="file"
