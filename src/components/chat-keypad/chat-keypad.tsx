@@ -241,6 +241,10 @@ const ChatKeyPad = (): JSX.Element => {
   const disableIosWindowScroll = useCallback(() => {
     if (isIphone()) {
       window.addEventListener("touchstart", touchStartHandler);
+      // Passive is true by default in modern browsers
+      // Passive listeners do not allow event.preventDefault()
+      // So we need to set it to false to prevent the default behavior in preventWindowScrolling
+      // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#using_passive_listeners
       window.addEventListener("touchmove", touchMoveHandler, {
         passive: false,
       });
