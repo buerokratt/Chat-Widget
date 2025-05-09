@@ -72,9 +72,12 @@ const preventWindowScrolling = (e: TouchEvent, direction: "up" | "down") => {
   //   );
   // ALLOW scroll if condition is met
   console.log("top", contentElement.getBoundingClientRect().top);
+  console.log("scrollHeight", contentElement.scrollHeight);
+  console.log("hostElement.scrollHeight", hostElement.scrollHeight);
   if (
     // Allow scrolling if the target is inside ChatContent
-    target.closest(".os-host-flexbox")
+    target.closest(".os-host-flexbox") &&
+    contentElement.scrollHeight > hostElement.scrollHeight
     // And the content element is overflowing
     // contentElement.scrollHeight > hostElement.scrollHeight
   ) {
@@ -260,15 +263,19 @@ const ChatKeyPad = (): JSX.Element => {
       window.addEventListener("touchstart", (e) => {
         touchStartY = e.touches[0].clientY;
       });
-      window.addEventListener("touchmove", (e) => {
-        const touchEndY = e.touches[0].clientY;
-        if (touchEndY > touchStartY) {
-          console.log("scrolling down");
-        } else {
-          console.log("scrolling up");
-        }
-        preventWindowScrolling(e, touchEndY > touchStartY ? "down" : "up");
-      });
+      window.addEventListener(
+        "touchmove",
+        (e) => {
+          const touchEndY = e.touches[0].clientY;
+          if (touchEndY > touchStartY) {
+            console.log("scrolling down");
+          } else {
+            console.log("scrolling up");
+          }
+          preventWindowScrolling(e, touchEndY > touchStartY ? "down" : "up");
+        },
+        { passive: false }
+      );
     }
   };
 
