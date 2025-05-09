@@ -42,7 +42,6 @@ import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import { isIphone } from "../../utils/browser-utils";
 import classNames from "classnames";
 
-// todo breaks scrolling on page when closed from X button
 // Hacky workaround for iOS bug
 // Prevents unnecessary window scrolling when the on-screen keyboard is open
 const preventWindowScrolling = (e: TouchEvent, direction: "up" | "down") => {
