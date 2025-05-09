@@ -45,23 +45,15 @@ import classNames from "classnames";
 // Hacky workaround for iOS bug
 // Prevents unnecessary window scrolling when the on-screen keyboard is open
 const preventWindowScrolling = (e: TouchEvent, direction: "up" | "down") => {
-  console.log("preventWindowScrolling", direction);
   const target = e.target as HTMLElement;
   const contentElement = document.getElementsByClassName(
     "os-content"
   )[0] as HTMLElement;
-  const hostElement = document.getElementsByClassName(
-    "os-host-flexbox"
-  )[0] as HTMLElement;
-
   const top = contentElement.getBoundingClientRect().top;
-  const isContentOverflowing =
-    contentElement.scrollHeight > hostElement.scrollHeight;
+
   if (
     // Allow scrolling if the target is inside ChatContent
     target.closest(".os-host-flexbox") &&
-    // AND the content element is overflowing the chat host element
-    isContentOverflowing &&
     // AND the hack to prevent glitchy iOS scrolling
     // 54 is the height of header
     ((direction === "up" && top > 0) || (direction === "down" && top < 54))
