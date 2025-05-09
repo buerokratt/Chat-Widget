@@ -46,7 +46,7 @@ import { t } from "i18next";
 // todo breaks scrolling on page when closed from X button
 // Hacky workaround for iOS bug
 // Prevents unnecessary window scrolling when the on-screen keyboard is open
-const preventWindowScrolling = (e: TouchEvent) => {
+const preventWindowScrolling = (e: TouchEvent, direction: "up" | "down") => {
   const target = e.target as HTMLElement;
   //   console.log("event", e);
   //   console.log("target.closest", target.closest(".os-host-flexbox"));
@@ -71,16 +71,26 @@ const preventWindowScrolling = (e: TouchEvent) => {
   //     contentElement.getBoundingClientRect()
   //   );
   // ALLOW scroll if condition is met
+  console.log("top", contentElement.getBoundingClientRect().top);
   if (
     // Allow scrolling if the target is inside ChatContent
-    target.closest(".os-host-flexbox") &&
+    target.closest(".os-host-flexbox")
     // And the content element is overflowing
-    contentElement.scrollHeight > hostElement.scrollHeight &&
-    (contentElement.getBoundingClientRect().top > -37 || // todo and scrolling down
-      contentElement.getBoundingClientRect().top < 54) // todo and scrolling up
+    // contentElement.scrollHeight > hostElement.scrollHeight
   ) {
     return;
   }
+  //   if (
+  //     // Allow scrolling if the target is inside ChatContent
+  //     target.closest(".os-host-flexbox") &&
+  //     // And the content element is overflowing
+  //     (contentElement.scrollHeight > hostElement.scrollHeight ||
+  //       (contentElement.getBoundingClientRect().top > -37 &&
+  //         direction === "down") || // todo and scrolling down
+  //       (contentElement.getBoundingClientRect().top < 54 && direction === "up")) // todo and scrolling up
+  //   ) {
+  //     return;
+  //   }
 
   e.preventDefault();
 };
@@ -257,14 +267,23 @@ const ChatKeyPad = (): JSX.Element => {
         } else {
           console.log("scrolling up");
         }
-        preventWindowScrolling(e);
+        preventWindowScrolling(e, touchEndY > touchStartY ? "down" : "up");
       });
     }
   };
 
   const enableIosWindowScroll = () => {
     if (isIphone()) {
-      window.removeEventListener("touchmove", preventWindowScrolling, false);
+      window.removeEventListener(
+        "touchmove",
+        (e) => preventWindowScrolling(e, "up"),
+        false
+      );
+      window.removeEventListener(
+        "touchmove",
+        (e) => preventWindowScrolling(e, "down"),
+        false
+      );
     }
   };
 
