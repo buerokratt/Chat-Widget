@@ -41,6 +41,7 @@ import { Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import { isIphone } from "../../utils/browser-utils";
 import classNames from "classnames";
+import { t } from "i18next";
 
 // todo breaks scrolling on page when closed from X button
 // Hacky workaround for iOS bug
@@ -245,9 +246,18 @@ const ChatKeyPad = (): JSX.Element => {
 
   const disableIosWindowScroll = () => {
     if (isIphone()) {
-      // todo https://stackoverflow.com/questions/13278087/determine-vertical-direction-of-a-touchmove
-      window.addEventListener("touchmove", preventWindowScrolling, {
-        passive: false,
+      let touchStartY = 0;
+      window.addEventListener("touchstart", (e) => {
+        touchStartY = e.touches[0].clientY;
+      });
+      window.addEventListener("touchmove", (e) => {
+        const touchEndY = e.touches[0].clientY;
+        if (touchEndY > touchStartY) {
+          console.log("scrolling down");
+        } else {
+          console.log("scrolling up");
+        }
+        preventWindowScrolling(e);
       });
     }
   };
