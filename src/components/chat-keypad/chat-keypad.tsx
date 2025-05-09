@@ -86,9 +86,7 @@ const preventWindowScrolling = (e: TouchEvent, direction: "up" | "down") => {
     // Allow scrolling if the target is inside ChatContent
     target.closest(".os-host-flexbox") &&
     isContentLargerThanHost &&
-    direction === "up" &&
-    top > 0
-
+    ((direction === "up" && top > 0) || (direction === "down" && top < 54))
     // || (direction === "down" && bottom > -Infinity)
     // And the content element is overflowing
     // contentElement.scrollHeight > hostElement.scrollHeight
@@ -96,17 +94,6 @@ const preventWindowScrolling = (e: TouchEvent, direction: "up" | "down") => {
     console.log("scroll ALLOWED");
     return;
   }
-  //   if (
-  //     // Allow scrolling if the target is inside ChatContent
-  //     target.closest(".os-host-flexbox") &&
-  //     // And the content element is overflowing
-  //     (contentElement.scrollHeight > hostElement.scrollHeight ||
-  //       (contentElement.getBoundingClientRect().top > -37 &&
-  //         direction === "down") || // todo and scrolling down
-  //       (contentElement.getBoundingClientRect().top < 54 && direction === "up")) // todo and scrolling up
-  //   ) {
-  //     return;
-  //   }
 
   e.preventDefault();
 };
