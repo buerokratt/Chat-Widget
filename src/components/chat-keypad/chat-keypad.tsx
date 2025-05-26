@@ -108,7 +108,7 @@ const ChatKeyPad = (): JSX.Element => {
     return true;
   };
 
-  const addNewMessageToState = (): void => {
+  const addNewMessageToState = async (): Promise<void> => {
     if (!isInputValid()) return;
     const message: Message = {
       chatId: chatId ?? "",
@@ -118,23 +118,25 @@ const ChatKeyPad = (): JSX.Element => {
       authorRole: AUTHOR_ROLES.END_USER,
     };
 
+    const delayFromDb = parseInt(widgetConfig.chatActiveDuration)
+    const timeout =  delayFromDb ? delayFromDb * 1000 * 60 : CHAT_DURATION_TIMEOUT
+
     dispatch(addMessage(message));
     // dispatch(sendAttachment(userInputFile!)); // To be done: Send attachment
     handleUploadClear();
 
         if (!chatId && !loading) {
-            dispatch(initChat(message));
+            const resultAction = await dispatch(initChat(message));
+            if (initChat.fulfilled.match(resultAction) && resultAction.payload.id) {
+                await ChatService.addChatToTerminationQueue(resultAction.payload.id, timeout);
+            }
         }
         if (loading) {
             dispatch(queueMessage(message));
         }
         if (chatId) {
             dispatch(sendNewMessage(message));
-        }
-        if (chatId) {
-            const delayFromDb = parseInt(widgetConfig.chatActiveDuration)
-            const seconds =  delayFromDb ? delayFromDb * 1000 : CHAT_DURATION_TIMEOUT
-            ChatService.addChatToTerminationQueue(chatId, seconds * 60);
+            await ChatService.addChatToTerminationQueue(chatId, timeout);
         }
     };
 

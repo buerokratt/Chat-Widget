@@ -65,6 +65,7 @@ const Chat = (): JSX.Element => {
   const { height, width } = useWindowDimensions();
   const {
     isChatEnded,
+    lastEvent,
     chatId,
     messageQueue,
     idleChat,
@@ -214,6 +215,7 @@ const Chat = (): JSX.Element => {
             isDetailSelected={showWidgetDetails}
             detailHandler={() => setShowWidgetDetails(!showWidgetDetails)}
           />
+          {isChatEnded && lastEvent === CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS && <WarningNotification warningMessage={t("conversation.inactive-termination")} />}
           {messageQueue.length >= 5 && <WarningNotification warningMessage={t("chat.error-message")} />}
           {burokrattOnlineStatus !== true && <OnlineStatusNotification />}
           {showWidgetDetails && <WidgetDetails />}

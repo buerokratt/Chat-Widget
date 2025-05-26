@@ -45,6 +45,7 @@ export interface ChatState {
   };
   customerSupportId: string;
   lastReadMessageTimestamp: string | null;
+  lastEvent: CHAT_EVENTS | null;
   messages: Message[];
   messageQueue: Message[];
   newMessagesAmount: number;
@@ -107,6 +108,7 @@ const initialState: ChatState = {
   chatDimensions: getInitialChatDimensions(),
   customerSupportId: "",
   lastReadMessageTimestamp: null,
+  lastEvent: null,
   messages: [],
   messageQueue: [],
   newMessagesAmount: 0,
@@ -490,10 +492,14 @@ export const chatSlice = createSlice({
           case CHAT_EVENTS.ANSWERED:
           case CHAT_EVENTS.TERMINATED:
           case TERMINATE_STATUS.ACCEPTED:
-          case TERMINATE_STATUS.CLIENT_LEFT_FOR_UNKNOWN_REASONS:
           case TERMINATE_STATUS.HATE_SPEECH:
           case TERMINATE_STATUS.CLIENT_LEFT_WITH_ACCEPTED:
           case TERMINATE_STATUS.CLIENT_LEFT_WITH_NO_RESOLUTION:
+          case TERMINATE_STATUS.CLIENT_LEFT_FOR_UNKNOWN_REASONS:
+            state.lastEvent = CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS;
+            clearStateVariablesFromLocalStorage();
+            state.chatStatus = CHAT_STATUS.ENDED;
+            break;
           case TERMINATE_STATUS.OTHER:
           case TERMINATE_STATUS.RESPONSE_SENT_TO_CLIENT_EMAIL:
             clearStateVariablesFromLocalStorage();

@@ -27,6 +27,7 @@ export const initialChatState: ChatState = {
   eventMessagesToHandle: [],
   chatStatus: null,
   lastReadMessageTimestamp: null,
+  lastEvent: null,
   contactMsgId: "",
   estimatedWaiting: {
     positionInUnassignedChats: "",
