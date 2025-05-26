@@ -8,7 +8,7 @@ export const EMAIL_REGEX =
 export const PHONE_NR_REGEX = '^$|^[+]*[0-9]{1,4}[-\\s.0-9]{6,15}$';
 export const MESSAGE_MAX_CHAR_LIMIT = 3000;
 export const MESSAGE_FILE_SIZE_LIMIT = 10_000_000;
-export const MESSAGE_WARNING_LIMIT = 2900;
+export const MESSAGE_WARNING_LIMIT = 3000;
 export const MESSAGE_VISIBILITY_LIMIT = 500;
 export const MAXIMUM_MESSAGE_TEXT_LENGTH_FOR_ONE_ROW = 27;
 export const FEEDBACK_CONFIRMATION_TIMEOUT = 5000;
@@ -41,41 +41,54 @@ export enum CHAT_MODES {
   FREE = 'free',
 }
 
+export enum CHAT_SESSIONS {
+  SESSION_ID_KEY = "tabId",
+  SESSION_STATE_KEY = "sessionTabs"
+}
+
 export enum CHAT_STATUS {
   ENDED = 'ENDED',
   OPEN = 'OPEN',
 }
 
 export enum CHAT_EVENTS {
-  ANSWERED = 'answered',
-  TERMINATED = 'terminated',
-  CLIENT_LEFT = 'client_left',
-  CLIENT_LEFT_WITH_ACCEPTED = 'client_left_with_accepted',
-  CLIENT_LEFT_WITH_NO_RESOLUTION = 'client_left_with_no_resolution',
-  CLIENT_LEFT_FOR_UNKNOWN_REASONS = 'client_left_for_unknown_reasons',
-  EMERGENCY_NOTICE = 'emergency-notice',
-  GREETING = 'greeting',
-  RATING = 'rating',
-  REQUESTED_AUTHENTICATION = 'requested-authentication',
-  USER_AUTHENTICATED = 'user-authenticated',
-  ASK_PERMISSION = 'ask-permission',
-  ASK_PERMISSION_ACCEPTED = 'ask-permission-accepted',
-  ASK_PERMISSION_REJECTED = 'ask-permission-rejected',
-  ASK_PERMISSION_IGNORED = 'ask-permission-ignored',
-  REQUESTED_CHAT_FORWARD = 'requested-chat-forward',
-  REQUESTED_CHAT_FORWARD_ACCEPTED = 'requested-chat-forward-accepted',
-  REQUESTED_CHAT_FORWARD_REJECTED = 'requested-chat-forward-rejected',
-  REDIRECTED = 'redirected',
-  TAKEN_OVER = 'taken-over',
-  CONTACT_INFORMATION = 'contact-information',
-  CONTACT_INFORMATION_FULFILLED = 'contact-information-fulfilled',
-  CONTACT_INFORMATION_REJECTED = 'contact-information-rejected',
-  UNAVAILABLE_CONTACT_INFORMATION_FULFILLED = 'unavailable-contact-information-fulfilled',
-  CONTACT_INFORMATION_SKIPPED = 'contact-information-skipped',
-  MESSAGE_READ = 'message-read',
-  UNAVAILABLE_ORGANIZATION = 'unavailable_organization',
-  UNAVAILABLE_CSAS = 'unavailable_csas',
-  UNAVAILABLE_HOLIDAY = 'unavailable_holiday'
+  ANSWERED = "answered",
+  TERMINATED = "terminated",
+  CLIENT_LEFT = "client_left",
+  CLIENT_LEFT_WITH_ACCEPTED = "client_left_with_accepted",
+  CLIENT_LEFT_WITH_NO_RESOLUTION = "client_left_with_no_resolution",
+  CLIENT_LEFT_FOR_UNKNOWN_REASONS = "client_left_for_unknown_reasons",
+  EMERGENCY_NOTICE = "emergency-notice",
+  GREETING = "greeting",
+  RATING = "rating",
+  REQUESTED_AUTHENTICATION = "requested-authentication",
+  USER_AUTHENTICATED = "user-authenticated",
+  ASK_PERMISSION = "ask-permission",
+  ASK_PERMISSION_ACCEPTED = "ask-permission-accepted",
+  ASK_PERMISSION_REJECTED = "ask-permission-rejected",
+  ASK_PERMISSION_IGNORED = "ask-permission-ignored",
+  ASK_TO_FORWARD_TO_CSA = "ask_to_forward_to_csa",
+  FORWARDED_TO_BACKOFFICE = "forwarded_to_backoffice",
+  CONTINUE_CHATTING_WITH_BOT = "continue_chatting_with_bot",
+  REQUESTED_CHAT_FORWARD = "requested-chat-forward",
+  REQUESTED_CHAT_FORWARD_ACCEPTED = "requested-chat-forward-accepted",
+  REQUESTED_CHAT_FORWARD_REJECTED = "requested-chat-forward-rejected",
+  REDIRECTED = "redirected",
+  TAKEN_OVER = "taken-over",
+  CONTACT_INFORMATION = "contact-information",
+  CONTACT_INFORMATION_FULFILLED = "contact-information-fulfilled",
+  CONTACT_INFORMATION_REJECTED = "contact-information-rejected",
+  UNAVAILABLE_CONTACT_INFORMATION_FULFILLED = "unavailable-contact-information-fulfilled",
+  CONTACT_INFORMATION_SKIPPED = "contact-information-skipped",
+  MESSAGE_READ = "message-read",
+  UNAVAILABLE_ORGANIZATION = "unavailable_organization",
+  UNAVAILABLE_ORGANIZATION_ASK_CONTACTS = "unavailable_organization_ask_contacts",
+  UNAVAILABLE_CSAS = "unavailable_csas",
+  UNAVAILABLE_CSAS_ASK_CONTACTS = "unavailable_csas_ask_contacts",
+  UNAVAILABLE_HOLIDAY = "unavailable_holiday",
+  UNAVAILABLE_HOLIDAY_ASK_CONTACTS = "unavailable_holiday_ask_contacts",
+  WAITING_VALIDATION = "waiting_validation",
+  APPROVED_VALIDATION = "approved_validation",
 }
 
 export enum TERMINATE_STATUS {
@@ -113,7 +126,7 @@ export enum RUUTER_ENDPOINTS {
   SEND_MESSAGE_WITH_NEW_EVENT = '/chats/messages/event',
   REMOVE_CHAT_FORWARDING_VALUE = '/chats/forwards/remove',
   GENERATE_FORWARDING_REQUEST = '/chats/forwards/add',
-  BUROKRATT_ONLINE_STATUS = '/healthz',
+  REDIRECT_TO_BACKOFFICE= '/chats/forwards/forward-to-backoffice',
   CUSTOM_JWT_EXTEND = '/auth/jwt/extend',
   CUSTOM_JWT_USERINFO = '/auth/jwt/userinfo',
   DOWNLOAD_CHAT = '/chats/download',
@@ -139,3 +152,7 @@ export enum RATING_TYPES {
 export const isHiddenFeatureEnabled = 
   window._env_.ENABLE_HIDDEN_FEATURES?.toLowerCase().trim() == 'true' ||
   window._env_.ENABLE_HIDDEN_FEATURES?.toLowerCase().trim() == '1';
+
+export const isFeedbackRatingColorsEnabled =
+  window._env_.FEEDBACK_RATING_COLORS_ENABLED?.toLowerCase().trim() == 'true' ||  
+  window._env_.FEEDBACK_RATING_COLORS_ENABLED?.toLowerCase().trim() == '1';

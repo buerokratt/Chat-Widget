@@ -20,7 +20,9 @@ const initialState: WidgetState = {
     animation: CHAT_BUBBLE_ANIMATION,
     chatActiveDuration: CHAT_DURATION_TIMEOUT.toString(),
     isLoaded: false,
+    isBurokrattActive: null,
   },
+  chatId: null,
 };
 
 describe('Widget slice', () => {

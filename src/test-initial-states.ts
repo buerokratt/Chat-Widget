@@ -20,6 +20,10 @@ export const initialChatState: ChatState = {
   isChatOpen: false,
   showContactForm: false,
   showUnavailableContactForm: false,
+  showAskToForwardToCsaForm: false,
+  forwardToCsaMessageId: "",
+  askForContacts: true,
+  forwardToCsaMessage: "",
   contactContentMessage: "",
   isChatRedirected: false,
   messages: [],
@@ -69,6 +73,7 @@ export const initialChatState: ChatState = {
   showLoadingMessage: false,
   showResponseError: false,
   responseErrorMessage: "",
+  failedMessages: [],
 };
 
 export const initialAuthState: AuthenticationState = {

@@ -51,10 +51,44 @@ Snippet can be embedded to any site using the following html:
       DAYS: [1, 2, 4, 5],
     },
     ENABLE_HIDDEN_FEATURES: 'FALSE',
+    IFRAME_TARGET_OIRGIN: "*",
+    FEEDBACK_RATING_COLORS_ENABLED: 'FALSE',
     other variables...
   };
 </script>
 <script id="script-bundle" type="text/javascript" src="LOCATION_OF_WIDGET_BUNDLE" crossorigin=""></script>
+```
+
+## Iframe Support
+
+If you want to use the widget inside an Iframe use the following snippet or reference iframe-index.html
+
+```
+<body>
+    <iframe
+      title="YOUR_IFRAME_TITLE"
+      id="YOUR_IFRAME_ID"
+      width="0"
+      height="0"
+      src="WIDGET_DOMAIN_URL"
+      scrolling="no"
+      style="YOUR_STYLE"
+    ></iframe>
+    <script>
+      window.addEventListener(
+        "message",
+        (e) => {
+          const isOpened = e.data.isOpened;
+          if (isOpened != undefined) {
+            const iframe = window.document.getElementById("YOUR_IFRAME_ID");
+            iframe.width = isOpened ? "OPENED_WIDTH" : "CLOSED_WIDTH";
+            iframe.height = isOpened ? "OPENED_HEIGHT" : "CLOSED_HEIGHT";
+          }
+        },
+        false
+      );
+    </script>
+  </body>
 ```
 
 ## Configurable variables
