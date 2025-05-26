@@ -4,5 +4,6 @@ export interface WidgetConfigResponse {
   widgetDisplayBubbleMessageSeconds: number;
   widgetBubbleMessageText: string;
   widgetColor: string;
+  chatActiveDuration: string;
   widgetAnimation: string;
 }

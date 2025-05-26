@@ -4,7 +4,7 @@ import {
   CHAT_SHOW_BUBBLE_MESSAGE,
   CHAT_BUBBLE_MESSAGE_DELAY_SECONDS,
   CHAT_BUBBLE_COLOR,
-  CHAT_BUBBLE_ANIMATION,
+  CHAT_BUBBLE_ANIMATION, CHAT_DURATION_TIMEOUT,
 } from "../constants";
 import WidgetService from "../services/widget-service";
 import chatService from '../services/chat-service';
@@ -20,6 +20,7 @@ export interface WidgetState {
     bubbleMessageText: string;
     color: string;
     animation: string;
+    chatActiveDuration: string;
     isLoaded: boolean;
   };
 }
@@ -34,6 +35,7 @@ const initialState: WidgetState = {
     bubbleMessageText: "",
     color: CHAT_BUBBLE_COLOR,
     animation: CHAT_BUBBLE_ANIMATION,
+    chatActiveDuration: '5000',
     isLoaded: false,
   },
 };
@@ -74,6 +76,7 @@ export const widgetSlice = createSlice({
         action.payload?.widgetDisplayBubbleMessageSeconds ?? CHAT_BUBBLE_MESSAGE_DELAY_SECONDS;
       state.widgetConfig.bubbleMessageText = action.payload?.widgetBubbleMessageText ?? "";
       state.widgetConfig.color = action.payload?.widgetColor ?? CHAT_BUBBLE_COLOR;
+      state.widgetConfig.chatActiveDuration = action.payload?.chatActiveDuration ?? CHAT_DURATION_TIMEOUT;
       state.widgetConfig.animation = action.payload?.widgetAnimation ?? CHAT_BUBBLE_ANIMATION;
     });
   },

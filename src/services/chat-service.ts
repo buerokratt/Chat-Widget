@@ -124,8 +124,8 @@ class ChatService {
     return http.get(RUUTER_ENDPOINTS.GET_CSA_TITLE_VISIBILITY);
   }
 
-  addChatToTerminationQueue(chatId: string): Promise<void> {
-    return http.post(RUUTER_ENDPOINTS.ADD_CHAT_TO_TERMINATION_QUEUE, { chatId });
+  addChatToTerminationQueue(chatId: string, timeout: number): Promise<void> {
+    return http.post(RUUTER_ENDPOINTS.ADD_CHAT_TO_TERMINATION_QUEUE, { chatId, timeout });
   }
 
   removeChatFromTerminationQueue(chatId: string): Promise<void> {

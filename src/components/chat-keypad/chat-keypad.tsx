@@ -21,31 +21,34 @@ import useChatSelector from "../../hooks/use-chat-selector";
 import KeypadErrorMessage from "./keypad-error-message";
 import ChatKeypadCharCounter from "./chat-keypad-char-counter";
 import {
-  AUTHOR_ROLES,
-  CHAT_STATUS,
-  MESSAGE_FILE_SIZE_LIMIT,
-  MESSAGE_MAX_CHAR_LIMIT,
-  MESSAGE_QUE_MAX_LENGTH,
-  StyledButtonType,
-  isHiddenFeatureEnabled,
+    AUTHOR_ROLES, CHAT_DURATION_TIMEOUT,
+    CHAT_STATUS,
+    isHiddenFeatureEnabled,
+    MESSAGE_FILE_SIZE_LIMIT,
+    MESSAGE_MAX_CHAR_LIMIT,
+    MESSAGE_QUE_MAX_LENGTH,
+    StyledButtonType,
 } from "../../constants";
-import { Message, Attachment, AttachmentTypes } from "../../model/message-model";
+import {Attachment, AttachmentTypes, Message} from "../../model/message-model";
 import StyledButton from "../styled-components/styled-button";
 import Close from "../../static/icons/close.svg";
 import formatBytes from "../../utils/format-bytes";
 import debounce from "../../utils/debounce";
-import { Subject } from "rxjs";
-import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
+import {Subject} from "rxjs";
+import {debounceTime, distinctUntilChanged, switchMap} from "rxjs/operators";
+import ChatService from "../../services/chat-service";
+import useWidgetSelector from "../../hooks/use-widget-selector";
 
 const ChatKeyPad = (): JSX.Element => {
-  const [userInput, setUserInput] = useState<string>("");
-  const [userInputFile, setUserInputFile] = useState<Attachment>();
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isKeypadDisabled, setIsKeypadDisabled] = useState(false);
-  const { feedback, chatId, loading, messageQueue, chatStatus } = useChatSelector();
-  const { t } = useTranslation();
-  const dispatch = useAppDispatch();
-  const hiddenFileInputRef = useRef<HTMLInputElement | null>(null);
+    const {widgetConfig} = useWidgetSelector();
+    const [userInput, setUserInput] = useState<string>("");
+    const [userInputFile, setUserInputFile] = useState<Attachment>();
+    const [errorMessage, setErrorMessage] = useState("");
+    const [isKeypadDisabled, setIsKeypadDisabled] = useState(false);
+    const {feedback, chatId, loading, messageQueue, chatStatus} = useChatSelector();
+    const {t} = useTranslation();
+    const dispatch = useAppDispatch();
+    const hiddenFileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleUploadClick = () => {
     hiddenFileInputRef.current?.click();
@@ -119,16 +122,21 @@ const ChatKeyPad = (): JSX.Element => {
     // dispatch(sendAttachment(userInputFile!)); // To be done: Send attachment
     handleUploadClear();
 
-    if (!chatId && !loading) {
-      dispatch(initChat(message));
-    }
-    if (loading) {
-      dispatch(queueMessage(message));
-    }
-    if (chatId) {
-      dispatch(sendNewMessage(message));
-    }
-  };
+        if (!chatId && !loading) {
+            dispatch(initChat(message));
+        }
+        if (loading) {
+            dispatch(queueMessage(message));
+        }
+        if (chatId) {
+            dispatch(sendNewMessage(message));
+        }
+        if (chatId) {
+            const delayFromDb = parseInt(widgetConfig.chatActiveDuration)
+            const seconds =  delayFromDb ? delayFromDb * 1000 : CHAT_DURATION_TIMEOUT
+            ChatService.addChatToTerminationQueue(chatId, seconds * 60);
+        }
+    };
 
   const [previewSubject] = useState(() => new Subject<Message>());
   useEffect(() => {

@@ -249,7 +249,7 @@ export const addChatToTerminationQueue = createAsyncThunk("chat/addChatToTermina
   thunkApi.dispatch(resetState());
 
   if (chat.chatId) {
-    return ChatService.addChatToTerminationQueue(chat.chatId);
+    return ChatService.addChatToTerminationQueue(chat.chatId,5000);
   }
 });
 
