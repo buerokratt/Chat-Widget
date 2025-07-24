@@ -3,15 +3,16 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useAppDispatch } from "../../store";
 import {
-  addMessage,
-  clearMessageQueue,
-  initChat,
-  queueMessage,
-  sendFeedbackMessage,
-  sendMessagePreview,
-  sendNewMessage,
-  setFeedbackMessageGiven,
-  setFeedbackWarning,
+    addMessage,
+    clearMessageQueue,
+    initChat,
+    queueMessage,
+    resetState,
+    sendFeedbackMessage,
+    sendMessagePreview,
+    sendNewMessage,
+    setFeedbackMessageGiven,
+    setFeedbackWarning,
 } from "../../slices/chat-slice";
 import Send from "../../static/icons/send.svg";
 import File from "../../static/icons/file.svg";
@@ -41,6 +42,7 @@ import { Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import { isIphone } from "../../utils/browser-utils";
 import classNames from "classnames";
+import useWidgetSelector from "../../hooks/use-widget-selector";
 
 // Hacky workaround for iOS bug
 // Prevents unnecessary window scrolling when the on-screen keyboard is open
@@ -69,14 +71,21 @@ const ChatKeyPad = (): JSX.Element => {
   const [userInputFile, setUserInputFile] = useState<Attachment>();
   const [errorMessage, setErrorMessage] = useState("");
   const [isKeypadDisabled, setIsKeypadDisabled] = useState(false);
-  const { feedback, chatId, loading, messageQueue, chatStatus } =
-    useChatSelector();
+  const {
+    feedback,
+    chatId,
+    loading,
+    messageQueue,
+    chatStatus,
+    showResponseError,
+  } = useChatSelector();
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const hiddenFileInputRef = useRef<HTMLInputElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [dynamicStyle, setdynamicStyle] = useState("");
   const touchStartYRef = useRef<number>(0);
+    const { widgetConfig } = useWidgetSelector();
 
   const handleUploadClick = () => {
     hiddenFileInputRef.current?.click();
@@ -124,21 +133,28 @@ const ChatKeyPad = (): JSX.Element => {
     adjustHeight();
   }, []);
 
-  const handleTextFeedback = () => {
-    if (!feedback.isFeedbackRatingGiven) {
-      dispatch(setFeedbackWarning(true));
-      return;
-    }
-    dispatch(setFeedbackWarning(false));
-    dispatch(sendFeedbackMessage({ userInput }));
-    dispatch(setFeedbackMessageGiven(true));
-    setIsKeypadDisabled(true);
-  };
-  useEffect(() => {
-    if (messageQueue.length >= MESSAGE_QUE_MAX_LENGTH) {
-      setIsKeypadDisabled(true);
-    }
-  }, [messageQueue]);
+    const handleTextFeedback = () => {
+        if (widgetConfig.feedbackActive && !feedback.isFeedbackRatingGiven) {
+            dispatch(setFeedbackWarning(true));
+            return;
+        }
+        if (!widgetConfig.feedbackActive && !widgetConfig.feedbackNoticeActive) {
+          dispatch(resetState());
+          return;
+        }
+        dispatch(setFeedbackWarning(false));
+        if (widgetConfig.feedbackNoticeActive) dispatch(sendFeedbackMessage({ userInput }));
+        dispatch(setFeedbackMessageGiven(true));
+        setIsKeypadDisabled(true);
+        if (!widgetConfig.feedbackActive) {
+            dispatch(resetState());
+        }
+    };
+    useEffect(() => {
+        if (messageQueue.length >= MESSAGE_QUE_MAX_LENGTH) {
+            setIsKeypadDisabled(true);
+        }
+    }, [messageQueue]);
 
   useEffect(() => {
     if (chatId && !loading && messageQueue.length > 0) {
@@ -203,6 +219,17 @@ const ChatKeyPad = (): JSX.Element => {
       subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    if (showResponseError && chatId) {
+      const message: Message = {
+        chatId,
+        content: "",
+        authorTimestamp: new Date().toISOString(),
+      };
+      dispatch(sendMessagePreview(message));
+    }
+  }, [showResponseError, chatId, dispatch]);
 
   const handleKeyUp = useCallback(
     debounce(() => {
