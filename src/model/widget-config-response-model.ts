@@ -6,6 +6,10 @@ export interface WidgetConfigResponse {
   widgetColor: string;
   widgetAnimation: string;
   isBurokrattActive: string;
+  showIdleWarningMessage: string;
+  chatActiveDuration: string;
+  autoCloseConversation: string;
+  autoCloseText: string;
   feedbackActive: string;
   feedbackQuestion: string;
   feedbackNoticeActive: string;
