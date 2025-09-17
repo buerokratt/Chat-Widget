@@ -122,12 +122,13 @@ class ChatService {
   generateForwardingRequest(): Promise<Chat[]> {
     return http.post(RUUTER_ENDPOINTS.GENERATE_FORWARDING_REQUEST);
   }
-
+  
   generateDownloadChatRequest(
     chatId: string,
-    email: string | null
+    email?: string | null
   ): Promise<string> {
-    return http.post(RUUTER_ENDPOINTS.DOWNLOAD_CHAT, { chatId, email });
+    const safeEmail = email ?? ""; // convert null or undefined to empty string
+    return http.post(RUUTER_ENDPOINTS.DOWNLOAD_CHAT, { chatId, email: safeEmail });
   }
 
   sendAttachment(attachment: Attachment): Promise<void> {
