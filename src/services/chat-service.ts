@@ -41,6 +41,10 @@ class ChatService {
     return http.post(RUUTER_ENDPOINTS.POST_MESSAGE, { message, holidays, holidayNames, domain: getMultiDomainPath()});
   }
 
+  sendNewLlmMessage(message: Message, holidays: string[], holidayNames: string, context: any, uuid: string): Promise<Document> {
+    return http.post(RUUTER_ENDPOINTS.POST_LLM_MESSAGE, { message, holidays, holidayNames, context, uuid, domain: getMultiDomainPath()});
+  }
+
   sendNewSilentMessage(message: Message, holidays: string[], holidayNames: string): Promise<Document> {
     return http.post(RUUTER_ENDPOINTS.POST_MESSAGE, { message, holidays, holidayNames, silent: true, domain: getMultiDomainPath() });
   }
@@ -112,7 +116,12 @@ class ChatService {
   }
 
   sendMessageWithNewEvent(message: Message): Promise<void> {
-    return http.post(RUUTER_ENDPOINTS.SEND_MESSAGE_WITH_NEW_EVENT, message);
+    let updatedMessage = {
+      ...message,
+      rating: message.rating ?? ""
+    };
+
+    return http.post(RUUTER_ENDPOINTS.SEND_MESSAGE_WITH_NEW_EVENT, updatedMessage);
   }
 
   removeChatForwardingValue(): Promise<void> {
