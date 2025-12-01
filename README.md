@@ -52,6 +52,11 @@ Snippet can be embedded to any site using the following html:
     },
     ENABLE_HIDDEN_FEATURES: 'FALSE',
     IFRAME_TARGET_OIRGIN: "*",
+    FEEDBACK_RATING_COLORS_ENABLED: 'FALSE',
+    ENABLE_MULTI_DOMAIN: 'FALSE',
+    WIDGET_HEIGHT: 450;
+    WIDGET_WIDTH: 400;
+    STREAM_TYPING_SPEED: 30,
     other variables...
   };
 </script>
@@ -101,6 +106,7 @@ If you want to use the widget inside an Iframe use the following snippet or refe
   - `DAYS`: List of days in numbers, where 1=monday, 2=tuesday, 3=wednesday... If current day is in the list of days, the widget will be displayed according to
     BEGIN and END times.
 - `ENABLE_HIDDEN_FEATURES`: set it to `'TRUE'` will show experimental features, `'FALSE'` will hide them
+- `SMAX_INTEGRATION`: { enabled: true; } -- For SMAX integration. Default is false.
 
 ## Licence
 

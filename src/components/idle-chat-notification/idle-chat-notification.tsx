@@ -1,55 +1,49 @@
 import {useTranslation} from 'react-i18next';
 import Button from '../button/button';
-import styles from './idle-chat-notification.module.scss';
 import {useAppDispatch} from '../../store';
-import {endChat, setIdleChat} from '../../slices/chat-slice';
-import {CHAT_EVENTS} from '../../constants';
+import {setIdleChat} from '../../slices/chat-slice';
 import {customJwtExtend} from '../../slices/authentication-slice';
+import {IdleChatNotificationStyled} from "./IdleChatNotificationStyled";
+import {FC} from "react";
 
-const IdleChatNotification = () => {
+interface IdleChatNotificationProps {
+    customMessage?: string;
+}
+
+
+const IdleChatNotification: FC<IdleChatNotificationProps> = ({customMessage}) => {
     const {t} = useTranslation();
     const dispatch = useAppDispatch();
 
     return (
-        <div className="byk-chat">
-            <div className={styles.container}>
+        <IdleChatNotificationStyled>
+            <div className="byk_container">
                 <dialog
-                    className={styles.content}
+                    className="byk_content"
                     aria-modal="true"
                     aria-labelledby={t("notifications.idle-chat-notification")}
                 >
-                    <h2 className={styles.title}>
-                        {t("notifications.idle-chat-notification")}
-                    </h2>
-                    <div className={styles.actions}>
-                        <Button
-                            title={t("widget.action.yes")}
-                            onClick={() => {
-                                dispatch(
-                                    setIdleChat({isIdle: false, lastActive: new Date().getTime()})
-                                );
-                                dispatch(customJwtExtend());
-                            }}
-                        >
-                            {t("widget.action.yes")}
-                        </Button>
-                        <Button
-                            title={t("widget.action.no")}
-                            onClick={() =>
-                                dispatch(
-                                    endChat({
-                                        event: CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS,
-                                        isUpperCase: true,
-                                    })
-                                )
-                            }
-                        >
-                            {t("widget.action.no")}
-                        </Button>
-                    </div>
+                    <>
+                        <div className="byk_title h2-style" role="heading" aria-level={2}>
+                            {customMessage || t("notifications.idle-chat-notification")}
+                        </div>
+                        <div className="byk_actions">
+                            <Button
+                                title={t("widget.action.yes")}
+                                onClick={() => {
+                                    dispatch(
+                                        setIdleChat({isIdle: false, lastActive: new Date().getTime()})
+                                    );
+                                    dispatch(customJwtExtend());
+                                }}
+                            >
+                                {t("widget.action.continue")}
+                            </Button>
+                        </div>
+                    </>
                 </dialog>
             </div>
-        </div>
+        </IdleChatNotificationStyled>
     );
 };
 

@@ -1,6 +1,6 @@
 import { UserContacts } from "./../model/user-contacts-model";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Attachment, Message } from "../model/message-model";
+import { Attachment, Message, SendLLMMessagePayload } from "../model/message-model";
 import ChatService from "../services/chat-service";
 import {
   AUTHOR_ROLES,
@@ -188,6 +188,72 @@ const initialState: ChatState = {
   failedMessages: [],
 };
 
+const initialStateOpen: ChatState = {
+    chatId: null,
+    isChatOpen: true,
+    chatStatus: null,
+    chatDimensions: getInitialChatDimensions(),
+    customerSupportId: "",
+    lastReadMessageTimestamp: null,
+    messages: [],
+    messageQueue: [],
+    newMessagesAmount: 0,
+    eventMessagesToHandle: [],
+    errorMessage: "",
+    showContactForm: false,
+    showUnavailableContactForm: false,
+    showAskToForwardToCsaForm: false,
+    forwardToCsaMessageId: "",
+    askForContacts: true,
+    forwardToCsaMessage: "",
+    contactContentMessage: "",
+    isChatRedirected: false,
+    estimatedWaiting: initialEstimatedTime,
+    idleChat: {
+        isIdle: false,
+        lastActive: "",
+    },
+    loading: false,
+    endUserContacts: {
+        idCode: "",
+        mailAddress: "",
+        phoneNr: "",
+        comment: "",
+    },
+    contactMsgId: "",
+    feedback: {
+        isFeedbackConfirmationShown: false,
+        isFeedbackMessageGiven: false,
+        isFeedbackRatingGiven: false,
+        showFeedbackWarning: false,
+    },
+    downloadChat: {
+        isLoading: false,
+        error: false,
+        data: null,
+    },
+    emergencyNotice: null,
+    contactForm: {
+        data: {
+            chatId: null,
+            endUserEmail: null,
+            endUserPhone: null,
+        },
+        state: {
+            isLoading: false,
+            isSubmitted: false,
+            isFailed: false,
+        },
+    },
+    chatMode: CHAT_MODES.FREE,
+    nameVisibility: false,
+    titleVisibility: false,
+    showLoadingMessage: false,
+    showResponseError: false,
+    responseErrorMessage: "",
+    failedMessages: [],
+};
+
 export const initChat = createAsyncThunk(
   "chat/init",
   async (message: Message) => {
@@ -261,13 +327,13 @@ export const sendFeedbackMessage = createAsyncThunk(
 export const endChat = createAsyncThunk(
   "chat/endChat",
   async (
-    args: { event: CHAT_EVENTS | null; isUpperCase: boolean },
+    args: { event: CHAT_EVENTS | null; isUpperCase: boolean; keepChatOpen?: boolean },
     thunkApi
   ) => {
     const {
       chat: { chatStatus, chatId },
     } = thunkApi.getState() as { chat: ChatState };
-    thunkApi.dispatch(resetState());
+    thunkApi.dispatch(args.keepChatOpen ? resetStateOpen() : resetState());
 
     const endEvent = args.isUpperCase
       ? args.event?.toUpperCase()
@@ -393,6 +459,10 @@ export const sendNewMessage = createAsyncThunk(
   }
 );
 
+export const sendNewLlmMessage = createAsyncThunk("chat/sendNewLlmMessage", (payload: SendLLMMessagePayload) => {
+  const { holidays, holidayNames } = getHolidays();
+  return ChatService.sendNewLlmMessage(payload.message, holidays, holidayNames, payload.context, payload.uuid);
+});
 export const sendNewSilentMessage = createAsyncThunk(
   "chat/sendNewSilentMessage",
   (message: Message) => {
@@ -468,6 +538,7 @@ export const chatSlice = createSlice({
   initialState,
   reducers: {
     resetState: () => initialState,
+    resetStateOpen: () => initialStateOpen,
     resetStateWithValue: (state, action: PayloadAction<string>) => {
       state.chatId = action.payload;
     },
@@ -475,10 +546,7 @@ export const chatSlice = createSlice({
       state.chatId = action.payload;
     },
     addMessage: (state, action: PayloadAction<Message>) => {
-      state.messages = filterDuplicatMessages([
-        ...state.messages,
-        action.payload,
-      ]);
+      state.messages = filterDuplicatMessages([...state.messages, action.payload]);
     },
     addMessageToTop: (state, action: PayloadAction<Message>) => {
       state.messages = [action.payload, ...state.messages];
@@ -488,10 +556,7 @@ export const chatSlice = createSlice({
       state.isChatOpen = action.payload;
       state.newMessagesAmount = 0;
     },
-    setChatDimensions: (
-      state,
-      action: PayloadAction<{ width: number; height: number }>
-    ) => {
+    setChatDimensions: (state, action: PayloadAction<{ width: number; height: number }>) => {
       state.chatDimensions = action.payload;
       setToLocalStorage(LOCAL_STORAGE_CHAT_DIMENSIONS_KEY, action.payload);
     },
@@ -517,6 +582,9 @@ export const chatSlice = createSlice({
     setShowAskToForwardToCsaForm: (state, action: PayloadAction<boolean>) => {
       state.showAskToForwardToCsaForm = action.payload;
     },
+    setShowLoadingMessage: (state, action: PayloadAction<boolean>) => {
+      state.showLoadingMessage = action.payload;
+    },
     queueMessage: (state, action: PayloadAction<Message>) => {
       state.messageQueue.push(action.payload);
     },
@@ -533,9 +601,7 @@ export const chatSlice = createSlice({
       }
     },
     updateMessage: (state, action: PayloadAction<Message>) => {
-      state.messages = state.messages.map((message) =>
-        message.id === action.payload.id ? action.payload : message
-      );
+      state.messages = state.messages.map((message) => (message.id === action.payload.id ? action.payload : message));
     },
     setIsFeedbackConfirmationShown: (state, action: PayloadAction<boolean>) => {
       state.feedback.isFeedbackConfirmationShown = action.payload;
@@ -567,12 +633,9 @@ export const chatSlice = createSlice({
     },
     removeMessageFromDisplay: (state, action: PayloadAction<Message>) => {
       state.failedMessages = state.failedMessages.filter(
-        (failedMessage) =>
-          failedMessage.authorTimestamp !== action.payload.authorTimestamp
+        (failedMessage) => failedMessage.authorTimestamp !== action.payload.authorTimestamp
       );
-      state.messages = state.messages.filter(
-        (message) => message.authorTimestamp !== action.payload.authorTimestamp
-      );
+      state.messages = state.messages.filter((message) => message.authorTimestamp !== action.payload.authorTimestamp);
     },
     addMessagesToDisplay: (state, action: PayloadAction<Message[]>) => {
       let receivedMessages = action.payload || [];
@@ -581,23 +644,16 @@ export const chatSlice = createSlice({
       let messageEdited = false;
 
       const newMessagesList = state.messages.map((existingMessage) => {
-        const matchingMessage = findMatchingMessageFromMessageList(
-          existingMessage,
-          receivedMessages
-        );
+        const matchingMessage = findMatchingMessageFromMessageList(existingMessage, receivedMessages);
         if (!matchingMessage) return existingMessage;
-        receivedMessages = receivedMessages.filter(
-          (rMsg) => rMsg.id !== matchingMessage.id
-        );
+        receivedMessages = receivedMessages.filter((rMsg) => rMsg.id !== matchingMessage.id);
         return { ...existingMessage, ...matchingMessage };
       });
 
       // Handle edited messages
       receivedMessages.forEach((receivedMessage) => {
         if (receivedMessage.originalBaseId) {
-          const indexToReplace = state.messages.findIndex(
-            (message) => message.id === receivedMessage.originalBaseId
-          );
+          const indexToReplace = state.messages.findIndex((message) => message.id === receivedMessage.originalBaseId);
 
           if (indexToReplace !== -1) {
             newMessagesList[indexToReplace] = {
@@ -607,41 +663,27 @@ export const chatSlice = createSlice({
 
             messageEdited = true;
 
-            receivedMessages = receivedMessages.filter(
-              (msg) => msg.id !== receivedMessage.id
-            );
+            receivedMessages = receivedMessages.filter((msg) => msg.id !== receivedMessage.id);
           }
         }
       });
 
-      if (
-        !messageEdited &&
-        newMessagesList.length + receivedMessages.length ===
-          state.messages.length
-      ) {
+      if (!messageEdited && newMessagesList.length + receivedMessages.length === state.messages.length) {
         return;
       }
 
       state.lastReadMessageTimestamp = new Date().toISOString();
       state.newMessagesAmount += receivedMessages.length;
-      state.messages = filterDuplicatMessages([
-        ...newMessagesList,
-        ...receivedMessages,
-      ]);
+      state.messages = filterDuplicatMessages([...newMessagesList, ...receivedMessages]);
       setToLocalStorage("newMessagesAmount", state.newMessagesAmount);
 
       state.chatMode = getChatModeBasedOnLastMessage(state.messages);
     },
-    handleStateChangingEventMessages: (
-      state,
-      action: PayloadAction<Message[]>
-    ) => {
+    handleStateChangingEventMessages: (state, action: PayloadAction<Message[]>) => {
       action.payload.forEach((msg) => {
         switch (msg.event) {
           case CHAT_EVENTS.ASK_PERMISSION_IGNORED:
-            state.messages = state.messages.map((message) =>
-              message.id === msg.id ? msg : message
-            );
+            state.messages = state.messages.map((message) => (message.id === msg.id ? msg : message));
             break;
           case CHAT_EVENTS.CONTACT_INFORMATION:
             state.showContactForm = true;
@@ -696,11 +738,48 @@ export const chatSlice = createSlice({
       });
     },
     removeEstimatedWaitingMessage: (state) => {
-      const estimatedMsgIndex = state.messages.findIndex(
-        (msg) => msg.id === "estimatedWaiting"
-      );
+      const estimatedMsgIndex = state.messages.findIndex((msg) => msg.id === "estimatedWaiting");
       if (estimatedMsgIndex === -1) return;
       state.messages[estimatedMsgIndex].content = "hidden";
+    },
+    updateStreamingMessage: (state, action: PayloadAction<Message>) => {
+      state.showLoadingMessage = false;
+      const streamMessage = action.payload;
+
+      const existingStreamIndex = state.messages.findIndex(
+        (msg) => msg.isStreaming && msg.streamId === streamMessage.streamId
+      );
+
+      if (existingStreamIndex !== -1) {
+        // Update existing streaming message
+        state.messages[existingStreamIndex] = {
+          ...state.messages[existingStreamIndex],
+          ...streamMessage,
+          content: streamMessage.content,
+          isStreaming: streamMessage.isStreaming,
+        };
+      } else {
+        // Add new streaming message
+        state.messages = filterDuplicatMessages([
+          ...state.messages,
+          {
+            ...streamMessage,
+            isStreaming: streamMessage.isStreaming,
+          },
+        ]);
+      }
+    },
+    clearStreamingMessage: (state, action: PayloadAction<string | undefined>) => {
+      state.showLoadingMessage = false;
+      if (action.payload) {
+        state.messages = state.messages.filter((msg) => !(msg.isStreaming && msg.streamId === action.payload));
+      } else {
+        state.messages = state.messages.filter((msg) => !msg.isStreaming);
+      }
+    },
+    addStreamError: (state, action: PayloadAction<Message>) => {
+      const errorMessage = action.payload;
+      state.messages = filterDuplicatMessages([...state.messages, errorMessage]);
     },
   },
   extraReducers: (builder) => {
@@ -713,7 +792,6 @@ export const chatSlice = createSlice({
       state.chatId = action.payload.id;
       state.loading = false;
       state.chatStatus = CHAT_STATUS.OPEN;
-      state.showLoadingMessage = false;
     });
     builder.addCase(initChat.rejected, (state, action) => {
       state.showLoadingMessage = false;
@@ -729,9 +807,6 @@ export const chatSlice = createSlice({
       if (state.customerSupportId === "chatbot") {
         state.showLoadingMessage = true;
       }
-    });
-    builder.addCase(sendNewMessage.fulfilled, (state) => {
-      state.showLoadingMessage = false;
     });
     builder.addCase(sendNewMessage.rejected, (state, action) => {
       state.showLoadingMessage = false;
@@ -800,9 +875,7 @@ export const chatSlice = createSlice({
     builder.addCase(getEstimatedWaitingTime.fulfilled, (state, action) => {
       state.estimatedWaiting = action.payload;
 
-      const estimatedMsg = state.messages.find(
-        (msg) => msg.id === "estimatedWaiting"
-      );
+      const estimatedMsg = state.messages.find((msg) => msg.id === "estimatedWaiting");
       if (estimatedMsg) return;
 
       state.messages.push({
@@ -852,6 +925,7 @@ export const {
   setIsChatOpen,
   setChatDimensions,
   resetState,
+  resetStateOpen,
   clearMessageQueue,
   queueMessage,
   updateMessage,
@@ -868,6 +942,7 @@ export const {
   setShowContactForm,
   setShowUnavailableContactForm,
   setShowAskToForwardToCsaForm,
+  setShowLoadingMessage,
   setEstimatedWaitingTimeToZero,
   setIdleChat,
   setChat,
@@ -876,6 +951,9 @@ export const {
   handleStateChangingEventMessages,
   resetStateWithValue,
   removeEstimatedWaitingMessage,
+  updateStreamingMessage,
+  clearStreamingMessage,
+  addStreamError,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

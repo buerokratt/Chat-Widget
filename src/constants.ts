@@ -1,3 +1,6 @@
+export const externalWidgetHeight = window._env_.WIDGET_HEIGHT;
+export const externalWidgetWidth = window._env_.WIDGET_WIDTH;
+
 /* eslint-disable */
 export const SESSION_STORAGE_CHAT_ID_KEY = 'byk-va-cid';
 export const LOCAL_STORAGE_TARA_LOGIN_REDIRECT = 'byk-va-tara-login-redirect';
@@ -8,8 +11,8 @@ export const EMAIL_REGEX =
 export const PHONE_NR_REGEX = '^$|^[+]*[0-9]{1,4}[-\\s.0-9]{6,15}$';
 export const MESSAGE_MAX_CHAR_LIMIT = 3000;
 export const MESSAGE_FILE_SIZE_LIMIT = 10_000_000;
-export const MESSAGE_WARNING_LIMIT = 2900;
-export const MESSAGE_VISIBILITY_LIMIT = 500;
+export const MESSAGE_WARNING_LIMIT = 3000;
+export const MESSAGE_VISIBILITY_LIMIT = 2750;
 export const MAXIMUM_MESSAGE_TEXT_LENGTH_FOR_ONE_ROW = 27;
 export const FEEDBACK_CONFIRMATION_TIMEOUT = 5000;
 export const FEEDBACK_MESSAGE_MAX_CHAR_LIMIT = 500;
@@ -19,8 +22,10 @@ export const MESSAGE_QUE_MAX_LENGTH = 5;
 export const TERMS_AND_CONDITIONS_LINK =
   'https://www.kratid.ee/kasutustingimused';
 export const ERROR_MESSAGE = 'An error has occured';
-export const CHAT_WINDOW_WIDTH = 400;
-export const CHAT_WINDOW_HEIGHT = 460;
+export const CHAT_WINDOW_WIDTH = externalWidgetWidth ?? 400;
+export const CHAT_MIN_WINDOW_WIDTH = 400;
+export const CHAT_WINDOW_HEIGHT = externalWidgetHeight ?? 460;
+export const CHAT_MIN_WINDOW_HEIGHT = 460;
 export const LOCAL_STORAGE_CHAT_DIMENSIONS_KEY = 'chat-dimensions';
 export const IDLE_CHAT_INTERVAL = 15 * 60;
 export const IDLE_CHAT_CHOICES_INTERVAL = 60;
@@ -113,8 +118,10 @@ export enum RUUTER_ENDPOINTS {
   SEND_CONTACT_INFO = '/chats/users/contact',
   AUTHENTICATE_USER = '/chats/users/name',
   GET_NEW_MESSAGES = '/chats/messages/new',
+  ADD_TIM = "/tim/add-key",
   POST_MESSAGE = '/chats/messages/add',
   POST_MESSAGE_PREVIEW = '/chats/messages/preview',
+  POST_LLM_MESSAGE = '/chats/messages/llm',
   GET_MESSAGES_BY_CHAT_ID = '/chats/messages/all',
   END_CHAT = '/chats/end',
   GET_GREETING = '/chats/greeting',
@@ -134,7 +141,7 @@ export enum RUUTER_ENDPOINTS {
   GET_CSA_TITLE_VISIBILITY = '/chats/config/title-visibility',
   ADD_CHAT_TO_TERMINATION_QUEUE = '/add-chat-to-termination-queue',
   REMOVE_CHAT_FROM_TERMINATION_QUEUE = '/remove-chat-from-termination-queue',
-  LOGIN_WITH_TARA = '/auth/tara/login',
+  AUTHENTICATE_SMAX_USER = '/auth/authenticate-smax-user',
 }
 
 export enum StyledButtonType {
@@ -151,3 +158,11 @@ export enum RATING_TYPES {
 export const isHiddenFeatureEnabled = 
   window._env_.ENABLE_HIDDEN_FEATURES?.toLowerCase().trim() == 'true' ||
   window._env_.ENABLE_HIDDEN_FEATURES?.toLowerCase().trim() == '1';
+
+export const isFeedbackRatingColorsEnabled =
+  window._env_.FEEDBACK_RATING_COLORS_ENABLED?.toLowerCase().trim() == 'true' ||  
+  window._env_.FEEDBACK_RATING_COLORS_ENABLED?.toLowerCase().trim() == '1';
+
+export const isMultiDomainEnabled =
+    window._env_.ENABLE_MULTI_DOMAIN?.toLowerCase().trim() == 'true' ||
+    window._env_.ENABLE_MULTI_DOMAIN?.toLowerCase().trim() == '1';

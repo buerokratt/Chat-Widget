@@ -1,13 +1,15 @@
-import React, {useState} from "react";
+import {useState} from "react";
 import {useTranslation} from "react-i18next";
 import {useSelector} from "react-redux";
+import useChatSelector from "../../hooks/use-chat-selector";
 import {closeConfirmationModal} from "../../slices/widget-slice";
 import {RootState, useAppDispatch} from "../../store";
 import Button from "../button";
-import styles from "./confirmation-modal.module.scss";
 import ConfirmationModalNps from "./confirmation-modal-nps";
 import ConfirmationModalDownload from "./confirmation-modal-download";
 import {CHAT_EVENTS} from "../../constants";
+import {ConfirmationModalStyled} from "./ConfirmationModalStyled";
+import { endChat } from "../../slices/chat-slice";
 
 export default function ConfirmationModal(): JSX.Element {
     const {t} = useTranslation();
@@ -15,6 +17,7 @@ export default function ConfirmationModal(): JSX.Element {
     const isConfirmationModelOpen = useSelector(
         (state: RootState) => state.widget.showConfirmationModal
     );
+    const { isChatEnded } = useChatSelector();
     const [nps, setNps] = useState<{
         showNps: boolean;
         feedback: CHAT_EVENTS | null;
@@ -30,33 +33,38 @@ export default function ConfirmationModal(): JSX.Element {
             option === CHAT_EVENTS.CLIENT_LEFT_WITH_ACCEPTED ||
             CHAT_EVENTS.CLIENT_LEFT_WITH_NO_RESOLUTION
         ) {
-            setNps({
+            if (isChatEnded) {
+                dispatch(endChat({event: option, isUpperCase: true}))
+            } else {
+                setNps({
                 ...nps,
                 showNps: true,
                 feedback: option,
-            });
+                });
+            }
         }
     }
 
     return (
-        <div className="byk-chat">
-            <div className={styles.container}>
+        <ConfirmationModalStyled>
+            <div className="container">
                 <dialog
-                    className={styles.content}
+                    className="content"
                     aria-modal="true"
                     aria-labelledby={t("widget.action.close-confirmation")}
                 >
                     {nps.showNps === false ? (
                         <>
-                            <h2 className={styles.title}>
+                            <div className="title h2-style" role="heading" aria-level={2}>
                                 {t("widget.action.close-confirmation")}
-                            </h2>
-                            <div className={styles.actions}>
+                            </div>
+                            <div className="actions">
                                 <Button
                                     title={t("header.button.confirmation.yes")}
                                     onClick={() =>
                                         handleClick(CHAT_EVENTS.CLIENT_LEFT_WITH_ACCEPTED)
                                     }
+                                    autoFocus
                                 >
                                     {t("widget.action.yes-got-answer")}
                                 </Button>
@@ -84,6 +92,6 @@ export default function ConfirmationModal(): JSX.Element {
                     )}
                 </dialog>
             </div>
-        </div>
+        </ConfirmationModalStyled>
     );
 }

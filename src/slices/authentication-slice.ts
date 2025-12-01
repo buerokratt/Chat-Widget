@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import AuthenticationService from '../services/authentication-service';
-import { ChatState, endChat } from './chat-slice';
+import { endChat } from './chat-slice';
 import { UserInfo } from '../model/user-info-model';
 
 export interface AuthenticationState {
@@ -25,15 +25,12 @@ const initialState: AuthenticationState = {
   },
 };
 
-export const loginWithTaraJwt = createAsyncThunk('auth/loginWithTaraJwt', async (_args, thunkApi) => {
-  const {chat: { chatId }} = thunkApi.getState() as { chat: ChatState };
-  if (chatId) {
-    const res = await AuthenticationService.loginWithTaraJwt(chatId);
-    thunkApi.dispatch(getUserinfo());
-    return res;
+export const authSmaxUser = createAsyncThunk(
+  "auth/authSmaxUserJwt",
+  async (code: string) => {
+    return await AuthenticationService.authSmaxUser(code);
   }
-  return Promise.reject(new Error('Error Logging in with Tara'));
-});
+);
 
 export const getUserinfo = createAsyncThunk('auth/getUserinfo', () => AuthenticationService.customJwtUserinfo());
 
@@ -71,12 +68,6 @@ export const authenticationSlice = createSlice({
     });
     builder.addCase(getUserinfo.rejected, (state) => {
       state.fetchingUserInfo = false;
-    });
-    builder.addCase(loginWithTaraJwt.pending, (state) => {
-      state.loggedInWithTaraJwt = false;
-    });
-    builder.addCase(loginWithTaraJwt.fulfilled, (state) => {
-      state.loggedInWithTaraJwt = true;
     });
     builder.addCase(endChat.fulfilled, (state) => {
       state.isAuthenticated = false;

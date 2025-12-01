@@ -2,7 +2,6 @@ import React, {useEffect, useMemo, useRef, useState} from "react";
 import {motion} from "framer-motion";
 import classNames from "classnames";
 import {Message} from "../../../model/message-model";
-import styles from "../chat-message.module.scss";
 import RobotIcon from "../../../static/icons/buerokratt.svg";
 import {
     CHAT_EVENTS,
@@ -11,7 +10,7 @@ import {
     RATING_TYPES,
 } from "../../../constants";
 import Thumbs from "../../../static/icons/thumbs.svg";
-import {sendMessageWithRating, updateMessage,} from "../../../slices/chat-slice";
+import {sendMessageWithRating, sendNewLlmMessage, updateMessage,} from "../../../slices/chat-slice";
 import {useAppDispatch} from "../../../store";
 import ChatButtonGroup from "./chat-button-group";
 import ChatOptionGroup from "./chat-option-group";
@@ -19,12 +18,9 @@ import {parseButtons, parseOptions} from "../../../utils/chat-utils";
 import useChatSelector from "../../../hooks/use-chat-selector";
 import {useTranslation} from "react-i18next";
 import Markdownify from "./Markdownify";
-
-const leftAnimation = {
-    animate: {opacity: 1, x: 0},
-    initial: {opacity: 0, x: -20},
-    transition: {duration: 0.25, delay: 0.25},
-};
+import {ChatMessageStyled} from "../ChatMessageStyled";
+import { format } from "date-fns";
+import SmoothStreamingMessage from "./smooth-streaming-message";
 
 const AdminMessage = ({message}: { message: Message }): JSX.Element => {
     const {t} = useTranslation();
@@ -43,11 +39,23 @@ const AdminMessage = ({message}: { message: Message }): JSX.Element => {
     };
 
     useEffect(() => {
-        if (messageRef.current) {
-            const height = messageRef.current.offsetHeight;
-            setIsTall(height > 42);
-        }
-    }, [message]);
+        if (!messageRef.current) return;
+
+        const resizeObserver = new ResizeObserver(() => {
+            if (messageRef.current) {
+                const height = messageRef.current.offsetHeight;
+                setIsTall(height > 42);
+            }
+        });
+
+        resizeObserver.observe(messageRef.current);
+
+        return () => {
+            resizeObserver.disconnect();
+        };
+    }, []);
+
+    const messageClass = `admin  ${isTall ? "tall" : ""}`;
 
     const hasButtons = useMemo(() => {
         return parseButtons(message).length > 0;
@@ -65,100 +73,97 @@ const AdminMessage = ({message}: { message: Message }): JSX.Element => {
         [message.authorFirstName, message.authorLastName]);
 
     return (
-        <motion.div
-            animate={leftAnimation.animate}
-            initial={leftAnimation.initial}
-            transition={leftAnimation.transition}
-            ref={messageRef}
-        >
-            <div className="byk-chat">
-                <div className={classNames(styles.message, styles.admin, styles.content, {
-                    [styles.tall]: isTall
-                })}>
-                    {nameVisibility && csaName && message.event != CHAT_EVENTS.GREETING && (
-                        <div className={styles.name}>{csaName}</div>
-                    )}
-                    {titleVisibility &&
-                        message.csaTitle &&
-                        message.event != CHAT_EVENTS.GREETING && (
-                            <div className={styles.name}>{message.csaTitle}</div>
-                        )}
-                    <div className={styles.main}>
-                        <div className={styles.icon}>
-                            {message.event === CHAT_EVENTS.EMERGENCY_NOTICE ? (
-                                <div className={styles.emergency}>!</div>
-                            ) : (
-                                <img src={RobotIcon} alt="Robot icon"/>
-                            )}
-                        </div>
-                        <div
-                            className={`${styles.content} ${
-                                message.event === CHAT_EVENTS.EMERGENCY_NOTICE &&
-                                styles.emergency_content
-                            }`}
-                        >
-                            <Markdownify message={message.content ?? ""}/>
-                            {!message.content && (
-                                hasOptions || hasButtons
-                                    ? t('widget.action.select')
-                                    : <i>{t('widget.error.empty')}</i>
-                            )}
-                        </div>
-                        <div
-                            className={classNames(
-                                styles.feedback,
-                                message.content?.length !== undefined &&
-                                message.content?.length >
-                                MAXIMUM_MESSAGE_TEXT_LENGTH_FOR_ONE_ROW
-                                    ? styles.column
-                                    : styles.row
-                            )}
-                        >
-                            {![CHAT_EVENTS.GREETING, CHAT_EVENTS.EMERGENCY_NOTICE].includes(
-                                    message.event as CHAT_EVENTS
-                                ) &&
-                                !hasButtons && !hasOptions &&
-                                isHiddenFeatureEnabled && (
-                                    <div>
-                                        <button
-                                            type="button"
-                                            className={
-                                                message.rating === RATING_TYPES.LIKED
-                                                    ? styles.highlight
-                                                    : styles.grey
-                                            }
-                                            onClick={() => {
-                                                setNewFeedbackRating(RATING_TYPES.LIKED);
-                                            }}
-                                        >
-                                            <img src={Thumbs} alt="thumbs up icon"/>
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className={
-                                                message.rating === RATING_TYPES.DISLIKED
-                                                    ? styles.highlight
-                                                    : styles.grey
-                                            }
-                                            onClick={() => {
-                                                setNewFeedbackRating(RATING_TYPES.DISLIKED);
-                                            }}
-                                        >
-                                            <img
-                                                className={styles.thumbsDownImg}
-                                                src={Thumbs}
-                                                alt="thumbs down icon"
-                                            />
-                                        </button>
-                                    </div>
-                                )}
-                        </div>
+      <motion.div ref={messageRef}>
+        <div hidden={message.content?.startsWith("$")}>
+          <ChatMessageStyled className={messageClass}>
+            {nameVisibility && csaName && message.event != CHAT_EVENTS.GREETING && (
+              <div className="name">{csaName}</div>
+            )}
+            {titleVisibility && message.csaTitle && message.event != CHAT_EVENTS.GREETING && (
+              <div className="name">{message.csaTitle}</div>
+            )}
+            <div className="main">
+              <div className="icon">
+                {message.event === CHAT_EVENTS.EMERGENCY_NOTICE ? (
+                  <div className="emergency">!</div>
+                ) : (
+                  <img src={RobotIcon} alt="Robot icon" />
+                )}
+              </div>
+              <div className={`content ${message.event === CHAT_EVENTS.EMERGENCY_NOTICE && "emergency_content"}`}>
+                {message.isStreaming != undefined ? (
+                  <SmoothStreamingMessage
+                    message={message.content ?? ""}
+                    isStreaming={message.isStreaming}
+                    onComplete={() => {
+                      if (message.isStreaming === false) {
+                        const updatedMessage = { ...message, isStreaming: undefined };
+                        if (updatedMessage.id) {
+                          dispatch(
+                            sendNewLlmMessage({
+                              message: updatedMessage,
+                              context: updatedMessage.context,
+                              uuid: updatedMessage.id,
+                            })
+                          );
+                        }
+                      }
+                    }}
+                  />
+                ) : (
+                  <Markdownify message={message.content ?? ""} />
+                )}
+                {!message.content &&
+                  (hasOptions || hasButtons ? t("widget.action.select") : <i>{t("widget.error.empty")}</i>)}
+              </div>
+              <div
+                className={classNames(
+                  "feedback",
+                  message.content?.length !== undefined &&
+                    message.content?.length > MAXIMUM_MESSAGE_TEXT_LENGTH_FOR_ONE_ROW
+                    ? "column"
+                    : "row"
+                )}
+              >
+                {![CHAT_EVENTS.GREETING, CHAT_EVENTS.EMERGENCY_NOTICE].includes(message.event as CHAT_EVENTS) &&
+                  !hasButtons &&
+                  !hasOptions &&
+                  isHiddenFeatureEnabled && (
+                    <div>
+                      <button
+                        type="button"
+                        className={message.rating === RATING_TYPES.LIKED ? "highlight" : "grey"}
+                        onClick={() => {
+                          setNewFeedbackRating(RATING_TYPES.LIKED);
+                        }}
+                      >
+                        <img src={Thumbs} alt="thumbs up icon" />
+                      </button>
+                      <button
+                        type="button"
+                        className={message.rating === RATING_TYPES.DISLIKED ? "highlight" : "grey"}
+                        onClick={() => {
+                          setNewFeedbackRating(RATING_TYPES.DISLIKED);
+                        }}
+                      >
+                        <img className="thumbsDownImg" src={Thumbs} alt="thumbs down icon" />
+                      </button>
                     </div>
-                    {hasButtons && <ChatButtonGroup message={message}/>}
-                    {hasOptions && <ChatOptionGroup message={message}/>}
-                </div>
+                  )}
+              </div>
             </div>
-        </motion.div>
+            {message.originalBaseId && (
+              <div className="edited-message">
+                {t("chatMessage.edited-message", {
+                  date: format(new Date(message?.updated ?? new Date()), "HH:mm:ss"),
+                })}
+              </div>
+            )}
+            {hasButtons && <ChatButtonGroup message={message} />}
+            {hasOptions && <ChatOptionGroup message={message} />}
+          </ChatMessageStyled>
+        </div>
+      </motion.div>
     );
 };
 

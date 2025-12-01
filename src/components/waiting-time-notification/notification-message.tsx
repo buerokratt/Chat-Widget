@@ -1,6 +1,6 @@
 import {FC} from 'react';
 import InfoIcon from './info-icon';
-import styles from './waiting-time-notification.module.scss';
+import {WaitingTimeNotificationStyles} from "./WaitingTimeNotificationStyled";
 
 interface Props {
     showIcon: boolean;
@@ -9,22 +9,22 @@ interface Props {
 
 const NotificationMessage: FC<Props> = ({showIcon, children}) => {
     return (
-        <div className="byk-chat">
-            <div className={styles.messageContainer}>
+        <WaitingTimeNotificationStyles>
+            <div className="messageContainer">
                 <div
                     className={
                         showIcon === true
-                            ? `${styles.infoIcon}`
-                            : `${styles.infoIcon} ${styles.hideIcon}`
+                            ? `infoIcon`
+                            : `infoIcon hideIcon`
                     }
                 >
                     <InfoIcon/>
                 </div>
-                <div className={`${styles.message}`}>
-                    <p>{children}</p>
+                <div className="message">
+                    <div className="p-style">{children}</div>
                 </div>
             </div>
-        </div>
+        </WaitingTimeNotificationStyles>
     );
 };
 

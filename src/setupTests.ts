@@ -10,7 +10,7 @@ window._env_ = {
   NOTIFICATION_NODE_URL: "http://localhost:4040",
   ENVIRONMENT: "development",
   TIM_AUTHENTICATION_URL:
-    "http://localhost:8085/oauth2/authorization/tara?callback_url=http://localhost:3000/auth/callback",
+    "http://localhost:8085/oauth2/authorization/tara",
   TERMS_AND_CONDITIONS_LINK: "https://www.kratid.ee/kasutustingimused",
   ORGANIZATION_NAME: "TEST",
   OFFICE_HOURS: {
@@ -20,9 +20,15 @@ window._env_ = {
     END: 17,
     DAYS: [1, 2, 3, 4, 5],
   },
-  
+
   ENABLE_HIDDEN_FEATURES: "TRUE",
+  FEEDBACK_RATING_COLORS_ENABLED: "FALSE",
+  ENABLE_MULTI_DOMAIN: "FALSE",
+  WIDGET_HEIGHT: 450,
+  WIDGET_WIDTH: 400,
+  STREAM_TYPING_SPEED: 30,
   IFRAME_TARGET_OIRGIN: "*",
+  SMAX_INTEGRATION: { enabled: false },
 };
 
 beforeAll(() => {
