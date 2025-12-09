@@ -1,11 +1,10 @@
-import React, { createContext, useContext, useCallback, useRef, useMemo, useEffect } from 'react';
-import { OverlayScrollbarsComponent } from 'overlayscrollbars-react';
+import React, { createContext, useContext, useCallback, useRef, useMemo, useEffect } from "react";
+import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 
 interface ScrollContextType {
   scrollToBottom: () => void;
   setScrollRef: (ref: OverlayScrollbarsComponent | null) => void;
   resetAutoScroll: () => void;
-  isAtBottom: () => boolean;
 }
 
 const ScrollContext = createContext<ScrollContextType | undefined>(undefined);
@@ -14,8 +13,7 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const scrollRef = useRef<OverlayScrollbarsComponent | null>(null);
   const userHasScrolledUp = useRef(false);
   const cleanupRef = useRef<(() => void) | null>(null);
-  const programmaticScrollStartRef = useRef<number | null>(null);
-  const lastScrollTopRef = useRef<number>(0);
+  const rafRef = useRef<number | null>(null);
 
   const setScrollRef = useCallback((ref: OverlayScrollbarsComponent | null) => {
     if (cleanupRef.current) {
@@ -31,33 +29,20 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       if (instance) {
         const viewport = instance.getElements().viewport;
 
-        lastScrollTopRef.current = viewport.scrollTop;
+        let lastScrollTop = 0;
 
         const handleScroll = () => {
           const { scrollTop, scrollHeight, clientHeight } = viewport;
-          const isCurrentlyAtBottom = scrollHeight - scrollTop <= clientHeight + 2;
 
-          if (programmaticScrollStartRef.current !== null) {
-            if (scrollTop < programmaticScrollStartRef.current) {
-              userHasScrolledUp.current = true;
-              programmaticScrollStartRef.current = null;
-              lastScrollTopRef.current = scrollTop;
-            } else if (isCurrentlyAtBottom) {
-              userHasScrolledUp.current = false;
-              programmaticScrollStartRef.current = null;
-            }
-            return;
-          }
-
-          if (scrollTop < lastScrollTopRef.current) {
+          if (scrollTop < lastScrollTop) {
             userHasScrolledUp.current = true;
           }
 
-          if (isCurrentlyAtBottom) {
+          if (scrollHeight - scrollTop <= clientHeight + 2) {
             userHasScrolledUp.current = false;
           }
 
-          lastScrollTopRef.current = scrollTop;
+          lastScrollTop = scrollTop;
         };
 
         viewport.addEventListener("scroll", handleScroll);
@@ -69,23 +54,9 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }, []);
 
-  const isAtBottom = useCallback(() => {
-    if (!scrollRef.current) return false;
-    
-    const instance = scrollRef.current.osInstance();
-    if (!instance) return false;
-    
-    const viewport = instance.getElements().viewport;
-    const { scrollTop, scrollHeight, clientHeight } = viewport;
-    
-    return scrollHeight - scrollTop <= clientHeight + 2;
-  }, []);
-
   const resetAutoScroll = useCallback(() => {
-    if (isAtBottom()) {
-      userHasScrolledUp.current = false;
-    }
-  }, [isAtBottom]);
+    userHasScrolledUp.current = false;
+  }, []);
 
   const scrollToBottom = useCallback(() => {
     if (!scrollRef.current) return;
@@ -94,45 +65,45 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (!instance) return;
 
     if (!userHasScrolledUp.current) {
-      const viewport = instance.getElements().viewport;
-      programmaticScrollStartRef.current = viewport.scrollTop;
-      
-      instance.scroll({ y: "100%" }, 200);
-      
-      setTimeout(() => {
-        programmaticScrollStartRef.current = null;
-        const finalViewport = instance.getElements().viewport;
-        if (finalViewport) {
-          lastScrollTopRef.current = finalViewport.scrollTop;
-        }
-      }, 250);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+
+      rafRef.current = requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          instance.scroll({ y: "100%" }, 0);
+          rafRef.current = null;
+        });
+      });
     }
   }, []);
 
-  const contextValue = useMemo(() => ({
-    scrollToBottom,
-    setScrollRef,
-    resetAutoScroll,
-    isAtBottom,
-  }), [scrollToBottom, setScrollRef, resetAutoScroll, isAtBottom]);
+  const contextValue = useMemo(
+    () => ({
+      scrollToBottom,
+      setScrollRef,
+      resetAutoScroll,
+    }),
+    [scrollToBottom, setScrollRef, resetAutoScroll]
+  );
 
   useEffect(() => {
     return () => {
       cleanupRef.current?.();
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
     };
   }, []);
 
-  return (
-    <ScrollContext.Provider value={contextValue}>
-      {children}
-    </ScrollContext.Provider>
-  );
+  return <ScrollContext.Provider value={contextValue}>{children}</ScrollContext.Provider>;
 };
 
 export const useScroll = () => {
   const context = useContext(ScrollContext);
   if (context === undefined) {
-    throw new Error('useScroll must be used within a ScrollProvider');
+    throw new Error("useScroll must be used within a ScrollProvider");
   }
   return context;
 };

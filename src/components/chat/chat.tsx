@@ -278,7 +278,7 @@ const Chat = (): JSX.Element => {
   };
 
   return (
-    <ChatStyles isFullScreen={isFullScreen} style={{ transition: 'none' }}>
+    <ChatStyles isFullScreen={isFullScreen} style={{ transition: 'none !important' }}>
       <div className="chatWrapper">
         <Resizable
           size={isFullScreen ? { width: window.innerWidth, height: window.innerHeight } : chatDimensions}
