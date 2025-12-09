@@ -13,6 +13,7 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const scrollRef = useRef<OverlayScrollbarsComponent | null>(null);
   const userHasScrolledUp = useRef(false);
   const cleanupRef = useRef<(() => void) | null>(null);
+  const rafRef = useRef<number | null>(null);
 
   const setScrollRef = useCallback((ref: OverlayScrollbarsComponent | null) => {
     if (cleanupRef.current) {
@@ -64,7 +65,17 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (!instance) return;
 
     if (!userHasScrolledUp.current) {
-      instance.scroll({ y: "100%" }, 200);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+
+      rafRef.current = requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          instance.scroll({ y: "100%" }, 0);
+          rafRef.current = null;
+        });
+      });
     }
   }, []);
 
@@ -80,6 +91,9 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   useEffect(() => {
     return () => {
       cleanupRef.current?.();
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
     };
   }, []);
 
