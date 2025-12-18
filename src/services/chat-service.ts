@@ -1,5 +1,6 @@
 import {UserContacts} from "./../model/user-contacts-model";
 import http from "./http-service";
+import notificationHttp from "./notification-service";
 import {Attachment, Message} from "../model/message-model";
 import {Chat} from "../model/chat-model";
 import {RUUTER_ENDPOINTS} from "../constants";
@@ -174,6 +175,10 @@ class ChatService {
         `${window._env_.NOTIFICATION_NODE_URL}${RUUTER_ENDPOINTS.REMOVE_CHAT_FROM_TERMINATION_QUEUE}`,
         JSON.stringify({ chatId })
     );
+  }
+
+  stopStream(channelId: string): Promise<void> {
+    return notificationHttp.post(`/channels/${channelId}/stream/stop`, { channelId });
   }
 }
 

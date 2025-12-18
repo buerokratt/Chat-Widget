@@ -73,7 +73,9 @@ export const initialChatState: ChatState = {
   showResponseError: false,
   responseErrorMessage: "",
   failedMessages: [],
-  isFullScreen: false
+  isFullScreen: false,
+  isTypingStream: false,
+  stopTypingStream: false,
 };
 
 export const initialAuthState: AuthenticationState = {

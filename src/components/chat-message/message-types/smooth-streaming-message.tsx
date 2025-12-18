@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Markdownify from "./Markdownify";
 import { useScroll } from "../../../contexts/ScrollContext";
+import useChatSelector from "../../../hooks/use-chat-selector";
 
 interface SmoothStreamingMessageProps {
   message: string;
   isStreaming: boolean;
   sanitizeLinks?: boolean;
   batchSize?: number;
+  onChange?: (text: string) => void;
   onComplete?: () => void;
+  onStopRequest?: (displayedText: string) => void;
 }
 
 const SmoothStreamingMessage: React.FC<SmoothStreamingMessageProps> = ({
@@ -15,7 +18,9 @@ const SmoothStreamingMessage: React.FC<SmoothStreamingMessageProps> = ({
   isStreaming,
   sanitizeLinks = false,
   batchSize = 2,
+  onChange,
   onComplete,
+  onStopRequest,
 }) => {
   const [displayedText, setDisplayedText] = useState("");
   const tokenBuffer = useRef("");
@@ -25,38 +30,41 @@ const SmoothStreamingMessage: React.FC<SmoothStreamingMessageProps> = ({
   const isNewStream = useRef(true);
   const typingSpeed = window._env_.STREAM_TYPING_SPEED ?? 30;
   const { scrollToBottom, resetAutoScroll } = useScroll();
+  const { stopTypingStream } = useChatSelector();
 
   useEffect(() => {
-    if (isNewStream.current || !message.startsWith(previousMessage.current)) {
-      setDisplayedText("");
-      tokenBuffer.current = message;
-      displayIndex.current = 0;
-      isNewStream.current = false;
+    if (!stopTypingStream) {
+      if (isNewStream.current || !message.startsWith(previousMessage.current)) {
+        setDisplayedText("");
+        tokenBuffer.current = message;
+        displayIndex.current = 0;
+        isNewStream.current = false;
 
-      resetAutoScroll();
+        resetAutoScroll();
 
-      if (typewriterInterval.current) {
-        clearInterval(typewriterInterval.current);
-        typewriterInterval.current = null;
-      }
-      startTypewriting();
-    } else if (message.length > tokenBuffer.current.length) {
-      tokenBuffer.current = message;
-
-      if (!typewriterInterval.current && tokenBuffer.current.length > displayIndex.current) {
+        if (typewriterInterval.current) {
+          clearInterval(typewriterInterval.current);
+          typewriterInterval.current = null;
+        }
         startTypewriting();
-      }
-    } else if (message.length < tokenBuffer.current.length) {
-      tokenBuffer.current = message;
-      if (displayIndex.current > message.length) {
-        displayIndex.current = message.length;
-        setDisplayedText(message);
-        scrollToBottom();
-      }
-    }
+      } else if (message.length > tokenBuffer.current.length) {
+        tokenBuffer.current = message;
 
-    previousMessage.current = message;
-  }, [message, resetAutoScroll]);
+        if (!typewriterInterval.current && tokenBuffer.current.length > displayIndex.current) {
+          startTypewriting();
+        }
+      } else if (message.length < tokenBuffer.current.length) {
+        tokenBuffer.current = message;
+        if (displayIndex.current > message.length) {
+          displayIndex.current = message.length;
+          setDisplayedText(message);
+          scrollToBottom();
+        }
+      }
+
+      previousMessage.current = message;
+    }
+  }, [message, resetAutoScroll, stopTypingStream]);
 
   useEffect(() => {
     if (!isStreaming) {
@@ -64,42 +72,59 @@ const SmoothStreamingMessage: React.FC<SmoothStreamingMessageProps> = ({
     }
   }, [isStreaming]);
 
+  useEffect(() => {
+    if (stopTypingStream === true) {
+      clearInterval(typewriterInterval.current!);
+      typewriterInterval.current = null;
+      scrollToBottom();
+      onStopRequest?.(displayedText);
+    }
+  }, [stopTypingStream]);
+
   const startTypewriting = useCallback(() => {
-    if (typewriterInterval.current) return;
+    if (!stopTypingStream) {
+      if (typewriterInterval.current) return;
 
-    typewriterInterval.current = setInterval(() => {
-      const buffer = tokenBuffer.current;
-      const currentIndex = displayIndex.current;
+      typewriterInterval.current = setInterval(() => {
+        const buffer = tokenBuffer.current;
+        const currentIndex = displayIndex.current;
 
-      if (currentIndex >= buffer.length) {
-        if (!isStreaming) {
+        if (currentIndex >= buffer.length) {
+          if (!isStreaming) {
+            clearInterval(typewriterInterval.current!);
+            typewriterInterval.current = null;
+          }
+          return;
+        }
+
+        const nextIndex = Math.min(currentIndex + batchSize, buffer.length);
+        const newText = buffer.slice(0, nextIndex);
+
+        setDisplayedText(newText);
+        displayIndex.current = nextIndex;
+        scrollToBottom();
+
+        if (nextIndex >= buffer.length && !isStreaming) {
           clearInterval(typewriterInterval.current!);
           typewriterInterval.current = null;
         }
-        return;
-      }
-
-      const nextIndex = Math.min(currentIndex + batchSize, buffer.length);
-      const newText = buffer.slice(0, nextIndex);
-
-      setDisplayedText(newText);
-      displayIndex.current = nextIndex;
-      scrollToBottom();
-
-      if (nextIndex >= buffer.length && !isStreaming) {
-        clearInterval(typewriterInterval.current!);
-        typewriterInterval.current = null;
-      }
-    }, typingSpeed);
-  }, [isStreaming, batchSize, typingSpeed, scrollToBottom]);
+      }, typingSpeed);
+    }
+  }, [isStreaming, batchSize, typingSpeed, scrollToBottom, stopTypingStream]);
 
   useEffect(() => {
-    if (!isStreaming && displayedText.length === message.length && typewriterInterval.current) {
-      clearInterval(typewriterInterval.current);
-      typewriterInterval.current = null;
-      onComplete?.();
+    if (!stopTypingStream) {
+      console.log(`DisplayedText length: ${displayedText}`);
+      if (!isStreaming && displayedText.length === message.length && typewriterInterval.current) {
+        console.log(`Displayed text length: ${displayedText.length}, Message length: ${message.length}`);
+        clearInterval(typewriterInterval.current);
+        typewriterInterval.current = null;
+        onComplete?.();
+      } else {
+        onChange?.(displayedText);
+      }
     }
-  }, [isStreaming, displayedText.length, message.length]);
+  }, [isStreaming, displayedText.length, message.length, stopTypingStream]);
 
   useEffect(() => {
     return () => {
