@@ -3,7 +3,7 @@ import {colors, fontChat, fontChatBold} from "../../styling/style_settings";
 
 export const ChatStyles = styled.div<{isFullScreen?: boolean}>`
     .chatWrapper {
-        z-index: 99;
+        z-index: 9999;
         position: fixed !important;
         margin: ${props => props.isFullScreen ? '0' : '1em'};
         right: 0;
