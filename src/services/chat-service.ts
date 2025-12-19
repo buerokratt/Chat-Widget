@@ -178,7 +178,7 @@ class ChatService {
   }
 
   stopStream(channelId: string): Promise<void> {
-    return notificationHttp.post(`/channels/${channelId}/stream/stop`, { channelId });
+    return http.post(RUUTER_ENDPOINTS.STOP_STREAM, { channelId });
   }
 }
 
