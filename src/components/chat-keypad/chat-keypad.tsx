@@ -1,20 +1,24 @@
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useAppDispatch } from "../../store";
 import {
-    addMessage,
-    clearMessageQueue,
-    initChat,
-    queueMessage,
-    resetState,
-    sendFeedbackMessage,
-    sendMessagePreview,
-    sendNewMessage,
-    setFeedbackMessageGiven,
-    setFeedbackWarning,
+  addMessage,
+  clearMessageQueue,
+  initChat,
+  queueMessage,
+  resetState,
+  sendFeedbackMessage,
+  sendMessagePreview,
+  sendNewMessage,
+  setFeedbackMessageGiven,
+  setFeedbackWarning,
+  setStopTypingStream,
+  setTypingStream,
+  stopStream,
 } from "../../slices/chat-slice";
 import Send from "../../static/icons/send.svg";
+import StopStream from "../../static/icons/stop-stream.svg";
 import File from "../../static/icons/file.svg";
 import useChatSelector from "../../hooks/use-chat-selector";
 import KeypadErrorMessage from "./keypad-error-message";
@@ -29,11 +33,7 @@ import {
   MESSAGE_QUE_MAX_LENGTH,
   StyledButtonType,
 } from "../../constants";
-import {
-  Attachment,
-  AttachmentTypes,
-  Message,
-} from "../../model/message-model";
+import { Attachment, AttachmentTypes, Message } from "../../model/message-model";
 import StyledButton from "../styled-components/styled-button";
 import Close from "../../static/icons/close.svg";
 import formatBytes from "../../utils/format-bytes";
@@ -72,21 +72,14 @@ const ChatKeyPad = (): JSX.Element => {
   const [userInputFile, setUserInputFile] = useState<Attachment>();
   const [errorMessage, setErrorMessage] = useState("");
   const [isKeypadDisabled, setIsKeypadDisabled] = useState(false);
-  const {
-    feedback,
-    chatId,
-    loading,
-    messageQueue,
-    chatStatus,
-    showResponseError,
-  } = useChatSelector();
+  const { feedback, chatId, loading, messageQueue, chatStatus, showResponseError, isTypingStream } = useChatSelector();
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const hiddenFileInputRef = useRef<HTMLInputElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [dynamicStyle, setdynamicStyle] = useState("");
   const touchStartYRef = useRef<number>(0);
-    const { widgetConfig } = useWidgetSelector();
+  const { widgetConfig } = useWidgetSelector();
 
   const handleUploadClick = () => {
     hiddenFileInputRef.current?.click();
@@ -129,6 +122,10 @@ const ChatKeyPad = (): JSX.Element => {
       });
     }
   };
+
+  useEffect(() => {
+    setIsKeypadDisabled(isTypingStream);
+  }, [isTypingStream]);
 
   useEffect(() => {
     adjustHeight();
@@ -177,6 +174,16 @@ const ChatKeyPad = (): JSX.Element => {
       return false;
     }
     return true;
+  };
+
+  const handleSendStopButtonClick = () => {
+    if (isTypingStream && chatId) {
+      dispatch(setTypingStream(false));
+      dispatch(setStopTypingStream(true));
+      dispatch(stopStream(chatId));
+    } else {
+      addNewMessageToState();
+    }
   };
 
   const addNewMessageToState = (): void => {
@@ -260,10 +267,7 @@ const ChatKeyPad = (): JSX.Element => {
 
   const touchMoveHandler = useCallback((e: TouchEvent) => {
     const touchEndY = e.touches[0].clientY;
-    preventWindowScrolling(
-      e,
-      touchEndY > touchStartYRef.current ? "down" : "up"
-    );
+    preventWindowScrolling(e, touchEndY > touchStartYRef.current ? "down" : "up");
   }, []);
 
   const disableIosWindowScroll = useCallback(() => {
@@ -323,12 +327,7 @@ const ChatKeyPad = (): JSX.Element => {
           onFocus={disableIosWindowScroll}
           onBlur={enableIosWindowScroll}
         />
-        <input
-          type="file"
-          ref={hiddenFileInputRef}
-          onChange={handleFileChange}
-          style={{ display: "none" }}
-        />
+        <input type="file" ref={hiddenFileInputRef} onChange={handleFileChange} style={{ display: "none" }} />
 
         {chatStatus === CHAT_STATUS.ENDED && !!chatId ? (
           <FeedbackButtonStyle
@@ -341,14 +340,18 @@ const ChatKeyPad = (): JSX.Element => {
         ) : (
           <>
             <button
-              onKeyDown={addNewMessageToState}
-              onClick={addNewMessageToState}
+              key={isTypingStream ? "stop" : "send"}
+              onKeyDown={handleSendStopButtonClick}
+              onClick={handleSendStopButtonClick}
               className="button"
-              title={t("keypad.button.label")}
-              aria-label={t("keypad.button.label")}
+              title={t(isTypingStream ? "keypad.button.stop-stream" : "keypad.button.label")}
+              aria-label={t(isTypingStream ? "keypad.button.stop-stream" : "keypad.button.label")}
               tabIndex={0}
             >
-              <img src={Send} alt="Send message icon" />
+              <img
+                src={isTypingStream ? StopStream : Send}
+                alt={isTypingStream ? "Stop stream icon" : "Send message icon"}
+              />
             </button>
 
             {isHiddenFeatureEnabled && renderSendFileButton()}

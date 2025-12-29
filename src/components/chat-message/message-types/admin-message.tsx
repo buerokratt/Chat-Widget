@@ -10,7 +10,13 @@ import {
     RATING_TYPES,
 } from "../../../constants";
 import Thumbs from "../../../static/icons/thumbs.svg";
-import {sendMessageWithRating, sendNewLlmMessage, updateMessage,} from "../../../slices/chat-slice";
+import {
+  sendMessageWithRating,
+  sendNewLlmMessage,
+  setTypingStream,
+  updateMessage,
+  setStopTypingStream,
+} from "../../../slices/chat-slice";
 import {useAppDispatch} from "../../../store";
 import ChatButtonGroup from "./chat-button-group";
 import ChatOptionGroup from "./chat-option-group";
@@ -27,7 +33,7 @@ const AdminMessage = ({message}: { message: Message }): JSX.Element => {
     const dispatch = useAppDispatch();
     const messageRef = useRef<HTMLDivElement>(null);
     const [isTall, setIsTall] = useState(false);
-    const {nameVisibility, titleVisibility} = useChatSelector();
+    const {nameVisibility, titleVisibility, stopTypingStream} = useChatSelector();
 
     const setNewFeedbackRating = (newRating: string): void => {
         const updatedMessage = {
@@ -95,6 +101,28 @@ const AdminMessage = ({message}: { message: Message }): JSX.Element => {
                   <SmoothStreamingMessage
                     message={message.content ?? ""}
                     isStreaming={message.isStreaming}
+                    onChange={(_) => {
+                      if (stopTypingStream === false && message.isStreaming != undefined) {
+                        setTimeout(() => dispatch(setTypingStream(true)), 0);
+                      }
+                    }}
+                    onStopRequest={(displayedText) => {
+                      const updatedMessage = { ...message, isStreaming: undefined, content: displayedText };
+                      if (updatedMessage.id) {
+                        dispatch(
+                          sendNewLlmMessage({
+                            message: updatedMessage,
+                            context: updatedMessage.context,
+                            uuid: updatedMessage.id,
+                          })
+                        );
+                      }
+                      setTimeout(() => {
+                        dispatch(updateMessage(updatedMessage));
+                        dispatch(setTypingStream(false));
+                        dispatch(setStopTypingStream(false));
+                      }, 0);
+                    }}
                     onComplete={() => {
                       if (message.isStreaming === false) {
                         const updatedMessage = { ...message, isStreaming: undefined };
@@ -107,6 +135,10 @@ const AdminMessage = ({message}: { message: Message }): JSX.Element => {
                             })
                           );
                         }
+                        setTimeout(() => {
+                          dispatch(setTypingStream(false));
+                          dispatch(setStopTypingStream(false));
+                        }, 0);
                       }
                     }}
                   />
