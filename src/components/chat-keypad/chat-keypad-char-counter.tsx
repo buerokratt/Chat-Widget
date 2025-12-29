@@ -10,6 +10,7 @@ import {
     MESSAGE_WARNING_LIMIT,
 } from '../../constants';
 import useChatSelector from '../../hooks/use-chat-selector';
+import { isMobile } from "../../utils/browser-utils";
 
 interface ChatKeypadCharCounterType {
     userInput: string;
@@ -54,6 +55,8 @@ const orangeVariant = css`
     color: #ff4800;
 `;
 
+const marginCheck = isMobile() ? "0rem 3.5rem 0.45rem 0" : "-0.35rem 3.5rem 0.25rem 0";
+
 const ChatKeypadCharCounterStyle = styled.div<{
   warning: boolean;
   isVisible: boolean;
@@ -62,7 +65,7 @@ const ChatKeypadCharCounterStyle = styled.div<{
   ${(props) => (props.warning ? orangeVariant : grayVariant)}
   visibility: ${(props) => (props.isVisible ? "visible" : "hidden")};
   font-size: 0.7rem;
-  margin: ${props => props.isConfirmationFeedback ? "0" : "-0.4rem 3.5rem 0.25rem 0"};
+  margin: ${(props) => (props.isConfirmationFeedback ? "0" : marginCheck)};
   display: flex;
   justify-content: flex-end;
 `;
