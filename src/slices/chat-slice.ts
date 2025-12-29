@@ -118,6 +118,8 @@ export interface ChatState {
   showResponseError: boolean;
   responseErrorMessage: string;
   failedMessages: Message[];
+  isTypingStream: boolean;
+  stopTypingStream: boolean;
 }
 
 const initialEstimatedTime = {
@@ -190,6 +192,8 @@ const initialState: ChatState = {
   showResponseError: false,
   responseErrorMessage: "",
   failedMessages: [],
+  isTypingStream: false,
+  stopTypingStream: false,
 };
 
 const initialStateOpen: ChatState = {
@@ -257,6 +261,8 @@ const initialStateOpen: ChatState = {
     showResponseError: false,
     responseErrorMessage: "",
     failedMessages: [],
+    isTypingStream: false,
+    stopTypingStream: false,
 };
 
 export const initChat = createAsyncThunk(
@@ -468,6 +474,11 @@ export const sendNewLlmMessage = createAsyncThunk("chat/sendNewLlmMessage", (pay
   const { holidays, holidayNames } = getHolidays();
   return ChatService.sendNewLlmMessage(payload.message, holidays, holidayNames, payload.context, payload.uuid);
 });
+
+export const stopStream = createAsyncThunk("chat/stopStream", async (channelId: string) => {
+  await ChatService.stopStream(channelId);
+});
+
 export const sendNewSilentMessage = createAsyncThunk(
   "chat/sendNewSilentMessage",
   (message: Message) => {
@@ -645,6 +656,12 @@ export const chatSlice = createSlice({
     },
     setPhoneNumber: (state, action) => {
       state.endUserContacts.phoneNr = action.payload;
+    },
+    setTypingStream: (state, action: PayloadAction<boolean>) => {
+      state.isTypingStream = action.payload;
+    },
+    setStopTypingStream: (state, action: PayloadAction<boolean>) => {
+      state.stopTypingStream = action.payload;
     },
     setChat: (state, action: PayloadAction<Chat>) => {
       if (action.payload) {
@@ -978,6 +995,8 @@ export const {
   updateStreamingMessage,
   clearStreamingMessage,
   addStreamError,
+  setTypingStream,
+  setStopTypingStream,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

@@ -28,6 +28,7 @@
   "keypad.input.placeholder": "Enter your message...",
   "keypad.input.feedbackPlaceholder": "Enter your feedback...",
   "keypad.button.label": "Send",
+  "keypad.button.stop-stream": "Stop",
   "keypad.input.label": "Enter text",
   "chatMessage.accept": "accept",
   "chatMessage.deny": "deny",
