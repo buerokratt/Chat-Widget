@@ -31,7 +31,7 @@ const SmoothStreamingMessage: React.FC<SmoothStreamingMessageProps> = ({
   const typingSpeed = window._env_.STREAM_TYPING_SPEED ?? 30;
   const { scrollToBottom, resetAutoScroll } = useScroll();
   const { stopTypingStream } = useChatSelector();
-  const filterDocReferences = (text: string): string => text.replaceAll(/\[d(oc)?(\d+)?\]?/g, "");
+  const filterDocReferences = (text: string): string => text.replaceAll(/\[do?c?\s*\d*\s*\]?/g, "");
 
   useEffect(() => {
     if (!stopTypingStream) {
