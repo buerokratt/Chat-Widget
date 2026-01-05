@@ -72,7 +72,7 @@ const ChatKeyPad = (): JSX.Element => {
   const [userInputFile, setUserInputFile] = useState<Attachment>();
   const [errorMessage, setErrorMessage] = useState("");
   const [isKeypadDisabled, setIsKeypadDisabled] = useState(false);
-  const { feedback, chatId, loading, messageQueue, chatStatus, showResponseError, isTypingStream } = useChatSelector();
+  const { feedback, chatId, loading, messageQueue, chatStatus, showResponseError, isTypingStream, isChatOpen } = useChatSelector();
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const hiddenFileInputRef = useRef<HTMLInputElement | null>(null);
@@ -130,6 +130,15 @@ const ChatKeyPad = (): JSX.Element => {
   useEffect(() => {
     adjustHeight();
   }, []);
+
+  useEffect(() => {
+    if (isChatOpen && textareaRef.current && !isKeypadDisabled && !userInputFile) {
+      const timeoutId = setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isChatOpen, isKeypadDisabled, userInputFile]);
 
     const handleTextFeedback = () => {
         if (widgetConfig.feedbackActive && !feedback.isFeedbackRatingGiven) {
