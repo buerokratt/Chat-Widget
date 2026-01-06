@@ -1,4 +1,4 @@
-import { CHAT_SESSIONS } from "../constants";
+import {CHAT_SESSIONS, LOCAL_STORAGE_TARA_LOGIN_REDIRECT} from "../constants";
 
 export const isLastSession = (): boolean => {
   const currentState = JSON.parse(
@@ -6,6 +6,10 @@ export const isLastSession = (): boolean => {
   ) || { ids: [], count: 0 };
   return currentState.count <= 1;
 };
+
+export const isWentToTim = () : boolean => {
+  return localStorage.getItem(LOCAL_STORAGE_TARA_LOGIN_REDIRECT) === 'true'
+}
 
 export const wasPageReloaded = () => {
   return window.performance
@@ -25,8 +29,10 @@ export const isChatAboutToBeTerminated = () => {
   const terminationTime = sessionStorage.getItem("terminationTime");
 
   if (!terminationTime) return false;
+  const terminationTimeout = window._env_.TERMINATION_TIMEOUT;
+  const preTerminationTime = (terminationTimeout - 1) * 1000;
 
-  return 9500 > Date.now() - parseInt(terminationTime);
+  return preTerminationTime > Date.now() - parseInt(terminationTime);
 };
 
 export const isMobileWidth = () => {
@@ -35,4 +41,11 @@ export const isMobileWidth = () => {
 
 export const isIphone = () => {
   return /iPhone|iPad|iPod/.test(window.navigator.userAgent) && isMobileWidth();
+};
+
+export const isMobile = () => {
+  return (
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile/i.test(window.navigator.userAgent) &&
+    isMobileWidth()
+  );
 };
