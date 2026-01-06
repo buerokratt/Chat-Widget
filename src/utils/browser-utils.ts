@@ -42,3 +42,10 @@ export const isMobileWidth = () => {
 export const isIphone = () => {
   return /iPhone|iPad|iPod/.test(window.navigator.userAgent) && isMobileWidth();
 };
+
+export const isMobile = () => {
+  return (
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile/i.test(window.navigator.userAgent) &&
+    isMobileWidth()
+  );
+};
