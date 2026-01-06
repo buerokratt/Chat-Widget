@@ -31,6 +31,7 @@ const SmoothStreamingMessage: React.FC<SmoothStreamingMessageProps> = ({
   const typingSpeed = window._env_.STREAM_TYPING_SPEED ?? 30;
   const { scrollToBottom, resetAutoScroll } = useScroll();
   const { stopTypingStream } = useChatSelector();
+  const filterDocReferences = (text: string): string => text.replaceAll(/\[do?c?\s*\d*\s*\]?/g, "");
 
   useEffect(() => {
     if (!stopTypingStream) {
@@ -135,12 +136,12 @@ const SmoothStreamingMessage: React.FC<SmoothStreamingMessageProps> = ({
   }, []);
 
   if (!isStreaming && displayedText.length === message.length) {
-    return <Markdownify message={message} sanitizeLinks={sanitizeLinks} />;
+    return <Markdownify message={filterDocReferences(message)} sanitizeLinks={sanitizeLinks} />;
   }
 
   return (
     <div className="smooth-streaming-message">
-      <Markdownify message={displayedText} sanitizeLinks={sanitizeLinks} />
+      <Markdownify message={filterDocReferences(displayedText)} sanitizeLinks={sanitizeLinks} />
     </div>
   );
 };
