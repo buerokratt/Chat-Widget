@@ -78,6 +78,6 @@ describe('Keypad char counter', () => {
         name: /send icon/i,
       }),
     );
-    screen.getByText('keypad.long-message-warning');
+    screen.getByText('keypad.long-message-warning'.replace('{{limit}}', '3000'));
   });
 });
