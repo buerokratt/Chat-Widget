@@ -46,7 +46,7 @@
   "header.button.confirmation.yes": "Confirmation button yes",
   "chat.error-message": "There are currently network problems.",
   "chat.feedback.button.label": "Send",
-  "keypad.long-message-warning": "Message has to be shorter than 3000 characters",
+  "keypad.long-message-warning": "Message has to be shorter than {{limit}} characters",
   "feedback.upperText": "Please assess how satisfied you are with the answer or solution provided by {{organization}}?",
   "feedback.lowerText": "We appreciate your letting us know what we can do better in the future.",
   "feedback.warningText": "please rate the conversation",

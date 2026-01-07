@@ -49,7 +49,7 @@
   "header.button.confirmation.yes": "Kinnitusnupp jah",
   "chat.error-message": "Hetkel esineb võrguühenduse probleeme",
   "chat.feedback.button.label": "Saada",
-  "keypad.long-message-warning": "Sõnum peab olema lühem kui 3000 tähemärki",
+  "keypad.long-message-warning": "Sõnum peab olema lühem kui {{limit}} tähemärki",
   "feedback.upperText": "Kuidas jäite rahule {{organization}} antud vastuse või lahendusega?",
   "feedback.lowerText": "Oleme tänulikud, kui annate teada, mida saaksime edaspidi paremini teha.",
   "feedback.warningText": "Palun hinnake vestlust",

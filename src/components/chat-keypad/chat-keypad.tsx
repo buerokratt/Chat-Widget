@@ -49,9 +49,7 @@ import useWidgetSelector from "../../hooks/use-widget-selector";
 // Prevents unnecessary window scrolling when the on-screen keyboard is open
 const preventWindowScrolling = (e: TouchEvent, direction: "up" | "down") => {
   const target = e.target as HTMLElement;
-  const contentElement = document.getElementsByClassName(
-    "os-content"
-  )[0] as HTMLElement;
+  const contentElement = document.getElementsByClassName("os-content")[0] as HTMLElement;
   const top = contentElement.getBoundingClientRect().top;
 
   if (
@@ -131,28 +129,28 @@ const ChatKeyPad = (): JSX.Element => {
     adjustHeight();
   }, []);
 
-    const handleTextFeedback = () => {
-        if (widgetConfig.feedbackActive && !feedback.isFeedbackRatingGiven) {
-            dispatch(setFeedbackWarning(true));
-            return;
-        }
-        if (!widgetConfig.feedbackActive && !widgetConfig.feedbackNoticeActive) {
-          dispatch(resetState());
-          return;
-        }
-        dispatch(setFeedbackWarning(false));
-        if (widgetConfig.feedbackNoticeActive) dispatch(sendFeedbackMessage({ userInput }));
-        dispatch(setFeedbackMessageGiven(true));
-        setIsKeypadDisabled(true);
-        if (!widgetConfig.feedbackActive) {
-            dispatch(resetState());
-        }
-    };
-    useEffect(() => {
-        if (messageQueue.length >= MESSAGE_QUE_MAX_LENGTH) {
-            setIsKeypadDisabled(true);
-        }
-    }, [messageQueue]);
+  const handleTextFeedback = () => {
+    if (widgetConfig.feedbackActive && !feedback.isFeedbackRatingGiven) {
+      dispatch(setFeedbackWarning(true));
+      return;
+    }
+    if (!widgetConfig.feedbackActive && !widgetConfig.feedbackNoticeActive) {
+      dispatch(resetState());
+      return;
+    }
+    dispatch(setFeedbackWarning(false));
+    if (widgetConfig.feedbackNoticeActive) dispatch(sendFeedbackMessage({ userInput }));
+    dispatch(setFeedbackMessageGiven(true));
+    setIsKeypadDisabled(true);
+    if (!widgetConfig.feedbackActive) {
+      dispatch(resetState());
+    }
+  };
+  useEffect(() => {
+    if (messageQueue.length >= MESSAGE_QUE_MAX_LENGTH) {
+      setIsKeypadDisabled(true);
+    }
+  }, [messageQueue]);
 
   useEffect(() => {
     if (chatId && !loading && messageQueue.length > 0) {
@@ -170,11 +168,19 @@ const ChatKeyPad = (): JSX.Element => {
     if (!userInput.trim()) return false;
 
     if (userInput.length > MESSAGE_MAX_CHAR_LIMIT) {
-      setErrorMessage(t("keypad.long-message-warning"));
+      setErrorMessage(t("keypad.long-message-warning", { limit: MESSAGE_MAX_CHAR_LIMIT }));
       return false;
     }
     return true;
   };
+
+  useEffect(() => {
+    if (userInput.length > MESSAGE_MAX_CHAR_LIMIT) {
+      setErrorMessage(t("keypad.long-message-warning", { limit: MESSAGE_MAX_CHAR_LIMIT }));
+    } else {
+      setErrorMessage("");
+    }
+  }, [userInput, t]);
 
   const handleSendStopButtonClick = () => {
     if (isTypingStream && chatId) {
@@ -303,7 +309,6 @@ const ChatKeyPad = (): JSX.Element => {
           placeholder={t("keypad.input.placeholder")}
           onChange={(e) => {
             setUserInput(e.target.value);
-            setErrorMessage("");
             adjustHeight();
           }}
           onKeyDown={(event) => {
@@ -403,9 +408,7 @@ const ChatKeyPad = (): JSX.Element => {
     }
 
     if (file.size > MESSAGE_FILE_SIZE_LIMIT) {
-      setErrorMessage(
-        `Max allowed file size is ${formatBytes(MESSAGE_FILE_SIZE_LIMIT)}`
-      );
+      setErrorMessage(`Max allowed file size is ${formatBytes(MESSAGE_FILE_SIZE_LIMIT)}`);
       return null;
     } else {
       return await convertBase64(file);
