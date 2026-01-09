@@ -165,7 +165,7 @@ class ChatService {
     // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
     navigator.sendBeacon(
       `${window._env_.NOTIFICATION_NODE_URL}${RUUTER_ENDPOINTS.ADD_CHAT_TO_TERMINATION_QUEUE}`,
-      JSON.stringify({ chatId, timeout: 10 })
+      JSON.stringify({ chatId, timeout: window._env_.TERMINATION_TIMEOUT })
     );
   }
 

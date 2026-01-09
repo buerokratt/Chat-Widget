@@ -14,6 +14,7 @@ window._env_ = {
   SMAX_INTEGRATION: { enabled: false },
   FEEDBACK_RATING_COLORS_ENABLED: "FALSE",
   ENABLE_MULTI_DOMAIN: "FALSE",
+  TERMINATION_TIMEOUT: 10,
   WIDGET_HEIGHT: 450,
   WIDGET_WIDTH: 400,
   STREAM_TYPING_SPEED: 30, // in milliseconds - lower is faster
