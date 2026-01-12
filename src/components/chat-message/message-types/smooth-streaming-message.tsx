@@ -115,9 +115,7 @@ const SmoothStreamingMessage: React.FC<SmoothStreamingMessageProps> = ({
 
   useEffect(() => {
     if (!stopTypingStream) {
-      console.log(`DisplayedText length: ${displayedText}`);
       if (!isStreaming && displayedText.length === message.length && typewriterInterval.current) {
-        console.log(`Displayed text length: ${displayedText.length}, Message length: ${message.length}`);
         clearInterval(typewriterInterval.current);
         typewriterInterval.current = null;
         onComplete?.();
