@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Resizable, ResizeCallback } from "re-resizable";
 import useChatSelector from "../../hooks/use-chat-selector";
@@ -178,23 +178,40 @@ const Chat = (): JSX.Element => {
     dispatch(setChatDimensions(newDimensions));
   };
 
+  const checkIdleWarning = useCallback(() => {
+    if (isChatEnded || messages.length === 0) {
+      return;
+    }
+
+    let lastActive;
+
+    if (idleChat.lastActive === "") {
+      lastActive = messages[messages.length - 1].authorTimestamp;
+    } else {
+      lastActive = idleChat.lastActive;
+    }
+
+    const differenceInSeconds = getIdleTime(lastActive);
+    if (differenceInSeconds >= (widgetConfig.chatActiveDuration * 60)) {
+      dispatch(setIdleChat({ isIdle: true }));
+    }
+  }, [
+    isChatEnded,
+    messages,
+    idleChat.lastActive,
+    widgetConfig.chatActiveDuration,
+    dispatch
+  ]);
+
   useLayoutEffect(() => {
     if (!isChatEnded) {
       if (messages.length > 0) {
+        checkIdleWarning();
+        
         const interval = setInterval(() => {
-          let lastActive;
-
-          if (idleChat.lastActive === "") {
-            lastActive = messages[messages.length - 1].authorTimestamp;
-          } else {
-            lastActive = idleChat.lastActive;
-          }
-
-          const differenceInSeconds = getIdleTime(lastActive);
-          if (differenceInSeconds >= (widgetConfig.chatActiveDuration * 60)) {
-            dispatch(setIdleChat({ isIdle: true }));
-          }
-        }, widgetConfig.chatActiveDuration * 60 * 1000);
+          checkIdleWarning();
+        }, 1000);
+        
         return () => {
           clearInterval(interval);
         };
@@ -208,47 +225,79 @@ const Chat = (): JSX.Element => {
     showConfirmationModal,
     isChatEnded,
     feedback.isFeedbackConfirmationShown,
+    checkIdleWarning,
+  ]);
+
+  const checkInactivityTermination = useCallback(() => {
+    if (isChatEnded || displayEndMessage || messages.length === 0) {
+      return;
+    }
+
+    let lastActive;
+
+    if (idleChat.lastActive === "") {
+      lastActive = messages[messages.length - 1].authorTimestamp;
+    } else {
+      lastActive = idleChat.lastActive;
+    }
+    
+    const differenceInSeconds = getIdleTime(lastActive);
+    const terminationThreshold = (widgetConfig.chatActiveDuration * 60) + idleTimerSelection;
+    
+    if (differenceInSeconds >= terminationThreshold) {
+      if(widgetConfig.showAutoCloseText) {
+        setDisplayEndMessage(true);
+      }
+      dispatch(setIdleChat({ isIdle: false }));
+      dispatch(
+        endChat({
+          event: CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS,
+          isUpperCase: true,
+          keepChatOpen: widgetConfig.showAutoCloseText ?? false
+        })
+      );
+    }
+  }, [
+    isChatEnded,
+    displayEndMessage,
+    messages,
+    idleChat.lastActive,
+    widgetConfig.chatActiveDuration,
+    widgetConfig.showAutoCloseText,
+    idleTimerSelection,
+    dispatch
   ]);
 
   useLayoutEffect(() => {
-    if (!isChatEnded && !displayEndMessage) {
-      if (messages.length > 0) {
-        const interval = setInterval(() => {
-          let lastActive;
-
-          if (idleChat.lastActive === "") {
-            lastActive = messages[messages.length - 1].authorTimestamp;
-          } else {
-            lastActive = idleChat.lastActive;
-          }
-          const differenceInSeconds = getIdleTime(lastActive);
-          if (
-            differenceInSeconds >=
-              (widgetConfig.chatActiveDuration * 60) + idleTimerSelection
-          ) {
-            if(widgetConfig.showAutoCloseText) {
-              setDisplayEndMessage(true);
-            }
-            dispatch(setIdleChat({ isIdle: false }));
-            dispatch(
-              endChat({
-                event: CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS,
-                isUpperCase: true,
-                keepChatOpen: widgetConfig.showAutoCloseText ?? false
-              })
-            )
-          }
-        }, idleTimerSelection * 1000);
-        return () => {
-          clearInterval(interval);
-        };
-      }
+    if (!isChatEnded && !displayEndMessage && messages.length > 0) {
+      checkInactivityTermination();
+      
+      const interval = setInterval(() => {
+        checkInactivityTermination();
+      }, 1000);
+      
+      return () => {
+        clearInterval(interval);
+      };
     }
   }, [
-    idleChat.isIdle,
-    showConfirmationModal,
-    feedback.isFeedbackConfirmationShown,
+    isChatEnded,
+    displayEndMessage,
+    messages,
+    checkInactivityTermination
   ]);
+
+  useEffect(() => {
+    if (isTabActive && !isChatEnded && !displayEndMessage && messages.length > 0) {
+      checkInactivityTermination();
+    }
+  }, [isTabActive, isChatEnded, displayEndMessage, messages, checkInactivityTermination]);
+
+  useEffect(() => {
+    if (isTabActive && !isChatEnded && messages.length > 0) {
+      checkIdleWarning();
+    }
+  }, [isTabActive, isChatEnded, messages, checkIdleWarning]);
 
   useReloadChatEndEffect();
 
