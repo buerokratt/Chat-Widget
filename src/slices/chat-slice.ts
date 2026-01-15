@@ -385,7 +385,8 @@ export const addChatToTerminationQueue = createAsyncThunk(
     thunkApi.dispatch(resetState());
 
     if (chat.chatId) {
-      return ChatService.addChatToTerminationQueue(chat.chatId);
+      ChatService.addChatToTerminationQueue(chat.chatId);
+      return { success: true };
     }
   }
 );
@@ -399,11 +400,17 @@ export const removeChatFromTerminationQueue = createAsyncThunk(
 
     const chatId = localStorage.getItem("previousChatId");
     setToLocalStorage(SESSION_STORAGE_CHAT_ID_KEY, chatId);
-    sessionStorage.removeItem("terminationTime");
 
     if (chatId) {
       thunkApi.dispatch(resetStateWithValue(chatId));
-      return ChatService.removeChatFromTerminationQueue(chatId);
+      try {
+        await ChatService.removeChatFromTerminationQueue(chatId);
+        sessionStorage.removeItem("terminationTime");
+        return { success: true };
+      } catch (error) {
+        console.error("Failed to remove chat from termination queue:", error);
+        throw error;
+      }
     }
   }
 );
