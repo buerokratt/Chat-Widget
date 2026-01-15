@@ -40,6 +40,7 @@ export const CHAT_BUBBLE_COLOR = '#003CFF';
 export const CHAT_BUBBLE_ANIMATION = 'shockwave';
 export const CHAT_INPUT_DEBOUNCE_TIMEOUT = 500;
 export const CURRENT_COUNTRY = 'EE';
+export const LOCAL_STORAGE_INSTANTLY_OPEN_CHAT_WIDGET_KEY = 'instantly-open-chat-widget';
 
 export enum CHAT_MODES {
   FLOW = 'flow',
