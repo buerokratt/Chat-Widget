@@ -33,6 +33,10 @@ export const isChatAboutToBeTerminated = () => {
   const terminationTimeout = window._env_.TERMINATION_TIMEOUT;
   const preTerminationTime = (terminationTimeout - 1) * 1000;
 
+  console.log("terminationTimeout (s):", terminationTimeout);
+  console.log("preTerminationTime (ms):", preTerminationTime);
+  console.log("currentTime (ms):", Date.now());
+  console.log("terminationTime parsed (ms):", parseInt(terminationTime));
   console.log("is chat about to be terminated?", preTerminationTime > Date.now() - parseInt(terminationTime));
   return preTerminationTime > Date.now() - parseInt(terminationTime);
 };
