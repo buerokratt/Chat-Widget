@@ -31,7 +31,6 @@ import {
 } from "../utils/chat-utils";
 import {
   isChatAboutToBeTerminated,
-  wasPageReloaded,
 } from "../utils/browser-utils";
 import {
   browserName,
@@ -394,23 +393,28 @@ export const addChatToTerminationQueue = createAsyncThunk(
 export const removeChatFromTerminationQueue = createAsyncThunk(
   "chat/removeChatFromTerminationQueue",
   async (args, thunkApi) => {
-    if (!wasPageReloaded() || !isChatAboutToBeTerminated()) {
+    const chatId = localStorage.getItem("previousChatId");
+    const terminationTime = sessionStorage.getItem("terminationTime");
+
+    if (!chatId || !terminationTime) {
       return null;
     }
 
-    const chatId = localStorage.getItem("previousChatId");
+    if (!isChatAboutToBeTerminated()) {
+      sessionStorage.removeItem("terminationTime");
+      return null;
+    }
+
     setToLocalStorage(SESSION_STORAGE_CHAT_ID_KEY, chatId);
 
-    if (chatId) {
-      thunkApi.dispatch(resetStateWithValue(chatId));
-      try {
-        await ChatService.removeChatFromTerminationQueue(chatId);
-        sessionStorage.removeItem("terminationTime");
-        return { success: true };
-      } catch (error) {
-        console.error("Failed to remove chat from termination queue:", error);
-        throw error;
-      }
+    thunkApi.dispatch(resetStateWithValue(chatId));
+    try {
+      await ChatService.removeChatFromTerminationQueue(chatId);
+      sessionStorage.removeItem("terminationTime");
+      return { success: true };
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
   }
 );
