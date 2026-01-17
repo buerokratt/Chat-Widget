@@ -68,12 +68,12 @@ const ChatFeedback = (): JSX.Element => {
             })}
           </div>
         )}
-        <div className="downloadContainer">
+        {/* <div className="downloadContainer">
           <Download ref={downloadRef} />
           <a onClick={handleDownload} className="downloadLink">
             {loading ? <span className="spinner"></span> : t("widget.action.download-chat")}
           </a>
-        </div>
+        </div> */}
         {widgetConfig.feedbackNoticeActive && <div className="feedback-paragraph below p-style">{widgetConfig.feedbackNotice}</div>}
       </ChatFeedbackStyled>
     );
