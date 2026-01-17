@@ -57,7 +57,7 @@ const ConfirmationModalDownload = () => {
             <div className="downloadContainer">
                 {!showForwardForm ? (
                     <>
-                        <Download ref={downloadRef}/>
+                        {/* <Download ref={downloadRef}/>
                         <button
                             className="downloadLink"
                             disabled={loading}
@@ -69,7 +69,7 @@ const ConfirmationModalDownload = () => {
                             <div>
                                 <span style={{color: "red"}}>{t("widget.error.technicalProblemsTryAgain")}</span>
                             </div>
-                        )}
+                        )} */}
                         {/* <a onClick={() => setShowForwardForm(true)} className={styles.downloadLink}>
             {t("widget.action.forward-chat")}
           </a> */}
