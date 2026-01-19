@@ -45,13 +45,18 @@ const hasSpecialFormat = (m: string) => m.includes("\n\n") && m.indexOf(".") > 0
 
 function formatMessage(message?: string): string {
   const sanitizedMessage = sanitizeHtml(message ?? '');
-
+  
   if (!sanitizedMessage) return "";
 
-  return sanitizedMessage
-    .replace(/&#x([0-9A-Fa-f]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
-    .replace(/(^|\n)(\d{4})\.\s/g, (match, prefix, year) => {
-      const remainingText = sanitizedMessage.substring(sanitizedMessage.indexOf(match) + match.length);
+  const filteredMessage = sanitizedMessage
+    .replaceAll(/\\?\$b\w*/g, "")
+    .replaceAll(/\\?\$v\w*/g, "")
+    .replaceAll(/\\?\$g\w*/g, "");
+
+  return filteredMessage
+    .replaceAll(/&#x([0-9A-Fa-f]+);/g, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
+    .replaceAll(/(^|\n)(\d{4})\.\s/g, (match, prefix, year) => {
+      const remainingText = filteredMessage.substring(filteredMessage.indexOf(match) + match.length);
       const sentenceEnd = remainingText.indexOf("\n\n");
       if (sentenceEnd !== -1) {
         const currentSentence = remainingText.substring(0, sentenceEnd);
@@ -61,7 +66,7 @@ function formatMessage(message?: string): string {
       }
       return `${prefix}${year}\\. `;
     })
-    .replace(/(?<=\n)\d+\.\s/g, hasSpecialFormat(sanitizedMessage) ? "\n\n$&" : "$&");
+    .replace(/(?<=\n)\d+\.\s/g, hasSpecialFormat(filteredMessage) ? "\n\n$&" : "$&");
 }
 
 const Markdownify: React.FC<MarkdownifyProps> = ({ message, sanitizeLinks = false }) => (
