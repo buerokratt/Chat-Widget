@@ -70,8 +70,17 @@ const ChatKeyPad = (): JSX.Element => {
   const [userInputFile, setUserInputFile] = useState<Attachment>();
   const [errorMessage, setErrorMessage] = useState("");
   const [isKeypadDisabled, setIsKeypadDisabled] = useState(false);
-  const { feedback, chatId, loading, messageQueue, chatStatus, showResponseError, isTypingStream, isChatOpen } =
-    useChatSelector();
+  const {
+    feedback,
+    chatId,
+    loading,
+    messageQueue,
+    chatStatus,
+    showResponseError,
+    isTypingStream,
+    isChatOpen,
+    showLoadingMessage,
+  } = useChatSelector();
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const hiddenFileInputRef = useRef<HTMLInputElement | null>(null);
@@ -79,6 +88,7 @@ const ChatKeyPad = (): JSX.Element => {
   const [dynamicStyle, setdynamicStyle] = useState("");
   const touchStartYRef = useRef<number>(0);
   const { widgetConfig } = useWidgetSelector();
+  const keypadDisableCheck = userInputFile ? true : isKeypadDisabled;
 
   const handleUploadClick = () => {
     hiddenFileInputRef.current?.click();
@@ -312,7 +322,7 @@ const ChatKeyPad = (): JSX.Element => {
       <div className={`${keypadClasses}`}>
         <textarea
           ref={textareaRef}
-          disabled={userInputFile ? true : isKeypadDisabled}
+          disabled={showLoadingMessage ? true : keypadDisableCheck}
           aria-label={t("keypad.input.label")}
           className="input"
           value={userInputFile ? userInputFile.name : userInput}
