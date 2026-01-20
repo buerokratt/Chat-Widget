@@ -44,6 +44,7 @@ import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import { isIphone } from "../../utils/browser-utils";
 import classNames from "classnames";
 import useWidgetSelector from "../../hooks/use-widget-selector";
+import sanitizeHtml from "sanitize-html";
 
 // Hacky workaround for iOS bug
 // Prevents unnecessary window scrolling when the on-screen keyboard is open
@@ -91,7 +92,7 @@ const ChatKeyPad = (): JSX.Element => {
 
     if (!base64) return;
 
-    setUserInput(e.target.files[0].name);
+    setUserInput(sanitizeHtml(e.target.files[0].name));
     setUserInputFile({
       chatId: chatId!,
       name: e.target.files[0].name,
@@ -149,7 +150,7 @@ const ChatKeyPad = (): JSX.Element => {
       return;
     }
     dispatch(setFeedbackWarning(false));
-    if (widgetConfig.feedbackNoticeActive) dispatch(sendFeedbackMessage({ userInput }));
+    if (widgetConfig.feedbackNoticeActive) dispatch(sendFeedbackMessage({ userInput: sanitizeHtml(userInput) }));
     dispatch(setFeedbackMessageGiven(true));
     setIsKeypadDisabled(true);
     if (!widgetConfig.feedbackActive) {
@@ -175,9 +176,9 @@ const ChatKeyPad = (): JSX.Element => {
   }, [chatId, dispatch, loading, messageQueue]);
 
   const isInputValid = () => {
-    if (!userInput.trim()) return false;
+    if (!sanitizeHtml(userInput).trim()) return false;
 
-    if (userInput.length > MESSAGE_MAX_CHAR_LIMIT) {
+    if (sanitizeHtml(userInput).length > MESSAGE_MAX_CHAR_LIMIT) {
       setErrorMessage(t("keypad.long-message-warning", { limit: MESSAGE_MAX_CHAR_LIMIT }));
       return false;
     }
@@ -206,7 +207,7 @@ const ChatKeyPad = (): JSX.Element => {
     if (!isInputValid()) return;
     const message: Message = {
       chatId: chatId ?? "",
-      content: userInput,
+      content: sanitizeHtml(userInput),
       file: userInputFile,
       authorTimestamp: new Date().toISOString(),
       authorRole: AUTHOR_ROLES.END_USER,
@@ -259,7 +260,7 @@ const ChatKeyPad = (): JSX.Element => {
     debounce(() => {
       const message: Message = {
         chatId,
-        content: userInput,
+        content: sanitizeHtml(userInput),
         authorTimestamp: new Date().toISOString(),
       };
 
