@@ -15,4 +15,5 @@ export interface WidgetConfigResponse {
   feedbackQuestion: string;
   feedbackNoticeActive: string;
   feedbackNotice: string;
+  isFiveRatingScale: string;
 }

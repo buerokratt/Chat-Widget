@@ -33,6 +33,7 @@ const initialState: WidgetState = {
     feedbackQuestion: "",
     feedbackNoticeActive: null,
     feedbackNotice: "",
+    isFiveRatingScale: null,
   },
   chatId: null,
 };
