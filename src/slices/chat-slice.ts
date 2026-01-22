@@ -399,10 +399,8 @@ export const removeChatFromTerminationQueue = createAsyncThunk(
       return null;
     }
 
-    console.log("setting chat id to local storage:", chatId);
     setToLocalStorage(SESSION_STORAGE_CHAT_ID_KEY, chatId);
 
-    console.log('resetting state with chat id:', chatId);
     thunkApi.dispatch(resetStateWithValue(chatId));
     try {
       await ChatService.removeChatFromTerminationQueue(chatId);
