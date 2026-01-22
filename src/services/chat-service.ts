@@ -34,8 +34,8 @@ class ChatService {
     return http.post(RUUTER_ENDPOINTS.INIT_CHAT, { message, endUserTechnicalData, holidays, holidayNames , domain: getMultiDomainPath()});
   }
 
-  getChatById(): Promise<Chat> {
-    return http.get(RUUTER_ENDPOINTS.GET_CHAT_BY_ID);
+  getChatById(chatId: string): Promise<Chat> {
+    return http.post(RUUTER_ENDPOINTS.GET_CHAT_BY_ID, { chatId });
   }
 
   sendNewMessage(message: Message, holidays: string[], holidayNames: string): Promise<Document> {
@@ -58,8 +58,8 @@ class ChatService {
     return http.post(RUUTER_ENDPOINTS.REDIRECT_TO_BACKOFFICE, { message, holidays, holidayNames });
   }
 
-  getMessages(): Promise<Message[]> {
-    return http.get(RUUTER_ENDPOINTS.GET_MESSAGES_BY_CHAT_ID);
+  getMessages(chatId: string): Promise<Message[]> {
+    return http.post(RUUTER_ENDPOINTS.GET_MESSAGES_BY_CHAT_ID, { chatId });
   }
 
   sendMessageWithRating(message: Message): Promise<Document> {

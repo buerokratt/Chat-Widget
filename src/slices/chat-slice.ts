@@ -290,7 +290,7 @@ export const getChat = createAsyncThunk(
     const {
       chat: { chatId },
     } = thunkApi.getState() as { chat: ChatState };
-    if (chatId) return ChatService.getChatById();
+    if (chatId) return ChatService.getChatById(chatId);
     return null;
   }
 );
@@ -301,7 +301,7 @@ export const getChatMessages = createAsyncThunk(
     const {
       chat: { chatId },
     } = thunkApi.getState() as { chat: ChatState };
-    return chatId ? ChatService.getMessages() : null;
+    return chatId ? ChatService.getMessages(chatId) : null;
   }
 );
 
