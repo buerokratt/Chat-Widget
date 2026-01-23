@@ -31,7 +31,6 @@ import {
 } from "../utils/chat-utils";
 import {
   isChatAboutToBeTerminated,
-  wasPageReloaded,
 } from "../utils/browser-utils";
 import {
   browserName,
@@ -291,7 +290,7 @@ export const getChat = createAsyncThunk(
     const {
       chat: { chatId },
     } = thunkApi.getState() as { chat: ChatState };
-    if (chatId) return ChatService.getChatById();
+    if (chatId) return ChatService.getChatById(chatId);
     return null;
   }
 );
@@ -302,7 +301,7 @@ export const getChatMessages = createAsyncThunk(
     const {
       chat: { chatId },
     } = thunkApi.getState() as { chat: ChatState };
-    return chatId ? ChatService.getMessages() : null;
+    return chatId ? ChatService.getMessages(chatId) : null;
   }
 );
 
@@ -385,7 +384,8 @@ export const addChatToTerminationQueue = createAsyncThunk(
     thunkApi.dispatch(resetState());
 
     if (chat.chatId) {
-      return ChatService.addChatToTerminationQueue(chat.chatId);
+      ChatService.addChatToTerminationQueue(chat.chatId);
+      return { success: true };
     }
   }
 );
@@ -393,17 +393,22 @@ export const addChatToTerminationQueue = createAsyncThunk(
 export const removeChatFromTerminationQueue = createAsyncThunk(
   "chat/removeChatFromTerminationQueue",
   async (args, thunkApi) => {
-    if (!wasPageReloaded() || !isChatAboutToBeTerminated()) {
+    const chatId = localStorage.getItem("previousChatId");
+
+    if (!chatId || !isChatAboutToBeTerminated()) {
       return null;
     }
 
-    const chatId = localStorage.getItem("previousChatId");
     setToLocalStorage(SESSION_STORAGE_CHAT_ID_KEY, chatId);
-    sessionStorage.removeItem("terminationTime");
 
-    if (chatId) {
-      thunkApi.dispatch(resetStateWithValue(chatId));
-      return ChatService.removeChatFromTerminationQueue(chatId);
+    thunkApi.dispatch(resetStateWithValue(chatId));
+    try {
+      await ChatService.removeChatFromTerminationQueue(chatId);
+      sessionStorage.removeItem("terminationTime");
+      return { success: true };
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
   }
 );

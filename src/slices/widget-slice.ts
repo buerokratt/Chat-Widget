@@ -5,11 +5,13 @@ import {
   CHAT_BUBBLE_MESSAGE_DELAY_SECONDS,
   CHAT_BUBBLE_PROACTIVE_SECONDS,
   CHAT_SHOW_BUBBLE_MESSAGE,
+  CHAT_STATUS,
   IDLE_CHAT_INTERVAL,
 } from "../constants";
 import WidgetService from "../services/widget-service";
-import { endChat } from "./chat-slice";
+import { endChat, resetState } from "./chat-slice";
 import { RootState } from "../store";
+import chatService from "../services/chat-service";
 
 export interface WidgetState {
   showConfirmationModal: boolean;
@@ -66,6 +68,16 @@ export const getWidgetConfig = createAsyncThunk(
   "widget/getWidgetConfig",
   async (_, { getState, dispatch }) => {
     const state = getState() as RootState;
+    const previousChatId = localStorage.getItem("previousChatId");
+
+    if (previousChatId) {
+      const chat = await chatService.getChatById(previousChatId);
+      if (chat.status === CHAT_STATUS.ENDED) {
+        dispatch(resetState());
+        localStorage.removeItem("previousChatId");
+      }
+    }
+
     dispatch(setChatId(state.chat.chatId));
     return WidgetService.getWidgetConfig();
   }

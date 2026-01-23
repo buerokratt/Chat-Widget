@@ -21,12 +21,12 @@ describe('ChatService', () => {
   });
 
   it('should query all messages of a chat', () => {
-    chatService.getMessages();
+    chatService.getMessages('1');
     expect(http.post).toHaveBeenCalledWith(RUUTER_ENDPOINTS.GET_MESSAGES_BY_CHAT_ID, { id: '1' });
   });
 
   it('should query chat by id', () => {
-    chatService.getChatById();
+    chatService.getChatById('1');
     expect(http.post).toHaveBeenCalledWith(RUUTER_ENDPOINTS.GET_CHAT_BY_ID, { id: '1' });
   });
 
@@ -37,7 +37,7 @@ describe('ChatService', () => {
   });
 
   it('return chats, by chat id', () => {
-    chatService.getChatById();
+    chatService.getChatById('1');
     expect(http.post).toHaveBeenCalledWith(RUUTER_ENDPOINTS.GET_CHAT_BY_ID, { id: 'cid' });
   });
 
