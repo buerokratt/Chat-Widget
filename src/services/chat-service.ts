@@ -34,8 +34,8 @@ class ChatService {
     return http.post(RUUTER_ENDPOINTS.INIT_CHAT, { message, endUserTechnicalData, holidays, holidayNames , domain: getMultiDomainPath()});
   }
 
-  getChatById(): Promise<Chat> {
-    return http.get(RUUTER_ENDPOINTS.GET_CHAT_BY_ID);
+  getChatById(chatId: string): Promise<Chat> {
+    return http.post(RUUTER_ENDPOINTS.GET_CHAT_BY_ID, { chatId });
   }
 
   sendNewMessage(message: Message, holidays: string[], holidayNames: string): Promise<Document> {
@@ -58,8 +58,8 @@ class ChatService {
     return http.post(RUUTER_ENDPOINTS.REDIRECT_TO_BACKOFFICE, { message, holidays, holidayNames });
   }
 
-  getMessages(): Promise<Message[]> {
-    return http.get(RUUTER_ENDPOINTS.GET_MESSAGES_BY_CHAT_ID);
+  getMessages(chatId: string): Promise<Message[]> {
+    return http.post(RUUTER_ENDPOINTS.GET_MESSAGES_BY_CHAT_ID, { chatId });
   }
 
   sendMessageWithRating(message: Message): Promise<Document> {
@@ -161,20 +161,28 @@ class ChatService {
   }
 
   addChatToTerminationQueue(chatId: string): void {
-    // navigator.sendBeacon is the only reliable way to send a request when the page is being unloaded
-    // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
-    navigator.sendBeacon(
+    const sent = navigator.sendBeacon(
       `${window._env_.NOTIFICATION_NODE_URL}${RUUTER_ENDPOINTS.ADD_CHAT_TO_TERMINATION_QUEUE}`,
       JSON.stringify({ chatId, timeout: window._env_.TERMINATION_TIMEOUT })
     );
+    if (!sent) {
+      console.error("Failed to send beacon for adding chat to termination queue");
+    }
   }
 
-  removeChatFromTerminationQueue(chatId: string): void {
-    // i made it same as add to termination que
-    navigator.sendBeacon(
+  async removeChatFromTerminationQueue(chatId: string): Promise<void> {
+    try {
+      await notificationHttp.post(RUUTER_ENDPOINTS.REMOVE_CHAT_FROM_TERMINATION_QUEUE, { chatId });
+    } catch (error) {
+      const sent = navigator.sendBeacon(
         `${window._env_.NOTIFICATION_NODE_URL}${RUUTER_ENDPOINTS.REMOVE_CHAT_FROM_TERMINATION_QUEUE}`,
         JSON.stringify({ chatId })
-    );
+      );
+
+      if (!sent) {
+        throw error;
+      }
+    }
   }
 
   stopStream(channelId: string): Promise<void> {

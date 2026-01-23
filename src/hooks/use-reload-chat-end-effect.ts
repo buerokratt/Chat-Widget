@@ -1,9 +1,5 @@
 import { useEffect } from "react";
 import { useAppDispatch } from "../store";
-import {
-  addChatToTerminationQueue,
-  removeChatFromTerminationQueue,
-} from "../slices/chat-slice";
 import useChatSelector from "./use-chat-selector";
 import {isLastSession, isWentToTim} from "../utils/browser-utils";
 
@@ -12,13 +8,9 @@ const useReloadChatEndEffect = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(removeChatFromTerminationQueue());
-  }, [dispatch]);
-
-  useEffect(() => {
     const handleBeforeUnload = () => {
       if (chatId && isLastSession() && !isWentToTim()) {
-        dispatch(addChatToTerminationQueue());
+        localStorage.setItem("previousChatId", chatId);
       }
     };
 

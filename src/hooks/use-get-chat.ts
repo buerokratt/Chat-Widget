@@ -29,7 +29,7 @@ const useGetChat = (): void => {
     if (sseUrl) {  
       const onMessage = async (data: any) => {   
         if (data.chatId) {
-          const chat = await chatService.getChatById();
+          const chat = await chatService.getChatById(data.chatId);
           dispatch(setChat(chat));
         } 
       };
