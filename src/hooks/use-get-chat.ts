@@ -28,8 +28,8 @@ const useGetChat = (): void => {
     let events: EventSource | undefined;
     if (sseUrl) {  
       const onMessage = async (data: any) => {   
-        if (data.chatId) {
-          const chat = await chatService.getChatById(data.chatId);
+        if (data) {
+          const chat = await chatService.getChatById(chatId ?? '');
           dispatch(setChat(chat));
         } 
       };
