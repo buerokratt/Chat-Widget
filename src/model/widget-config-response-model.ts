@@ -16,4 +16,6 @@ export interface WidgetConfigResponse {
   feedbackNoticeActive: string;
   feedbackNotice: string;
   instantlyOpenChatWidget: string;
+  showSubTitle: string;
+  subTitle: string;
 }

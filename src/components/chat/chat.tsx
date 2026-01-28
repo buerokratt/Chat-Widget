@@ -301,6 +301,7 @@ const Chat = (): JSX.Element => {
               isDetailSelected={showWidgetDetails}
               detailHandler={() => setShowWidgetDetails(!showWidgetDetails)}
             />
+            {widgetConfig.showSubTitle === true && <div className="sub-title">{widgetConfig.subTitle}</div>}
             {messageQueue.length >= 5 && <WarningNotification warningMessage={t("chat.error-message")} />}
             {burokrattOnlineStatus !== true && <OnlineStatusNotification />}
             {showWidgetDetails && <WidgetDetails />}
