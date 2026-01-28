@@ -12,6 +12,7 @@ import {
   ONLINE_CHECK_INTERVAL_ACTIVE_CHAT,
   EXTEND_JWT_COOKIE_IN_MS,
   CHAT_SESSIONS,
+  LOCAL_STORAGE_INSTANTLY_OPEN_CHAT_WIDGET_KEY,
 } from "./constants";
 import {
   getChat,
@@ -30,10 +31,10 @@ import { getWidgetConfig } from "./slices/widget-slice";
 import useWidgetSelector from "./hooks/use-widget-selector";
 import useGetEmergencyNotice from "./hooks/use-get-emergency-notice";
 import { customJwtExtend } from "./slices/authentication-slice";
-import { getFromLocalStorage } from "./utils/local-storage-utils";
+import { getFromLocalStorage, setToLocalStorage } from "./utils/local-storage-utils";
 import useNameAndTitleVisibility from "./hooks/use-name-title-visibility";
 import { generateUEID } from "./utils/generators";
-import { isMobileWidth } from "./utils/browser-utils";
+import { isMobile, isMobileWidth } from "./utils/browser-utils";
 import { ScrollProvider } from "./contexts/ScrollContext";
 
 declare global {
@@ -221,6 +222,16 @@ const App: FC = () => {
     if (emergencyNotice === null) dispatch(getEmergencyNotice());
     if (!widgetConfig.isLoaded) dispatch(getWidgetConfig());
   }, [chatId, dispatch, messages, widgetConfig]);
+
+  useEffect(() => {
+    if (!widgetConfig.instantlyOpenChatWidget || isMobile() || chatId) return;
+
+    const localStorageValue = getFromLocalStorage(LOCAL_STORAGE_INSTANTLY_OPEN_CHAT_WIDGET_KEY);
+    const shouldOpen = localStorageValue === true || localStorageValue === null;
+
+    dispatch(setIsChatOpen(shouldOpen));
+    setToLocalStorage(LOCAL_STORAGE_INSTANTLY_OPEN_CHAT_WIDGET_KEY, shouldOpen);
+  }, [widgetConfig]);
 
   useNameAndTitleVisibility();
 

@@ -33,6 +33,7 @@ const initialState: WidgetState = {
     feedbackQuestion: "",
     feedbackNoticeActive: null,
     feedbackNotice: "",
+    instantlyOpenChatWidget: null,
   },
   chatId: null,
 };

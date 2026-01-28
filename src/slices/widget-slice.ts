@@ -34,6 +34,7 @@ export interface WidgetState {
     feedbackQuestion: string;
     feedbackNoticeActive: boolean | null;
     feedbackNotice: string;
+    instantlyOpenChatWidget?: boolean | null;
   };
   chatId?: string | null;
 }
@@ -60,6 +61,7 @@ const initialState: WidgetState = {
     feedbackQuestion: "",
     feedbackNoticeActive: null,
     feedbackNotice: "",
+    instantlyOpenChatWidget: null,
   },
   chatId: null,
 };
@@ -138,6 +140,8 @@ export const widgetSlice = createSlice({
       state.widgetConfig.feedbackNoticeActive =
         action.payload?.feedbackNoticeActive === "true";
       state.widgetConfig.feedbackNotice = action.payload?.feedbackNotice ?? "";
+      state.widgetConfig.instantlyOpenChatWidget =
+        action.payload?.instantlyOpenChatWidget === "true";
       if (
         state.chatId != null &&
         state.widgetConfig.isBurokrattActive === false
