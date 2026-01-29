@@ -34,6 +34,9 @@ const initialState: WidgetState = {
     feedbackNoticeActive: null,
     feedbackNotice: "",
     isFiveRatingScale: null,
+    instantlyOpenChatWidget: null,
+    showSubTitle: null,
+    subTitle: null,
   },
   chatId: null,
 };

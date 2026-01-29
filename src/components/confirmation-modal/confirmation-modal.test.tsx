@@ -48,6 +48,7 @@ describe("Confirmation modal component", () => {
             feedbackNoticeActive: null,
             feedbackNotice: "",
             isFiveRatingScale: null,
+            instantlyOpenChatWidget: null,
           },
           chatId: null,
         },

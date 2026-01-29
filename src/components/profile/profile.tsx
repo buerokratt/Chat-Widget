@@ -6,8 +6,10 @@ import Buerokratt from "../../static/icons/buerokratt.svg";
 import {useAppDispatch} from "../../store";
 import useWidgetSelector from "../../hooks/use-widget-selector";
 import useReloadChatEndEffect from "../../hooks/use-reload-chat-end-effect";
-import {getFromLocalStorage} from "../../utils/local-storage-utils";
+import {getFromLocalStorage, setToLocalStorage} from "../../utils/local-storage-utils";
 import {ProfileStyles} from "./ProfileStyles";
+import { LOCAL_STORAGE_INSTANTLY_OPEN_CHAT_WIDGET_KEY } from "../../constants";
+import useChatSelector from "../../hooks/use-chat-selector";
 
 export const Profile = (): JSX.Element => {
     const {t} = useTranslation();
@@ -15,9 +17,13 @@ export const Profile = (): JSX.Element => {
     const {widgetConfig} = useWidgetSelector();
     const [delayFinished, setDelayFinished] = useState(false);
     const newMessagesAmount = getFromLocalStorage("newMessagesAmount");
+    const { chatId } = useChatSelector();
 
     const openChat = () => {
         dispatch(setIsChatOpen(true));
+        if (!chatId) {
+           setToLocalStorage(LOCAL_STORAGE_INSTANTLY_OPEN_CHAT_WIDGET_KEY, true); 
+        }
     };
 
     const variants = {
