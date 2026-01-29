@@ -34,6 +34,10 @@ export interface WidgetState {
     feedbackQuestion: string;
     feedbackNoticeActive: boolean | null;
     feedbackNotice: string;
+    isFiveRatingScale: boolean | null;
+    instantlyOpenChatWidget?: boolean | null;
+    showSubTitle?: boolean | null;
+    subTitle?: string | null;
   };
   chatId?: string | null;
 }
@@ -60,6 +64,10 @@ const initialState: WidgetState = {
     feedbackQuestion: "",
     feedbackNoticeActive: null,
     feedbackNotice: "",
+    isFiveRatingScale: null,
+    instantlyOpenChatWidget: null,
+    showSubTitle: null,
+    subTitle: null,
   },
   chatId: null,
 };
@@ -138,6 +146,12 @@ export const widgetSlice = createSlice({
       state.widgetConfig.feedbackNoticeActive =
         action.payload?.feedbackNoticeActive === "true";
       state.widgetConfig.feedbackNotice = action.payload?.feedbackNotice ?? "";
+      state.widgetConfig.isFiveRatingScale = action.payload?.isFiveRatingScale === "true";
+      state.widgetConfig.instantlyOpenChatWidget =
+        action.payload?.instantlyOpenChatWidget === "true";
+      state.widgetConfig.showSubTitle =
+        action.payload?.showSubTitle === "true";
+      state.widgetConfig.subTitle = action.payload?.subTitle ?? "";  
       if (
         state.chatId != null &&
         state.widgetConfig.isBurokrattActive === false

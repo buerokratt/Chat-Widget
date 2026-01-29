@@ -13,6 +13,8 @@ import useChatSelector from '../../hooks/use-chat-selector';
 import useAuthenticationSelector from '../../hooks/use-authentication-selector';
 import {ChatHeaderInitialStyles, ChatHeaderStyles} from "./ChatHeaderStyled";
 import { useScroll } from '../../contexts/ScrollContext';
+import { setToLocalStorage } from '../../utils/local-storage-utils';
+import { LOCAL_STORAGE_INSTANTLY_OPEN_CHAT_WIDGET_KEY } from '../../constants';
 
 interface ChatHeaderType {
     detailHandler: MouseEventHandler<HTMLButtonElement>;
@@ -25,7 +27,13 @@ const ChatHeader = (props: ChatHeaderType): JSX.Element => {
     const { chatId, isChatOpen, isFullScreen } = useChatSelector();
     const { scrollToBottom } = useScroll();
     const {isAuthenticated} = useAuthenticationSelector();
-    const minimizeChat = () => dispatch(setIsChatOpen(false));
+    const closeChatState = () => {
+        dispatch(setIsChatOpen(false));
+        if (!chatId) {
+            setToLocalStorage(LOCAL_STORAGE_INSTANTLY_OPEN_CHAT_WIDGET_KEY, false);
+        }
+    }
+    const minimizeChat = () => closeChatState();
     const setFullScreen = (value: boolean) => {
       dispatch(setIsFullScreen(value));
       setTimeout(() => {
@@ -72,7 +80,7 @@ const ChatHeader = (props: ChatHeaderType): JSX.Element => {
                     <button
                         title={t('header.button.close.label')}
                         onClick={() => {
-                            chatId ? dispatch(showConfirmationModal()) : dispatch(setIsChatOpen(false))
+                            chatId ? dispatch(showConfirmationModal()) : closeChatState();
                         }}
                         aria-label={t('header.button.close.label')}
                         type="button"
