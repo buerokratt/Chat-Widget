@@ -26,6 +26,20 @@ export const ChatStyles = styled.div<{isFullScreen?: boolean}>`
         z-index: 100;
     }
 
+    .sub-title {
+      width: 100%;
+      background-color: #F0F1F2;
+      color: #003cff;
+      padding: 5px 0px;
+      font-size: 22px;
+      text-align: center;
+      font-family: "Aino Headline";
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+
     .chat-resize-handle-top-left {
         top: 11px;
         left: 10px;
