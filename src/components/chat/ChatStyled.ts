@@ -86,4 +86,24 @@ export const ChatStyles = styled.div<{isFullScreen?: boolean}>`
             width: 100%;
         }
     }
+
+    @media screen and (max-height: 480px) {
+        .chatWrapper {
+            display: flex;
+            margin: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .chat {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100dvh;
+            width: 100%;
+        }
+    }
 `
