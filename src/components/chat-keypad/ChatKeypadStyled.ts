@@ -34,7 +34,7 @@ export const ChatKeypadStyled = styled.div`
       color: inherit;
       font: inherit;
       line-height: 1.5;
-      height: auto;
+      height: auto !important;
       max-height: 5.6em;
 
       &::placeholder {
