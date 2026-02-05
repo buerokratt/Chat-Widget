@@ -596,6 +596,7 @@ export const chatSlice = createSlice({
     closeFullScreen: (state) => {
       state.isFullScreen = false;
       setToLocalStorage(LOCAL_STORAGE_IS_FULL_SCREEN_KEY, false);
+      state.chatDimensions = getInitialChatDimensions();
     },
     clearMessageQueue: (state) => {
       state.messageQueue = [];

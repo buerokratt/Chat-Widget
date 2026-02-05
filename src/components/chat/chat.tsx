@@ -43,7 +43,6 @@ import useWindowDimensions from "../../hooks/useWindowDimensions";
 import ResponseErrorNotification from "../response-error-notification/response-error-notification";
 import useTabActive from "../../hooks/useTabActive";
 import AskForwardToCsa from "../ask-forward-to-csa-modal/ask-forward-to-csa-modal";
-import { isIphone } from "../../utils/browser-utils";
 import { ChatStyles } from "./ChatStyled";
 import ResizeHandleIcon from "../../static/icons/resize-handle.svg";
 import useWidgetSelector from "../../hooks/use-widget-selector";
@@ -103,23 +102,41 @@ const Chat = (): JSX.Element => {
   );
 
   const chatRef = useRef<HTMLDivElement>(null);
-
-  // Prevent chat from being cut off on iOS devices when on-screen keyboard is open
+  const isMobileLayout = width < 480 || height < 480;
   useEffect(() => {
     const vv = window.visualViewport;
     const currentRef = chatRef.current;
+    if (!vv || !isMobileLayout) return;
 
-    function setChatHeight() {
-      if (currentRef && vv && isIphone()) {
-        currentRef.style.height = `${vv.height}px`;
-      }
+    function setChatViewport() {
+      if (!currentRef || !vv) return;
+      currentRef.style.position = "fixed";
+      currentRef.style.height = `${vv.height}px`;
+      currentRef.style.width = `${vv.width}px`;
+      currentRef.style.top = `${vv.offsetTop}px`;
+      currentRef.style.left = `${vv.offsetLeft}px`;
+      currentRef.style.bottom = "auto";
+      currentRef.style.right = "auto";
     }
 
-    vv?.addEventListener("resize", setChatHeight);
-    setChatHeight();
+    setChatViewport();
+    vv.addEventListener("resize", setChatViewport);
+    vv.addEventListener("scroll", setChatViewport);
 
-    return () => vv?.removeEventListener("resize", setChatHeight);
-  }, []);
+    return () => {
+      vv.removeEventListener("resize", setChatViewport);
+      vv.removeEventListener("scroll", setChatViewport);
+      if (currentRef) {
+        currentRef.style.position = "";
+        currentRef.style.height = "";
+        currentRef.style.width = "";
+        currentRef.style.top = "";
+        currentRef.style.left = "";
+        currentRef.style.bottom = "";
+        currentRef.style.right = "";
+      }
+    };
+  }, [isMobileLayout]);
 
   useEffect(() => {
     if(!widgetConfig.showIdleWarningMessage) {
@@ -330,7 +347,7 @@ const Chat = (): JSX.Element => {
     <ChatStyles isFullScreen={isFullScreen} style={{ transition: "none !important" }}>
       <div className="chatWrapper">
         <Resizable
-          size={isFullScreen ? { width: window.innerWidth, height: window.innerHeight } : chatDimensions}
+          size={isFullScreen ? { width, height } : chatDimensions}
           minWidth={CHAT_MIN_WINDOW_WIDTH}
           minHeight={CHAT_MIN_WINDOW_HEIGHT}
           maxHeight={isFullScreen ? window.innerHeight : height - 50}
