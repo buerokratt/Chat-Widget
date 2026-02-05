@@ -4,14 +4,14 @@ import { useAppDispatch } from "../store";
 import useChatSelector from "./use-chat-selector";
 
 const useGetEmergencyNotice = (): void => {
-  const { emergencyNotice } = useChatSelector();
+  const { emergencyNotice, messages, chatId } = useChatSelector();
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (emergencyNotice === null) {
       dispatch(getEmergencyNotice());
     }
-  }, [dispatch, emergencyNotice]);
+  }, [dispatch, emergencyNotice, messages, chatId]);
 };
 
 export default useGetEmergencyNotice;
