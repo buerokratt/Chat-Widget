@@ -107,7 +107,7 @@ function formatMessage(message?: string): string {
       }
       return `${prefix}${year}\\. `;
     })
-    .replaceAll(/(?<=\n)\d+\.\s/g, hasSpecialFormat(filteredMessage) ? "\n\n$&" : "$&")
+    .replaceAll(/(?<=\n)\d+\.\s/g, hasSpecialFormat(finalMessage) ? "\n\n$&" : "$&")
     .replaceAll(/^(\s+)/g, (match) => match.replaceAll(" ", "&nbsp;"));
 }
 
