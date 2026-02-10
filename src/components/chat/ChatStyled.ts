@@ -40,6 +40,43 @@ export const ChatStyles = styled.div<{isFullScreen?: boolean}>`
       -webkit-box-orient: vertical;
     }
 
+    .emergency-notice {
+      width: 100%;
+      background-color: #ffffff;
+      padding: 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #e5e5e5;
+      box-shadow: 0 0.2px 0px rgba(0, 0, 0, 0.1);
+    }
+
+    .emergency-notice-icon {
+      width: 1.4em;
+      height: 1.4em;
+      margin-left: 12px;
+      background-color: #003cff;
+      border-radius: 50%;
+      color: #ffffff;
+      font-size: 2em;
+      font-weight: bold;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .emergency-notice-text {
+      flex: 1;
+      color: #333333;
+      font-size: 1.2em;
+      text-align: left;
+      font-family: ${fontChat};
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+
     .chat-resize-handle-top-left {
         top: 11px;
         left: 10px;
