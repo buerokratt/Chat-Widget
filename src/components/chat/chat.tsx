@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Resizable, ResizeCallback } from "re-resizable";
 import useChatSelector from "../../hooks/use-chat-selector";
@@ -47,6 +47,7 @@ import { ChatStyles } from "./ChatStyled";
 import ResizeHandleIcon from "../../static/icons/resize-handle.svg";
 import useWidgetSelector from "../../hooks/use-widget-selector";
 import PostChatMessage from "../post-chat-message/post-chat-message";
+import { format } from "date-fns";
 
 const RESIZABLE_HANDLES = {
   topLeft: true,
@@ -89,9 +90,17 @@ const Chat = (): JSX.Element => {
     chatDimensions,
     chatMode,
     showResponseError,
+    emergencyNotice,
   } = useChatSelector();
   const [ idleTimerSelection, setIdleTimerSelection ] = useState<number>(IDLE_CHAT_CHOICES_INTERVAL)
   const [ displayEndMessage, setDisplayEndMessage ] = useState<boolean>(false)
+
+  const showEmergencyNotice = useMemo(() => {
+    if (!emergencyNotice?.isVisible) return false;
+    const toDate = (d: Date) => new Date(format(d, "yyyy-MM-dd"));
+    const now = toDate(new Date());
+    return toDate(new Date(emergencyNotice.start)) <= now && toDate(new Date(emergencyNotice.end)) >= now;
+  }, [emergencyNotice]);
 
   const isTabActive = useTabActive();
 
@@ -368,6 +377,12 @@ const Chat = (): JSX.Element => {
               detailHandler={() => setShowWidgetDetails(!showWidgetDetails)}
             />
             {widgetConfig.showSubTitle === true && <div className="sub-title">{widgetConfig.subTitle}</div>}
+            {showEmergencyNotice && emergencyNotice && (
+              <div className="emergency-notice">
+                <div className="emergency-notice-icon">!</div>
+                <span className="emergency-notice-text">{emergencyNotice.text}</span>
+              </div>
+            )}
             {messageQueue.length >= 5 && <WarningNotification warningMessage={t("chat.error-message")} />}
             {burokrattOnlineStatus !== true && <OnlineStatusNotification />}
             {showWidgetDetails && <WidgetDetails />}
