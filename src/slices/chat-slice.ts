@@ -24,7 +24,7 @@ import {
   getFromLocalStorage,
   setToLocalStorage,
 } from "../utils/local-storage-utils";
-import getHolidays from "../utils/holidays";
+import getHolidays from "../utils/holidays-estonia";
 import {
   filterDuplicatMessages,
   getChatModeBasedOnLastMessage,

@@ -4,15 +4,42 @@ const path = require("path");
 
 module.exports = {
   mode: "production",
-  entry: path.resolve(__dirname, "src/index.tsx"),
+  entry: {
+    widget_bundle: path.resolve(__dirname, "src/index.tsx"),
+  },
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "widget_bundle.js",
+    filename: "[name].js",
+    chunkFilename: "[name].[contenthash:8].chunk.js",
+    publicPath: "./",
     library: "$",
     libraryTarget: "umd",
   },
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
+  },
+  optimization: {
+    usedExports: true,
+    splitChunks: {
+      chunks: "all",
+      cacheGroups: {
+        defaultVendors: {
+          test: /[\\/]node_modules[\\/]/,
+          name: "vendors",
+          priority: 10,
+        },
+        framerMotion: {
+          test: /[\\/]node_modules[\\/]framer-motion[\\/]/,
+          name: "framer-motion",
+          priority: 20,
+        },
+        primereact: {
+          test: /[\\/]node_modules[\\/]primereact[\\/]/,
+          name: "primereact",
+          priority: 20,
+        },
+      },
+    },
   },
   module: {
     rules: [
@@ -34,15 +61,24 @@ module.exports = {
       },
       {
         test: /\.svg/,
-        use: "svg-url-loader",
+        type: "asset/resource",
+        generator: {
+          filename: "static/icons/[name].[contenthash:8][ext]",
+        },
       },
       {
-        test: /\.mp3/,
-        use: "file-loader",
+        test: /\.mp3$/,
+        type: "asset/resource",
+        generator: {
+          filename: "static/[name].[contenthash:8][ext]",
+        },
       },
       {
         test: /\.(png|jpe?g|gif)$/i,
-        use: "file-loader",
+        type: "asset/resource",
+        generator: {
+          filename: "static/images/[name].[contenthash:8][ext]",
+        },
       },
       {
         test: /\.tsx?$/,
@@ -72,9 +108,9 @@ module.exports = {
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
-        loader: "url-loader",
-        options: {
-          limit: 100000,
+        type: "asset/resource",
+        generator: {
+          filename: "static/fonts/[name].[contenthash:8][ext]",
         },
       },
     ],
