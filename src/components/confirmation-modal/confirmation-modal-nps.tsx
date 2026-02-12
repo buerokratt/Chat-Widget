@@ -36,9 +36,7 @@ const ConfirmationModalNps = ({ npsFeedback }: Props) => {
     if (feedbackRating === null) return;
     setSelectedFeedbackButtonValue(feedbackRating);
     dispatch(
-      sendChatNpmRating({
-        NpmRating: parseInt(feedbackRating ?? "", widgetConfig.isFiveRatingScale ? 5 : 10),
-      }),
+      sendChatNpmRating({ NpmRating: parseInt(feedbackRating ?? "1") }),
     );
     dispatch(setFeedbackRatingGiven(true));
   };

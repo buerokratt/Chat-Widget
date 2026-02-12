@@ -26,7 +26,7 @@ const ChatFeedback = (): JSX.Element => {
         if (feedbackRating === null) return;
         setSelectedFeedbackButtonValue(feedbackRating);
         dispatch(
-          sendChatNpmRating({ NpmRating: parseInt(feedbackRating ?? "1", widgetConfig.isFiveRatingScale ? 5 : 10) }),
+          sendChatNpmRating({ NpmRating: parseInt(feedbackRating ?? "1") }),
         );
         dispatch(setFeedbackRatingGiven(true));
     };
