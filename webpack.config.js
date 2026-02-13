@@ -9,9 +9,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "[name].js",
-    chunkFilename: "[name].[contenthash:8].chunk.js",
-    publicPath: "./",
+    filename: "widget_bundle.js",
     library: "$",
     libraryTarget: "umd",
   },
@@ -20,26 +18,6 @@ module.exports = {
   },
   optimization: {
     usedExports: true,
-    splitChunks: {
-      chunks: "all",
-      cacheGroups: {
-        defaultVendors: {
-          test: /[\\/]node_modules[\\/]/,
-          name: "vendors",
-          priority: 10,
-        },
-        framerMotion: {
-          test: /[\\/]node_modules[\\/]framer-motion[\\/]/,
-          name: "framer-motion",
-          priority: 20,
-        },
-        primereact: {
-          test: /[\\/]node_modules[\\/]primereact[\\/]/,
-          name: "primereact",
-          priority: 20,
-        },
-      },
-    },
   },
   module: {
     rules: [
