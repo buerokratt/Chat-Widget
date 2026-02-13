@@ -5,6 +5,7 @@ import sanitizeHtml from "sanitize-html";
 interface MarkdownifyProps {
   message: string | undefined;
   sanitizeLinks?: boolean;
+  isClientMessage?: boolean;
 }
 
 const isValidImageUrl = (s: string): boolean => {
@@ -72,12 +73,12 @@ const LinkPreview: React.FC<{
 
 const hasSpecialFormat = (m: string) => m.includes("\n\n") && m.indexOf(".") > 0 && m.indexOf(":") > m.indexOf(".");
 
-function formatMessage(message?: string): string {
+function formatMessage(message?: string, isClientMessage?: boolean): string {
   const sanitizedMessage = sanitizeHtml(message ?? "");
 
   if (!sanitizedMessage) return "";
 
-  const filteredMessage = sanitizedMessage
+  const filteredMessage = isClientMessage ? sanitizedMessage : sanitizedMessage
     .replaceAll(/\\?\$b\w*/g, "")
     .replaceAll(/\\?\$v\w*/g, "")
     .replaceAll(/\\?\$g\w*/g, "");
@@ -111,7 +112,7 @@ function formatMessage(message?: string): string {
     .replaceAll(/^(\s+)/g, (match) => match.replaceAll(" ", "&nbsp;"));
 }
 
-const Markdownify: React.FC<MarkdownifyProps> = ({ message, sanitizeLinks = false }) => (
+const Markdownify: React.FC<MarkdownifyProps> = ({ message, sanitizeLinks = false, isClientMessage = false}) => (
   <div>
     <Markdown
       options={{
@@ -127,7 +128,7 @@ const Markdownify: React.FC<MarkdownifyProps> = ({ message, sanitizeLinks = fals
         disableParsingRawHTML: true,
       }}
     >
-      {formatMessage(message)}
+      {formatMessage(message, isClientMessage)}
     </Markdown>
   </div>
 );
