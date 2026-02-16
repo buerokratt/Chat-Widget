@@ -1,7 +1,8 @@
-import React, { FC, useEffect, useLayoutEffect, useState } from "react";
+import React, { FC, Suspense, lazy, useEffect, useLayoutEffect, useState } from "react";
 import { isOfficeHours } from "./utils/office-hours-utils";
-import Profile from "./components/profile/profile";
-import Chat from "./components/chat/chat";
+
+const Profile = lazy(() => import("./components/profile/profile"));
+const Chat = lazy(() => import("./components/chat/chat"));
 import useChatSelector from "./hooks/use-chat-selector";
 import useInterval from "./hooks/use-interval";
 import {
@@ -239,7 +240,9 @@ const App: FC = () => {
   if (displayWidget && widgetConfig.isLoaded)
     return (
       <ScrollProvider>
-        {isChatOpen ? <Chat /> : <Profile />}
+        <Suspense fallback={null}>
+          {isChatOpen ? <Chat /> : <Profile />}
+        </Suspense>
       </ScrollProvider>
     );
   return <></>;
