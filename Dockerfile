@@ -18,5 +18,7 @@ COPY --from=build ./usr/app/dist /usr/share/nginx/html/widget
 COPY ./public/favicon.ico /usr/share/nginx/html/widget
 COPY ./public/index.html /usr/share/nginx/html/widget
 COPY ./public/env-config.js /usr/share/nginx/html/widget
+# Uncomment the line below if you are on running on localhost
+# COPY ./public/static/byk-calendar.png ./public/static/byk-illustration.png /usr/share/nginx/html/widget/static/
 EXPOSE 443
 CMD ["nginx", "-g", "daemon off;"]
