@@ -34,7 +34,7 @@ export const ChatKeypadStyled = styled.div`
       color: inherit;
       font: inherit;
       line-height: 1.5;
-      height: auto !important;
+      height: auto;
       max-height: 5.6em;
 
       &::placeholder {
@@ -69,12 +69,10 @@ export const ChatKeypadStyled = styled.div`
 
   .three_lines {
     margin-bottom: 5px;
-    padding-top: 20px;
   }
 
   .four_lines {
     margin-bottom: 10px;
-    padding-top: 30px;
   }
 
   .button_cancelUpload {
