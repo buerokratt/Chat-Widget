@@ -27,6 +27,7 @@ export const ChatStyles = styled.div<{isFullScreen?: boolean}>`
     }
 
     .sub-title {
+      flex-shrink: 0;
       width: 100%;
       background-color: #F0F1F2;
       color: #003cff;

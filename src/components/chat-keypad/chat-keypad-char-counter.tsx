@@ -55,7 +55,7 @@ const orangeVariant = css`
     color: #ff4800;
 `;
 
-const marginCheck = isMobile() ? "0rem 3.5rem 0.45rem 0" : "-0.35rem 3.5rem 0.25rem 0";
+const marginCheck = isMobile() ? "0rem 3.5rem 0.45rem 0" : "-0.45rem 3.5rem 0.25rem 0";
 
 const ChatKeypadCharCounterStyle = styled.div<{
   warning: boolean;
@@ -68,6 +68,7 @@ const ChatKeypadCharCounterStyle = styled.div<{
   margin: ${(props) => (props.isConfirmationFeedback ? "0" : marginCheck)};
   display: flex;
   justify-content: flex-end;
+  padding-top: 10px;
 `;
 
 export default ChatKeypadCharCounter;
