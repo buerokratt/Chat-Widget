@@ -15,6 +15,7 @@ const ErrorMessageComponentStyles = styled.div<errorMessageType>`
   color: #f00;
   display: flex;
   justify-content: center;
+  padding-bottom: 25px;
 `;
 
 export default KeypadErrorMessage;
