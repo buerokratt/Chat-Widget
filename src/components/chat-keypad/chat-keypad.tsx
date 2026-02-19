@@ -120,7 +120,7 @@ const ChatKeyPad = (): JSX.Element => {
 
       const newHeight = textarea.scrollHeight;
 
-      setdynamicStyle((dynStyle) => {
+      setdynamicStyle(() => {
         if (newHeight >= 70 && newHeight <= 85) {
           return "threeLines";
         } else if (newHeight > 85) {
@@ -128,7 +128,6 @@ const ChatKeyPad = (): JSX.Element => {
         } else {
           return "";
         }
-        return dynStyle;
       });
     }
   };
@@ -285,6 +284,7 @@ const ChatKeyPad = (): JSX.Element => {
     three_lines: dynamicStyle === "threeLines",
     four_lines: dynamicStyle === "fourLines",
   });
+  const paddingTopCheck = dynamicStyle === "fourLines" ? "30px" : "20px";
 
   // Create stable references to the event handlers
   // So that we can remove them later with window.removeEventListener
@@ -320,7 +320,7 @@ const ChatKeyPad = (): JSX.Element => {
   return (
     <ChatKeypadStyled>
       <KeypadErrorMessage>{errorMessage}</KeypadErrorMessage>
-      <div className={`${keypadClasses}`}>
+      <div className={`${keypadClasses}`} style={{ paddingTop: errorMessage ? undefined : paddingTopCheck }}>
         <textarea
           ref={textareaRef}
           disabled={showLoadingMessage ? true : keypadDisableCheck}
