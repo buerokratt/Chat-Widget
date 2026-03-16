@@ -73,6 +73,13 @@ const LinkPreview: React.FC<{
 
 const hasSpecialFormat = (m: string) => m.includes("\n\n") && m.indexOf(".") > 0 && m.indexOf(":") > m.indexOf(".");
 
+function escapeMaskedAsterisks(text: string): string {
+  return text.replace(/(\d)(\*{2,})/g, (_, digit: string, stars: string) => {
+    const escapedStars = stars.replace(/\*/g, "\\*");
+    return `${digit}${escapedStars}`;
+  });
+}
+
 function formatMessage(message?: string, isClientMessage?: boolean): string {
   const sanitizedMessage = sanitizeHtml(message ?? "");
 
@@ -89,30 +96,32 @@ function formatMessage(message?: string, isClientMessage?: boolean): string {
     (_, prefix, dataUrl) => `${prefix}[image](${dataUrl})`,
   );
 
-  return finalMessage
-    .replaceAll(/&#x([0-9A-F]+);/gi, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
-    .replaceAll("&amp;", "&")
-    .replaceAll("&gt;", ">")
-    .replaceAll("&lt;", "<")
-    .replaceAll("&quot;", '"')
-    .replaceAll("&#39;", "'")
-    .replaceAll("&apos;", "'")
-    .replaceAll(/(^|\n)(\d{4})\.\s/g, (match, prefix, year) => {
-      const remainingText = finalMessage.substring(finalMessage.indexOf(match) + match.length);
-      const sentenceEnd = remainingText.indexOf("\n\n");
-      if (sentenceEnd !== -1) {
-        const currentSentence = remainingText.substring(0, sentenceEnd);
-        if (currentSentence.trim().endsWith(":")) {
-          return `${prefix}${year}. `;
+  return escapeMaskedAsterisks(
+    finalMessage
+      .replaceAll(/&#x([0-9A-F]+);/gi, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
+      .replaceAll("&amp;", "&")
+      .replaceAll("&gt;", ">")
+      .replaceAll("&lt;", "<")
+      .replaceAll("&quot;", '"')
+      .replaceAll("&#39;", "'")
+      .replaceAll("&apos;", "'")
+      .replaceAll(/(^|\n)(\d{4})\.\s/g, (match, prefix, year) => {
+        const remainingText = finalMessage.substring(finalMessage.indexOf(match) + match.length);
+        const sentenceEnd = remainingText.indexOf("\n\n");
+        if (sentenceEnd !== -1) {
+          const currentSentence = remainingText.substring(0, sentenceEnd);
+          if (currentSentence.trim().endsWith(":")) {
+            return `${prefix}${year}. `;
+          }
         }
-      }
-      return `${prefix}${year}\\. `;
-    })
-    .replaceAll(/(?<=\n)\d+\.\s/g, hasSpecialFormat(finalMessage) ? "\n\n$&" : "$&")
-    .replaceAll(/^(\s+)/g, (match) => match.replaceAll(" ", "&nbsp;"));
+        return `${prefix}${year}\\. `;
+      })
+      .replaceAll(/(?<=\n)\d+\.\s/g, hasSpecialFormat(finalMessage) ? "\n\n$&" : "$&")
+      .replaceAll(/^(\s+)/g, (match) => match.replaceAll(" ", "&nbsp;"))
+  );
 }
 
-const Markdownify: React.FC<MarkdownifyProps> = ({ message, sanitizeLinks = false, isClientMessage = false}) => (
+const Markdownify: React.FC<MarkdownifyProps> = ({ message, sanitizeLinks = false, isClientMessage = false }) => (
   <div>
     <Markdown
       options={{
