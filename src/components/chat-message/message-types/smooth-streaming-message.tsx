@@ -82,6 +82,18 @@ const SmoothStreamingMessage: React.FC<SmoothStreamingMessageProps> = ({
     }
   }, [stopTypingStream]);
 
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && tokenBuffer.current.length > displayIndex.current) {
+        setDisplayedText(tokenBuffer.current);
+        displayIndex.current = tokenBuffer.current.length;
+        scrollToBottom();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [scrollToBottom]);
+
   const startTypewriting = useCallback(() => {
     if (!stopTypingStream) {
       if (typewriterInterval.current) return;
@@ -98,7 +110,10 @@ const SmoothStreamingMessage: React.FC<SmoothStreamingMessageProps> = ({
           return;
         }
 
-        const nextIndex = Math.min(currentIndex + batchSize, buffer.length);
+        // When tab is hidden, advance through the entire buffer so animation
+        // doesn't stall due to browser throttling of background timers.
+        const advance = document.hidden ? buffer.length - currentIndex : batchSize;
+        const nextIndex = Math.min(currentIndex + advance, buffer.length);
         const newText = buffer.slice(0, nextIndex);
 
         setDisplayedText(newText);
