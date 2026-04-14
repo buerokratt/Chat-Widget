@@ -1,7 +1,6 @@
-import React, {ReactElement} from 'react';
+import {ReactElement, useMemo} from 'react';
 import styled, {css} from 'styled-components';
 import {
-    CHAT_STATUS,
     FEEDBACK_MESSAGE_LIMIT_VISIBILE_AT,
     FEEDBACK_MESSAGE_LIMIT_WARNING_AT,
     FEEDBACK_MESSAGE_MAX_CHAR_LIMIT,
@@ -9,7 +8,6 @@ import {
     MESSAGE_VISIBILITY_LIMIT,
     MESSAGE_WARNING_LIMIT,
 } from '../../constants';
-import useChatSelector from '../../hooks/use-chat-selector';
 import { isMobile } from "../../utils/browser-utils";
 
 interface ChatKeypadCharCounterType {
@@ -19,31 +17,25 @@ interface ChatKeypadCharCounterType {
 }
 
 const ChatKeypadCharCounter = (props: ChatKeypadCharCounterType): ReactElement => {
-    const {chatStatus} = useChatSelector();
-    let maxCharLimit;
-    let charWarningLimit;
-    let charVisibilityLimit;
-
-    if (chatStatus === CHAT_STATUS.ENDED || props.isFeedback) {
-        maxCharLimit = FEEDBACK_MESSAGE_MAX_CHAR_LIMIT;
-        charWarningLimit = FEEDBACK_MESSAGE_LIMIT_WARNING_AT;
-        charVisibilityLimit = FEEDBACK_MESSAGE_LIMIT_VISIBILE_AT;
-    } else {
-        maxCharLimit = MESSAGE_MAX_CHAR_LIMIT;
-        charWarningLimit = MESSAGE_WARNING_LIMIT;
-        charVisibilityLimit = MESSAGE_VISIBILITY_LIMIT;
-    }
+    const limit = useMemo(() => {
+      const isFeedback = typeof props.isFeedback === 'boolean' && props.isFeedback;
+      return {
+        maxChar: isFeedback ? FEEDBACK_MESSAGE_MAX_CHAR_LIMIT : MESSAGE_MAX_CHAR_LIMIT,
+        warning: isFeedback ? FEEDBACK_MESSAGE_LIMIT_WARNING_AT : MESSAGE_WARNING_LIMIT,
+        visibility: isFeedback ? FEEDBACK_MESSAGE_LIMIT_VISIBILE_AT : MESSAGE_VISIBILITY_LIMIT,
+      };
+    }, [props.isFeedback]);
 
     const {userInput = ''} = props;
     const currentCount = userInput.length;
 
     return (
       <ChatKeypadCharCounterStyle
-        warning={currentCount > charWarningLimit}
-        isVisible={currentCount > charVisibilityLimit}
+        warning={currentCount > limit.warning}
+        isVisible={currentCount > limit.visibility}
         isConfirmationFeedback={props.isConfirmationFeedback}
       >
-        {currentCount}/{maxCharLimit}
+        {currentCount}/{limit.maxChar}
       </ChatKeypadCharCounterStyle>
     );
 };
