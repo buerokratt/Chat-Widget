@@ -44,7 +44,8 @@ export const ChatStyles = styled.div<{isFullScreen?: boolean}>`
     .emergency-notice {
       width: 100%;
       background-color: #ffffff;
-      padding: 8px 0;
+      padding: 8px 12px;
+      box-sizing: border-box;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -55,7 +56,6 @@ export const ChatStyles = styled.div<{isFullScreen?: boolean}>`
     .emergency-notice-icon {
       width: 1.4em;
       height: 1.4em;
-      margin-left: 12px;
       background-color: #003cff;
       border-radius: 50%;
       color: #ffffff;
@@ -66,16 +66,61 @@ export const ChatStyles = styled.div<{isFullScreen?: boolean}>`
       justify-content: center;
     }
 
-    .emergency-notice-text {
+    .emergency-notice-content {
       flex: 1;
+      min-width: 0;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    .emergency-notice-text {
       color: #333333;
       font-size: 1.2em;
+      line-height: 1.5;
       text-align: left;
       font-family: ${fontChat};
+      overflow-wrap: anywhere;
+      width: 100%;
+    }
+
+    .emergency-notice-text-collapsed {
       overflow: hidden;
       display: -webkit-box;
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
+    }
+
+    .emergency-notice-text-expanded {
+      overflow: visible;
+      display: block;
+    }
+
+    .emergency-notice-text-measurement {
+      position: absolute;
+      top: 0;
+      left: 0;
+      visibility: hidden;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .emergency-notice-read-more {
+      border: none;
+      background: none;
+      padding: 0;
+      color: #003cff;
+      cursor: pointer;
+      font-family: ${fontChatBold};
+      font-size: 1em;
+      line-height: 1.2;
+      text-decoration: underline;
+    }
+
+    .emergency-notice-read-more {
+      align-self: flex-start;
     }
 
     .chat-resize-handle-top-left {
