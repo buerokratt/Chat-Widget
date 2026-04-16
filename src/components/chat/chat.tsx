@@ -111,6 +111,7 @@ const Chat = (): JSX.Element => {
   );
 
   const chatRef = useRef<HTMLDivElement>(null);
+  const dialogAnnouncementRef = useRef<HTMLDivElement>(null);
   const isMobileLayout = width < 480 || height < 480;
   useEffect(() => {
     const vv = window.visualViewport;
@@ -328,6 +329,18 @@ const Chat = (): JSX.Element => {
   useReloadChatEndEffect();
 
   useEffect(() => {
+    const ref = dialogAnnouncementRef.current;
+    if (!ref) return;
+    ref.textContent = '';
+    const timeoutId = setTimeout(() => {
+      if (dialogAnnouncementRef.current) {
+        dialogAnnouncementRef.current.textContent = t('widget.dialog.label');
+      }
+    }, 100);
+    return () => clearTimeout(timeoutId);
+  }, []);
+
+  useEffect(() => {
     if (
       isTabActive &&
       isFocused &&
@@ -354,6 +367,12 @@ const Chat = (): JSX.Element => {
 
   return (
     <ChatStyles isFullScreen={isFullScreen} style={{ transition: "none !important" }}>
+      <div
+        ref={dialogAnnouncementRef}
+        aria-live="assertive"
+        aria-atomic="true"
+        style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', border: 0 }}
+      />
       <div className="chatWrapper">
         <Resizable
           size={isFullScreen ? { width, height } : chatDimensions}
@@ -371,6 +390,9 @@ const Chat = (): JSX.Element => {
             animate={{ y: 0 }}
             style={{ y: 400 }}
             ref={chatRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('widget.dialog.label')}
           >
             <ChatHeader
               isDetailSelected={showWidgetDetails}
