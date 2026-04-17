@@ -44,6 +44,7 @@ const ClientMessage = (props: {
         return (
             <motion.div
                 ref={messageRef}
+                aria-live="off"
             >
                 <div>
                     <ChatMessageStyled className={messageClass}>
@@ -66,6 +67,7 @@ const ClientMessage = (props: {
     return (
         <motion.div
             ref={messageRef}
+            aria-live="off"
         >
             <div>
                 <ChatMessageStyled className={messageClass}>

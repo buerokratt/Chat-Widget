@@ -90,6 +90,7 @@ const ChatKeyPad = (): JSX.Element => {
   const touchStartYRef = useRef<number>(0);
   const { widgetConfig } = useWidgetSelector();
   const keypadDisableCheck = userInputFile ? true : isKeypadDisabled;
+  const isInputLocked = showLoadingMessage || keypadDisableCheck;
 
   const handleUploadClick = () => {
     hiddenFileInputRef.current?.click();
@@ -323,7 +324,8 @@ const ChatKeyPad = (): JSX.Element => {
       <div className={`${keypadClasses}`} style={{ paddingTop: errorMessage ? undefined : paddingTopCheck }}>
         <textarea
           ref={textareaRef}
-          disabled={showLoadingMessage ? true : keypadDisableCheck}
+          readOnly={isInputLocked}
+          aria-disabled={isInputLocked}
           aria-label={t("keypad.input.label")}
           className="input"
           value={userInputFile ? userInputFile.name : userInput}
@@ -366,7 +368,6 @@ const ChatKeyPad = (): JSX.Element => {
         ) : (
           <>
             <button
-              key={isTypingStream ? "stop" : "send"}
               onKeyDown={handleSendStopButtonClick}
               onClick={handleSendStopButtonClick}
               className="button"

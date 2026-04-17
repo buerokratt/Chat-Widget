@@ -5,7 +5,7 @@ import { ChatMessageStyled } from "../ChatMessageStyled";
 
 const LoadingMessage = (): JSX.Element => {
   return (
-    <motion.div>
+    <motion.div aria-hidden="true">
       <ChatMessageStyled className="admin">
         <div className="message">
           <div className="main">
