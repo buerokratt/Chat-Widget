@@ -56,14 +56,14 @@ const ChatHeader = (props: ChatHeaderType): JSX.Element => {
                 >
                     <span className={`hamburger-icon ${isDetailSelected ? 'active' : ''}`}/>
                 </motion.button>
-                <div className="title">
+                <h2 className="title">
                     {chatId && isAuthenticated && (
                         <div className="shield">
                             <img src={Shield} alt={t('image.alt.text.shield.icon')}/>
                         </div>
                     )}
                     {t('widget.title')}
-                </div>
+                </h2>
                 <div className="actions">
                     <button title={t('header.button.minimize.label')} onClick={minimizeChat}
                             aria-label={t('header.button.minimize.label')} type="button">
