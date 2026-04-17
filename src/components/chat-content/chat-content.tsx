@@ -1,5 +1,5 @@
 import {AnimatePresence} from 'framer-motion';
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef} from 'react';
 import {OverlayScrollbarsComponent} from 'overlayscrollbars-react';
 import {useTranslation} from 'react-i18next';
 import ChatMessage from '../chat-message/chat-message';
@@ -12,6 +12,7 @@ import {ChatContentStyles} from "./ChatContentStyled";
 import { useScroll } from '../../contexts/ScrollContext';
 import {AUTHOR_ROLES} from '../../constants';
 import {Message} from '../../model/message-model';
+import useLiveRegionAnnouncement from '../../hooks/use-live-region-announcement';
 
 const srStyles = {
     position: 'absolute' as const,
@@ -40,10 +41,6 @@ const getAnnouncementText = (content?: string): string => {
         .trim();
 };
 
-// Rotate an invisible suffix so repeated live-region text is treated as a fresh announcement.
-const withAnnouncementMarker = (text: string, cycle: number): string =>
-    `${text}${"\u2063".repeat((cycle % 3) + 1)}`;
-
 const isAnnounceableAssistantMessage = (message: Message): boolean =>
     message.authorRole !== undefined &&
     message.authorRole !== AUTHOR_ROLES.END_USER &&
@@ -53,12 +50,6 @@ const isAnnounceableAssistantMessage = (message: Message): boolean =>
 
 const ChatContent = (): JSX.Element => {
     const OSref = useRef<OverlayScrollbarsComponent>(null);
-    const responseAnnouncementTimeoutRef = useRef<number>();
-    const thinkingAnnouncementTimeoutRef = useRef<number>();
-    const responseAnnouncementCycleRef = useRef(0);
-    const thinkingAnnouncementCycleRef = useRef(0);
-    const usePrimaryResponseSlotRef = useRef(true);
-    const usePrimaryThinkingSlotRef = useRef(true);
     const hasMountedRef = useRef(false);
     const previousThinkingRef = useRef(false);
     const announcedMessageKeysRef = useRef<Set<string>>(new Set());
@@ -66,49 +57,21 @@ const ChatContent = (): JSX.Element => {
     const { t } = useTranslation();
     const {messages, failedMessages, showLoadingMessage} = useChatSelector();
     const { setScrollRef, scrollToBottom } = useScroll();
-    const [responseAnnouncementPrimary, setResponseAnnouncementPrimary] = useState('');
-    const [responseAnnouncementSecondary, setResponseAnnouncementSecondary] = useState('');
-    const [thinkingAnnouncementPrimary, setThinkingAnnouncementPrimary] = useState('');
-    const [thinkingAnnouncementSecondary, setThinkingAnnouncementSecondary] = useState('');
+    const {
+        announce: announceResponse,
+        clearAnnouncement: clearResponseAnnouncement,
+        primaryAnnouncement: responseAnnouncementPrimary,
+        secondaryAnnouncement: responseAnnouncementSecondary,
+    } = useLiveRegionAnnouncement();
+    const {
+        announce: announceThinking,
+        clearAnnouncement: clearThinkingAnnouncement,
+        primaryAnnouncement: thinkingAnnouncementPrimary,
+        secondaryAnnouncement: thinkingAnnouncementSecondary,
+    } = useLiveRegionAnnouncement();
 
     const isThinking = showLoadingMessage || messages.some((message) => message.isStreaming === true);
     const thinkingMessage = t('widget.status.thinking');
-
-    const triggerResponseAnnouncement = (text: string): void => {
-        window.clearTimeout(responseAnnouncementTimeoutRef.current);
-        setResponseAnnouncementPrimary('');
-        setResponseAnnouncementSecondary('');
-        responseAnnouncementTimeoutRef.current = window.setTimeout(() => {
-            responseAnnouncementCycleRef.current += 1;
-            const markedText = withAnnouncementMarker(text, responseAnnouncementCycleRef.current);
-            if (usePrimaryResponseSlotRef.current) {
-                setResponseAnnouncementPrimary(markedText);
-                setResponseAnnouncementSecondary('');
-            } else {
-                setResponseAnnouncementPrimary('');
-                setResponseAnnouncementSecondary(markedText);
-            }
-            usePrimaryResponseSlotRef.current = !usePrimaryResponseSlotRef.current;
-        }, 100);
-    };
-
-    const triggerThinkingAnnouncement = (): void => {
-        window.clearTimeout(thinkingAnnouncementTimeoutRef.current);
-        setThinkingAnnouncementPrimary('');
-        setThinkingAnnouncementSecondary('');
-        thinkingAnnouncementTimeoutRef.current = window.setTimeout(() => {
-            thinkingAnnouncementCycleRef.current += 1;
-            const markedText = withAnnouncementMarker(thinkingMessage, thinkingAnnouncementCycleRef.current);
-            if (usePrimaryThinkingSlotRef.current) {
-                setThinkingAnnouncementPrimary(markedText);
-                setThinkingAnnouncementSecondary('');
-            } else {
-                setThinkingAnnouncementPrimary('');
-                setThinkingAnnouncementSecondary(markedText);
-            }
-            usePrimaryThinkingSlotRef.current = !usePrimaryThinkingSlotRef.current;
-        }, 100);
-    };
 
     useEffect(() => {
         setScrollRef(OSref.current);
@@ -132,69 +95,42 @@ const ChatContent = (): JSX.Element => {
             (message) => !announcedMessageKeys.has(getMessageKey(message))
         );
 
-        if (!nextMessageToAnnounce) {
-            return;
-        }
+        if (!nextMessageToAnnounce) return;
 
         const messageKey = getMessageKey(nextMessageToAnnounce);
         const announcementText = getAnnouncementText(nextMessageToAnnounce.content);
 
-        if (!announcementText) {
-            return;
-        }
+        if (!announcementText) return;
 
         if (isThinking) {
             pendingAssistantAnnouncementRef.current = {
                 key: messageKey,
                 text: announcementText,
             };
-            setResponseAnnouncementPrimary('');
-            setResponseAnnouncementSecondary('');
+            clearResponseAnnouncement();
             return;
         }
 
         announcedMessageKeys.add(messageKey);
-        triggerResponseAnnouncement(announcementText);
-    }, [isThinking, messages]);
+        announceResponse(announcementText);
+    }, [announceResponse, clearResponseAnnouncement, isThinking, messages]);
 
     useEffect(() => {
-        if (isThinking && !previousThinkingRef.current) {
-            triggerThinkingAnnouncement();
-        }
-
-        if (!isThinking) {
-            window.clearTimeout(thinkingAnnouncementTimeoutRef.current);
-            setThinkingAnnouncementPrimary('');
-            setThinkingAnnouncementSecondary('');
-        }
+        if (isThinking && !previousThinkingRef.current) announceThinking(thinkingMessage);
+        if (!isThinking) clearThinkingAnnouncement();
 
         previousThinkingRef.current = isThinking;
-    }, [isThinking, thinkingMessage]);
+    }, [announceThinking, clearThinkingAnnouncement, isThinking, thinkingMessage]);
 
     useEffect(() => {
-        if (isThinking) {
-            window.clearTimeout(responseAnnouncementTimeoutRef.current);
-            setResponseAnnouncementPrimary('');
-            setResponseAnnouncementSecondary('');
-            return;
-        }
-
-        if (!pendingAssistantAnnouncementRef.current) {
-            return;
-        }
+        if (isThinking) return clearResponseAnnouncement();
+        if (!pendingAssistantAnnouncementRef.current) return;
 
         const deferredAnnouncement = pendingAssistantAnnouncementRef.current;
         pendingAssistantAnnouncementRef.current = null;
         announcedMessageKeysRef.current.add(deferredAnnouncement.key);
-        triggerResponseAnnouncement(deferredAnnouncement.text);
-    }, [isThinking]);
-
-    useEffect(() => {
-        return () => {
-            window.clearTimeout(responseAnnouncementTimeoutRef.current);
-            window.clearTimeout(thinkingAnnouncementTimeoutRef.current);
-        };
-    }, []);
+        announceResponse(deferredAnnouncement.text);
+    }, [announceResponse, clearResponseAnnouncement, isThinking]);
 
     return (
         <AnimatePresence initial={false}>
