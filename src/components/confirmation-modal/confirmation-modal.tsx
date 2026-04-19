@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {useSelector} from "react-redux";
 import useChatSelector from "../../hooks/use-chat-selector";
@@ -10,6 +10,7 @@ import ConfirmationModalDownload from "./confirmation-modal-download";
 import {CHAT_EVENTS} from "../../constants";
 import {ConfirmationModalStyled} from "./ConfirmationModalStyled";
 import { endChat } from "../../slices/chat-slice";
+import useFocusTrap from "../../hooks/useFocusTrap";
 
 export default function ConfirmationModal(): JSX.Element {
     const {t} = useTranslation();
@@ -25,6 +26,9 @@ export default function ConfirmationModal(): JSX.Element {
         showNps: false,
         feedback: null,
     });
+
+    const dialogRef = useRef<HTMLDialogElement>(null);
+    useFocusTrap(dialogRef, { onEscape: () => dispatch(closeConfirmationModal()) });
 
     if (!isConfirmationModelOpen) return <></>;
 
@@ -49,6 +53,7 @@ export default function ConfirmationModal(): JSX.Element {
         <ConfirmationModalStyled>
             <div className="container">
                 <dialog
+                    ref={dialogRef}
                     className="content"
                     aria-modal="true"
                     aria-labelledby={t("widget.action.close-confirmation")}

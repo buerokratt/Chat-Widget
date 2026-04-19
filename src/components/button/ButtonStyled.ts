@@ -9,8 +9,13 @@ export const ButtonStyles = styled.div<{isDisabled?: boolean}>`
         height: ${rem(40)};
         border-radius: 100px;
         border: none;
-        outline: none;
         cursor: ${props => props.isDisabled ? 'not-allowed' : 'pointer'};
+
+        &:focus-visible {
+            outline: 2px solid ${colors.primary};
+            outline-offset: 2px;
+        }
+
         text-transform: uppercase;
         font-size: ${rem(12)};
         font-weight: 700;

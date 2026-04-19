@@ -121,6 +121,11 @@ export const ChatMessageStyled = styled.div`
       filter: brightness(0.95);
     }
 
+    &:focus-visible {
+      outline: 2px solid white;
+      outline-offset: 2px;
+    }
+
     &.authenticated {
       color: gray;
       background-color: lightgray;
@@ -142,6 +147,11 @@ export const ChatMessageStyled = styled.div`
 
     &:hover {
       filter: brightness(0.95);
+    }
+
+    &:focus-visible {
+      outline: 2px solid white;
+      outline-offset: 2px;
     }
 
     &:active:not(:disabled) {

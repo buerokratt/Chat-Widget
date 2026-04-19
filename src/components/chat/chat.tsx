@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import useFocusTrap from "../../hooks/useFocusTrap";
 import { useTranslation } from "react-i18next";
 import { Resizable, ResizeCallback } from "re-resizable";
 import useChatSelector from "../../hooks/use-chat-selector";
@@ -111,6 +112,7 @@ const Chat = (): JSX.Element => {
   );
 
   const chatRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(chatRef);
   const isMobileLayout = width < 480 || height < 480;
   useEffect(() => {
     const vv = window.visualViewport;
