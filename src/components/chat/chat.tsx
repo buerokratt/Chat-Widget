@@ -353,7 +353,7 @@ const Chat = (): JSX.Element => {
   };
 
   return (
-    <ChatStyles isFullScreen={isFullScreen} style={{ transition: "none !important" }}>
+    <ChatStyles as="aside" aria-label={t("chat.landmark.label")} isFullScreen={isFullScreen} style={{ transition: "none !important" }}>
       <div className="chatWrapper">
         <Resizable
           size={isFullScreen ? { width, height } : chatDimensions}

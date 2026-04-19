@@ -106,5 +106,7 @@
   "widget.error.empty": "Tühi sõnum",
   "messageSendingFailed": "Sõnumi saatmine ebaõnnestus!",
   "sendAgain": "Saada uuesti",
-  "delete": "Kustuta"
+  "delete": "Kustuta",
+  "profile.landmark.label": "Vestlusvidin",
+  "chat.landmark.label": "Vestlusaken"
 }

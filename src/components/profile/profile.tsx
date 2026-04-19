@@ -48,7 +48,7 @@ export const Profile = (): JSX.Element => {
     };
 
     return (
-        <ProfileStyles>
+        <ProfileStyles as="aside" aria-label={t("profile.landmark.label")}>
             <ProfileStyles className="profile__wrapper">
                 <ProfileStyles>
                 <motion.button

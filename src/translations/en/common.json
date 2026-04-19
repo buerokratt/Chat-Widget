@@ -106,5 +106,7 @@
   "widget.error.empty": "Empty message",
   "messageSendingFailed": "Message sending failed!",
   "sendAgain": "Send again",
-  "delete": "Delete"
+  "delete": "Delete",
+  "profile.landmark.label": "Chat widget",
+  "chat.landmark.label": "Chat window"
 }
