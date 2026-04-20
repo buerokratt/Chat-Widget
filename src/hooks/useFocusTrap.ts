@@ -19,13 +19,14 @@ interface UseFocusTrapOptions {
   active?: boolean;
   onEscape?: () => void;
   focusFirstOnMount?: boolean;
+  returnFocusOnUnmount?: boolean;
 }
 
 function useFocusTrap(
   containerRef: RefObject<HTMLElement>,
   options: UseFocusTrapOptions = {}
 ) {
-  const { active = true, focusFirstOnMount = false } = options;
+  const { active = true, focusFirstOnMount = false, returnFocusOnUnmount = true } = options;
   const onEscapeRef = useRef(options.onEscape);
   useEffect(() => {
     onEscapeRef.current = options.onEscape;
@@ -36,6 +37,8 @@ function useFocusTrap(
 
     const container = containerRef.current;
     if (!container) return;
+
+    const previouslyFocused = document.activeElement as HTMLElement | null;
 
     if (focusFirstOnMount) {
       const elements = getFocusableElements(container);
@@ -59,7 +62,7 @@ function useFocusTrap(
       if (elements.length === 0) return;
 
       const firstEl = elements[0];
-      const lastEl = elements[elements.length - 1];
+      const lastEl = elements.at(-1)!;
       const activeEl = document.activeElement as HTMLElement;
 
       if (e.shiftKey) {
@@ -68,14 +71,20 @@ function useFocusTrap(
           lastEl.focus();
         }
       } else if (!container.contains(activeEl) || activeEl === lastEl) {
-          e.preventDefault();
-          firstEl.focus();
-        }
+        e.preventDefault();
+        firstEl.focus();
+      }
     };
 
     container.addEventListener('keydown', handleKeyDown);
-    return () => container.removeEventListener('keydown', handleKeyDown);
-  }, [active, containerRef, focusFirstOnMount]);
+
+    return () => {
+      container.removeEventListener('keydown', handleKeyDown);
+      if (returnFocusOnUnmount && previouslyFocused && typeof previouslyFocused.focus === 'function') {
+        previouslyFocused.focus();
+      }
+    };
+  }, [active, containerRef, focusFirstOnMount, returnFocusOnUnmount]);
 }
 
 export default useFocusTrap;
