@@ -50,14 +50,16 @@ export const ChatHeaderInitialStyles = styled.div`
         }
     }
 
-    .title {
+    h2.title {
         flex-direction: row;
         display: flex;
+        margin: 0;
         margin-right: 1rem;
         justify-content: center;
         font-family: ${fontTitle};
-        color: ${colors.white};
         font-size: 26px;
+        font-weight: normal;
+        color: ${colors.white};
         width: 100%;
         text-align: center;
     }
