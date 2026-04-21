@@ -1,4 +1,4 @@
-import React, { FC, Suspense, lazy, useEffect, useLayoutEffect, useState } from "react";
+import React, { FC, Suspense, lazy, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { isOfficeHours } from "./utils/office-hours-utils";
 
 const Profile = lazy(() => import("./components/profile/profile"));
@@ -236,12 +236,14 @@ const App: FC = () => {
 
   useNameAndTitleVisibility();
 
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+
   if (burokrattOnlineStatus !== true) return <></>;
   if (displayWidget && widgetConfig.isLoaded)
     return (
       <ScrollProvider>
         <Suspense fallback={null}>
-          {isChatOpen ? <Chat /> : <Profile />}
+          {isChatOpen ? <Chat triggerRef={triggerRef} /> : <Profile triggerRef={triggerRef} />}
         </Suspense>
       </ScrollProvider>
     );

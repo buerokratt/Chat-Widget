@@ -22,7 +22,6 @@ import ChatButtonGroup from "./chat-button-group";
 import ChatOptionGroup from "./chat-option-group";
 import {parseButtons, parseOptions} from "../../../utils/chat-utils";
 import useChatSelector from "../../../hooks/use-chat-selector";
-import useScreenReaderAnnouncement from "../../../hooks/use-screen-reader-announcement";
 import {useTranslation} from "react-i18next";
 import Markdownify from "./Markdownify";
 import {ChatMessageStyled} from "../ChatMessageStyled";
@@ -33,10 +32,8 @@ const AdminMessage = ({message}: { message: Message }): JSX.Element => {
     const {t} = useTranslation();
     const dispatch = useAppDispatch();
     const messageRef = useRef<HTMLDivElement>(null);
-    const screenReaderRef = useRef<HTMLDivElement>(null);
     const [isTall, setIsTall] = useState(false);
     const {nameVisibility, titleVisibility, stopTypingStream} = useChatSelector();
-    useScreenReaderAnnouncement(message, screenReaderRef);
 
     const setNewFeedbackRating = (newRating: string): void => {
         const updatedMessage = {
@@ -82,20 +79,8 @@ const AdminMessage = ({message}: { message: Message }): JSX.Element => {
         [message.authorFirstName, message.authorLastName]);
 
     return (
-      <motion.div ref={messageRef}>
+      <motion.div ref={messageRef} aria-live="off">
         <div hidden={message.content?.startsWith("$")}>
-          <div
-            ref={screenReaderRef}
-            aria-live="polite"
-            aria-atomic="false"
-            style={{
-              position: "absolute",
-              left: "-10000px",
-              width: "0.1px",
-              height: "0.1px",
-              overflow: "hidden",
-            }}
-          />
           <ChatMessageStyled className={messageClass}>
             {nameVisibility && csaName && message.event != CHAT_EVENTS.GREETING && (
               <div className="name">{csaName}</div>
@@ -116,11 +101,6 @@ const AdminMessage = ({message}: { message: Message }): JSX.Element => {
                   <SmoothStreamingMessage
                     message={message.content ?? ""}
                     isStreaming={message.isStreaming}
-                    onChange={(_) => {
-                      if (stopTypingStream === false && message.isStreaming != undefined) {
-                        setTimeout(() => dispatch(setTypingStream(true)), 0);
-                      }
-                    }}
                     onStopRequest={(displayedText) => {
                       const updatedMessage = { ...message, isStreaming: undefined, content: displayedText };
                       if (updatedMessage.id) {
@@ -151,6 +131,7 @@ const AdminMessage = ({message}: { message: Message }): JSX.Element => {
                           );
                         }
                         setTimeout(() => {
+                          dispatch(updateMessage(updatedMessage));
                           dispatch(setTypingStream(false));
                           dispatch(setStopTypingStream(false));
                         }, 0);

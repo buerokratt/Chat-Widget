@@ -101,6 +101,7 @@
   "widget.time.minute": "minut",
   "widget.action.restartChat": "Alustage uut vestlust",
   "widget.action.continueChat": "Jätka praegust vestlust",
+  "widget.status.thinking": "Bürokratt mõtleb",
   "widget.error.botError": "Vabandame, vestlus katkes tehniliste probleemide tõttu.",
   "widget.error.technicalProblems": "Vabandame, tekkisid tehnilised probleemid",
   "widget.error.technicalProblemsTryAgain": "Vabandame, tekkisid tehnilised probleemid. Proovige hiljem uuesti!",

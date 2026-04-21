@@ -1,10 +1,11 @@
+import {FC, useRef} from "react";
 import {useTranslation} from 'react-i18next';
 import Button from '../button/button';
 import {useAppDispatch} from '../../store';
 import {setIdleChat} from '../../slices/chat-slice';
 import {customJwtExtend} from '../../slices/authentication-slice';
 import {IdleChatNotificationStyled} from "./IdleChatNotificationStyled";
-import {FC} from "react";
+import useFocusTrap from "../../hooks/useFocusTrap";
 
 interface IdleChatNotificationProps {
     customMessage?: string;
@@ -14,11 +15,18 @@ interface IdleChatNotificationProps {
 const IdleChatNotification: FC<IdleChatNotificationProps> = ({customMessage}) => {
     const {t} = useTranslation();
     const dispatch = useAppDispatch();
+    const dialogRef = useRef<HTMLDialogElement>(null);
+    const dismissIdle = () => {
+        dispatch(setIdleChat({ isIdle: false, lastActive: new Date().getTime() }));
+        dispatch(customJwtExtend());
+    };
+    useFocusTrap(dialogRef, { focusFirstOnMount: true, onEscape: dismissIdle });
 
     return (
         <IdleChatNotificationStyled>
             <div className="byk_container">
                 <dialog
+                    ref={dialogRef}
                     className="byk_content"
                     aria-modal="true"
                     aria-labelledby={t("notifications.idle-chat-notification")}
