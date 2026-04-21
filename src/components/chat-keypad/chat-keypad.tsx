@@ -367,7 +367,12 @@ const ChatKeyPad = (): JSX.Element => {
           <>
             <button
               key={isTypingStream ? "stop" : "send"}
-              onKeyDown={handleSendStopButtonClick}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleSendStopButtonClick();
+                }
+              }}
               onClick={handleSendStopButtonClick}
               className="button"
               title={t(isTypingStream ? "keypad.button.stop-stream" : "keypad.button.label")}

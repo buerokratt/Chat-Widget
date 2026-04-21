@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {MutableRefObject, useEffect, useState} from "react";
 import {motion} from "framer-motion";
 import {useTranslation} from "react-i18next";
 import {setIsChatOpen} from "../../slices/chat-slice";
@@ -11,7 +11,11 @@ import {ProfileStyles} from "./ProfileStyles";
 import { LOCAL_STORAGE_INSTANTLY_OPEN_CHAT_WIDGET_KEY } from "../../constants";
 import useChatSelector from "../../hooks/use-chat-selector";
 
-export const Profile = (): JSX.Element => {
+interface ProfileProps {
+    triggerRef?: MutableRefObject<HTMLButtonElement | null>;
+}
+
+export const Profile = ({ triggerRef }: ProfileProps): JSX.Element => {
     const {t} = useTranslation();
     const dispatch = useAppDispatch();
     const {widgetConfig} = useWidgetSelector();
@@ -52,6 +56,7 @@ export const Profile = (): JSX.Element => {
             <ProfileStyles className="profile__wrapper">
                 <ProfileStyles>
                 <motion.button
+                    ref={triggerRef}
                     className={`profile ${getActiveProfileClass()}`}
                     variants={variants}
                     initial="initial"
