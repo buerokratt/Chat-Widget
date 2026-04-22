@@ -1,9 +1,10 @@
+import {FC, useRef} from "react";
 import {useTranslation} from 'react-i18next';
 import Button from '../button/button';
 import {useAppDispatch} from '../../store';
 import {resetChatState, resetState, setChatId, setIdleChat, setIsChatOpen} from '../../slices/chat-slice';
 import {PostChatMessageStyled} from "./PostChatMessageStyled";
-import {FC} from "react";
+import useFocusTrap from "../../hooks/useFocusTrap";
 
 interface PostChatMessageProps {
     customMessage?: string;
@@ -13,11 +14,14 @@ interface PostChatMessageProps {
 const PostChatMessage: FC<PostChatMessageProps> = ({customMessage}) => {
     const {t} = useTranslation();
     const dispatch = useAppDispatch();
+    const dialogRef = useRef<HTMLDialogElement>(null);
+    useFocusTrap(dialogRef, { focusFirstOnMount: true });
 
     return (
         <PostChatMessageStyled>
             <div className="byk_container">
                 <dialog
+                    ref={dialogRef}
                     className="byk_content"
                     aria-modal="true"
                     aria-labelledby={t("notifications.post-chat-notification")}

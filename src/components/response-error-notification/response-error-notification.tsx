@@ -1,3 +1,4 @@
+import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 import Button from "../button/button";
 import {useAppDispatch} from "../../store";
@@ -5,16 +6,22 @@ import {endChat, resetState, setShowErrorMessage} from "../../slices/chat-slice"
 import useChatSelector from "../../hooks/use-chat-selector";
 import {CHAT_EVENTS} from "../../constants";
 import {ResponseErrorNotificationStyles} from "./ResponseErrorNotificationStyled";
+import useFocusTrap from "../../hooks/useFocusTrap";
 
 const ResponseErrorNotification = () => {
     const {t} = useTranslation();
     const dispatch = useAppDispatch();
     const {chatId, responseErrorMessage} = useChatSelector();
+    const dialogRef = useRef<HTMLDialogElement>(null);
+    useFocusTrap(dialogRef, {
+        focusFirstOnMount: true,
+        onEscape: () => dispatch(setShowErrorMessage(false)),
+    });
 
     return (
         <ResponseErrorNotificationStyles>
             <div className="container">
-                <dialog className="content" aria-modal="true"
+                <dialog ref={dialogRef} className="content" aria-modal="true"
                         aria-labelledby={t("notifications.idle-chat-notification")}>
                     <h2 className="title">
                         {t(responseErrorMessage.length > 0 ? responseErrorMessage : "widget.error.technicalProblems")}

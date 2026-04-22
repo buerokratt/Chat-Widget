@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { memo, MutableRefObject, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import useFocusTrap from "../../hooks/useFocusTrap";
 import { useTranslation } from "react-i18next";
 import { Resizable, ResizeCallback } from "re-resizable";
 import useChatSelector from "../../hooks/use-chat-selector";
@@ -25,8 +26,10 @@ import {
   sendNewMessage,
   setChatDimensions,
   setIdleChat,
+  setIsChatOpen,
   setIsFeedbackConfirmationShown,
 } from "../../slices/chat-slice";
+import { showConfirmationModal } from "../../slices/widget-slice";
 import WarningNotification from "../warning-notification/warning-notification";
 import ChatFeedback from "../chat-feedback/chat-feedback";
 import ChatFeedbackConfirmation from "../chat-feedback/chat-feedback-confirmation";
@@ -68,7 +71,11 @@ const RESIZE_HANDLE_COMPONENTS = {
   ),
 };
 
-const Chat = (): JSX.Element => {
+interface ChatProps {
+  triggerRef?: MutableRefObject<HTMLButtonElement | null>;
+}
+
+const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
   const dispatch = useAppDispatch();
   const [showWidgetDetails, setShowWidgetDetails] = useState(false);
   const [showFeedbackResult, setShowFeedbackResult] = useState(false);
@@ -106,11 +113,25 @@ const Chat = (): JSX.Element => {
 
   const [isFocused, setIsFocused] = useState(true);
 
-  const { burokrattOnlineStatus, showConfirmationModal } = useAppSelector(
+  const { burokrattOnlineStatus, showConfirmationModal: isConfirmationModalVisible } = useAppSelector(
     (state) => state.widget
   );
 
+  const handleEscape = useCallback(() => {
+    if (chatId) {
+      dispatch(showConfirmationModal());
+    } else {
+      dispatch(setIsChatOpen(false));
+    }
+  }, [chatId, dispatch]);
+
   const chatRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(chatRef, { focusFirstOnMount: true, onEscape: handleEscape, returnFocusOnUnmount: false });
+
+  useEffect(() => {
+    return () => { triggerRef?.current?.focus(); };
+  }, []);
+  const dialogAnnouncementRef = useRef<HTMLDivElement>(null);
   const isMobileLayout = width < 480 || height < 480;
   useEffect(() => {
     const vv = window.visualViewport;
@@ -248,7 +269,7 @@ const Chat = (): JSX.Element => {
   }, [
     idleChat.isIdle,
     messages,
-    showConfirmationModal,
+    isConfirmationModalVisible,
     isChatEnded,
     feedback.isFeedbackConfirmationShown,
     checkIdleWarning,
@@ -328,6 +349,18 @@ const Chat = (): JSX.Element => {
   useReloadChatEndEffect();
 
   useEffect(() => {
+    const ref = dialogAnnouncementRef.current;
+    if (!ref) return;
+    ref.textContent = '';
+    const timeoutId = setTimeout(() => {
+      if (dialogAnnouncementRef.current) {
+        dialogAnnouncementRef.current.textContent = t('widget.dialog.label');
+      }
+    }, 100);
+    return () => clearTimeout(timeoutId);
+  }, []);
+
+  useEffect(() => {
     if (
       isTabActive &&
       isFocused &&
@@ -354,6 +387,12 @@ const Chat = (): JSX.Element => {
 
   return (
     <ChatStyles as="aside" aria-label={t("chat.landmark.label")} isFullScreen={isFullScreen} style={{ transition: "none !important" }}>
+      <div
+        ref={dialogAnnouncementRef}
+        aria-live="assertive"
+        aria-atomic="true"
+        style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', border: 0 }}
+      />
       <div className="chatWrapper">
         <Resizable
           size={isFullScreen ? { width, height } : chatDimensions}
@@ -371,6 +410,9 @@ const Chat = (): JSX.Element => {
             animate={{ y: 0 }}
             style={{ y: 400 }}
             ref={chatRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('widget.dialog.label')}
           >
             <ChatHeader
               isDetailSelected={showWidgetDetails}

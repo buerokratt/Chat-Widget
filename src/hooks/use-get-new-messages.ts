@@ -10,6 +10,7 @@ import {
   handleStateChangingEventMessages,
   sendNewLlmMessage,
   setShowLoadingMessage,
+  setTypingStream,
   updateStreamingMessage,
 } from "../slices/chat-slice";
 import {
@@ -68,6 +69,7 @@ const useGetNewMessages = (): void => {
           currentStreamId.current = data.streamId;
           currentStreamUuid.current = uuidv4();
           currentStreamStartTime.current = new Date().toISOString();
+          dispatch(setTypingStream(true));
         } else if (type === "stream_chunk" && data.channelId === chatId) {
           currentStreamContent.current += data.content;
 
@@ -98,6 +100,7 @@ const useGetNewMessages = (): void => {
           };
 
           dispatch(updateStreamingMessage(finalMessage));
+          dispatch(setTypingStream(false));
 
           currentStreamContent.current = "";
           currentStreamId.current = "";
@@ -105,6 +108,7 @@ const useGetNewMessages = (): void => {
           currentStreamStartTime.current = "";
         } else if (type === "stream_error" && data.channelId === chatId) {
           dispatch(clearStreamingMessage(data.channelId));
+          dispatch(setTypingStream(false));
           currentStreamContent.current = "";
           currentStreamId.current = "";
           currentStreamUuid.current = "";
@@ -122,6 +126,7 @@ const useGetNewMessages = (): void => {
             authorTimestamp: currentTime,
           };
           setTimeout(() => { dispatch(setShowLoadingMessage(false)); }, 0);
+          dispatch(setTypingStream(false));
           dispatch(addMessagesToDisplay([message]));
           dispatch(sendNewLlmMessage({ message, context: data.context, uuid }));
         }
@@ -133,6 +138,7 @@ const useGetNewMessages = (): void => {
       events?.close();
       if (currentStreamId.current) {
         dispatch(clearStreamingMessage(currentStreamId.current));
+        dispatch(setTypingStream(false));
       }
     };
   }, [sseUrl]);
