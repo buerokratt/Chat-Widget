@@ -386,7 +386,7 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
   };
 
   return (
-    <ChatStyles isFullScreen={isFullScreen} style={{ transition: "none !important" }}>
+    <ChatStyles as="aside" aria-label={t("chat.landmark.label")} isFullScreen={isFullScreen} style={{ transition: "none !important" }}>
       <div
         ref={dialogAnnouncementRef}
         aria-live="assertive"
