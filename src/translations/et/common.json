@@ -85,12 +85,15 @@
   "widget.action.yes-no-answer": "Jah, vastuseta",
   "widget.action.no-dont-close": "Ei soovi sulgeda",
   "widget.action.skip": "Jäta vahele",
+  "widget.action.close": "Sulge",
   "widget.action.confirm": "Kinnita",
   "widget.action.continue": "Jätka",
   "widget.action.download-chat": "Laadi vestlus alla",
   "widget.action.forward-chat": "Edasta vestlus e-posti",
   "widget.action.forward-email": "Teie e-posti aadress",
   "widget.action.select": "Valige üks järgmistest valikutest:",
+  "widget.action.readMore": "Loe rohkem",
+  "widget.action.showLess": "Näita vähem",
   "widget.form.phone": "Teie telefon",
   "widget.form.email": "Teie e-posti aadress",
   "widget.form.message": "Täpsustage siin oma küsimust",
@@ -108,5 +111,7 @@
   "widget.error.empty": "Tühi sõnum",
   "messageSendingFailed": "Sõnumi saatmine ebaõnnestus!",
   "sendAgain": "Saada uuesti",
-  "delete": "Kustuta"
+  "delete": "Kustuta",
+  "profile.landmark.label": "Vestlusvidin",
+  "chat.landmark.label": "Vestlusaken"
 }

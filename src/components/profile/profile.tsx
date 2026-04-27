@@ -52,7 +52,7 @@ export const Profile = ({ triggerRef }: ProfileProps): JSX.Element => {
     };
 
     return (
-        <ProfileStyles>
+        <ProfileStyles as="aside" aria-label={t("profile.landmark.label")}>
             <ProfileStyles className="profile__wrapper">
                 <ProfileStyles>
                 <motion.button

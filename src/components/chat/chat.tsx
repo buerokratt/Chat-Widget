@@ -51,6 +51,7 @@ import ResizeHandleIcon from "../../static/icons/resize-handle.svg";
 import useWidgetSelector from "../../hooks/use-widget-selector";
 import PostChatMessage from "../post-chat-message/post-chat-message";
 import { format } from "date-fns";
+import EmergencyNotice from "../emergency-notice/emergency-notice";
 
 const RESIZABLE_HANDLES = {
   topLeft: true,
@@ -386,7 +387,7 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
   };
 
   return (
-    <ChatStyles isFullScreen={isFullScreen} style={{ transition: "none !important" }}>
+    <ChatStyles as="aside" aria-label={t("chat.landmark.label")} isFullScreen={isFullScreen} style={{ transition: "none !important" }}>
       <div
         ref={dialogAnnouncementRef}
         aria-live="assertive"
@@ -420,10 +421,7 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
             />
             {widgetConfig.showSubTitle === true && <div className="sub-title">{widgetConfig.subTitle}</div>}
             {showEmergencyNotice && emergencyNotice && (
-              <div className="emergency-notice">
-                <div className="emergency-notice-icon">!</div>
-                <span className="emergency-notice-text">{emergencyNotice.text}</span>
-              </div>
+              <EmergencyNotice text={emergencyNotice.text} />
             )}
             {messageQueue.length >= 5 && <WarningNotification warningMessage={t("chat.error-message")} />}
             {burokrattOnlineStatus !== true && <OnlineStatusNotification />}
