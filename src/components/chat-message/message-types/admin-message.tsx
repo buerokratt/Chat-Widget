@@ -80,7 +80,7 @@ const AdminMessage = ({message}: { message: Message }): JSX.Element => {
 
     return (
       <motion.div ref={messageRef} aria-live="off">
-        <div hidden={message.content?.startsWith("$")}>
+        <div hidden={message.content?.trimStart().startsWith("$")}>
           <ChatMessageStyled className={messageClass}>
             {nameVisibility && csaName && message.event != CHAT_EVENTS.GREETING && (
               <div className="name">{csaName}</div>
