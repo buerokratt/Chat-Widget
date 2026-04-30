@@ -28,6 +28,7 @@ const SmoothStreamingMessage: React.FC<SmoothStreamingMessageProps> = ({
   const typewriterInterval = useRef<NodeJS.Timeout | null>(null);
   const previousMessage = useRef("");
   const isNewStream = useRef(true);
+  const streamCompleteNotified = useRef(false);
   const typingSpeed = window._env_.STREAM_TYPING_SPEED ?? 30;
   const { scrollToBottom, resetAutoScroll } = useScroll();
   const { stopTypingStream } = useChatSelector();
@@ -70,6 +71,12 @@ const SmoothStreamingMessage: React.FC<SmoothStreamingMessageProps> = ({
   useEffect(() => {
     if (!isStreaming) {
       isNewStream.current = true;
+    }
+  }, [isStreaming]);
+
+  useEffect(() => {
+    if (isStreaming) {
+      streamCompleteNotified.current = false;
     }
   }, [isStreaming]);
 
@@ -129,16 +136,18 @@ const SmoothStreamingMessage: React.FC<SmoothStreamingMessageProps> = ({
   }, [isStreaming, batchSize, typingSpeed, scrollToBottom, stopTypingStream]);
 
   useEffect(() => {
-    if (!stopTypingStream) {
-      if (!isStreaming && displayedText.length === message.length && typewriterInterval.current) {
-        clearInterval(typewriterInterval.current);
-        typewriterInterval.current = null;
-        onComplete?.();
-      } else {
-        onChange?.(displayedText);
-      }
+    if (stopTypingStream) {
+      return;
     }
-  }, [isStreaming, displayedText.length, message.length, stopTypingStream]);
+    if (!isStreaming && displayedText.length === message.length) {
+      if (!streamCompleteNotified.current) {
+        streamCompleteNotified.current = true;
+        onComplete?.();
+      }
+      return;
+    }
+    onChange?.(displayedText);
+  }, [isStreaming, displayedText, message.length, stopTypingStream, onChange, onComplete]);
 
   useEffect(() => {
     return () => {

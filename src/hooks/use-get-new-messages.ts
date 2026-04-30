@@ -100,7 +100,6 @@ const useGetNewMessages = (): void => {
           };
 
           dispatch(updateStreamingMessage(finalMessage));
-          dispatch(setTypingStream(false));
 
           currentStreamContent.current = "";
           currentStreamId.current = "";
