@@ -19,4 +19,6 @@ export interface WidgetConfigResponse {
   instantlyOpenChatWidget: string;
   showSubTitle: string;
   subTitle: string;
+  responseWaitingTime: string;
+  responseProcessingNotice: string;
 }

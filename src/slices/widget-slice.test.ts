@@ -37,6 +37,8 @@ const initialState: WidgetState = {
     instantlyOpenChatWidget: null,
     showSubTitle: null,
     subTitle: null,
+    responseWaitingTime: 0,
+    responseProcessingNotice: "",
   },
   chatId: null,
 };
