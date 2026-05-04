@@ -4,6 +4,7 @@ import RobotIcon from "../../../static/icons/buerokratt.svg";
 import { LoadingAnimationStyles } from "../LoadingAnimationStyled";
 import { ChatMessageStyled } from "../ChatMessageStyled";
 import useWidgetSelector from "../../../hooks/use-widget-selector";
+import BouncingLoader from "./bouncing-loader";
 
 const LoadingMessage = (): JSX.Element => {
   const { widgetConfig } = useWidgetSelector();
@@ -34,11 +35,7 @@ const LoadingMessage = (): JSX.Element => {
                   {showProcessingNotice ? (
                     <p className="processing-notice">{responseProcessingNotice}</p>
                   ) : (
-                    <div className="bouncing-loader">
-                      <div></div>
-                      <div></div>
-                      <div></div>
-                    </div>
+                    <BouncingLoader />
                   )}
                 </LoadingAnimationStyles>
               </div>
