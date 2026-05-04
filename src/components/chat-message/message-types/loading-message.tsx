@@ -4,7 +4,7 @@ import RobotIcon from "../../../static/icons/buerokratt.svg";
 import { LoadingAnimationStyles } from "../LoadingAnimationStyled";
 import { ChatMessageStyled } from "../ChatMessageStyled";
 import useWidgetSelector from "../../../hooks/use-widget-selector";
-import BouncingLoader from "./bouncing-loader";
+import BouncingLoader from "../../bouncing-loader";
 
 const LoadingMessage = (): JSX.Element => {
   const { widgetConfig } = useWidgetSelector();
