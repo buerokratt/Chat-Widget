@@ -41,11 +41,13 @@ const getAnnouncementText = (content?: string): string => {
         .trim();
 };
 
+const isHiddenAdminMessageContent = (content?: string): boolean => content?.trimStart().startsWith("$") ?? false;
+
 const isAnnounceableAssistantMessage = (message: Message): boolean =>
     message.authorRole !== undefined &&
     message.authorRole !== AUTHOR_ROLES.END_USER &&
     message.isStreaming !== true &&
-    !message.content?.startsWith('$') &&
+    !isHiddenAdminMessageContent(message.content) &&
     getAnnouncementText(message.content).length > 0;
 
 const ChatContent = (): JSX.Element => {
@@ -70,7 +72,20 @@ const ChatContent = (): JSX.Element => {
         secondaryAnnouncement: thinkingAnnouncementSecondary,
     } = useLiveRegionAnnouncement();
 
-    const isThinking = showLoadingMessage || messages.some((message) => message.isStreaming === true);
+    const listMessages = messages.filter(
+        (m) => !(m.id === 'estimatedWaiting' && m.content === 'hidden'),
+    );
+    const lastListMessage = listMessages[listMessages.length - 1];
+    const isAwaitingHiddenMessageContent =
+        lastListMessage != null &&
+        lastListMessage.authorRole !== AUTHOR_ROLES.END_USER &&
+        isHiddenAdminMessageContent(lastListMessage.content);
+
+    const isThinking =
+        showLoadingMessage ||
+        messages.some((message) => message.isStreaming === true) ||
+        isAwaitingHiddenMessageContent;
+    const hasStreamingMessage = messages.some((message) => message.isStreaming !== undefined);
     const thinkingMessage = t('widget.status.thinking');
 
     useEffect(() => {
@@ -183,7 +198,8 @@ const ChatContent = (): JSX.Element => {
                                 />
                             );
                         })}
-                        {isThinking && !messages.some((message) => message.isStreaming !== undefined) && <LoadingMessage/>}
+                        {isThinking &&
+                            (!hasStreamingMessage || isAwaitingHiddenMessageContent) && <LoadingMessage/>}
                     </div>
                 </OverlayScrollbarsComponent>
             </ChatContentStyles>
@@ -192,3 +208,4 @@ const ChatContent = (): JSX.Element => {
 };
 
 export default ChatContent;
+

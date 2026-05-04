@@ -51,6 +51,8 @@ describe("Confirmation modal component", () => {
             instantlyOpenChatWidget: null,
             showSubTitle: null,
             subTitle: null,
+            responseWaitingTime: 0,
+            responseProcessingNotice: "",
           },
           chatId: null,
         },

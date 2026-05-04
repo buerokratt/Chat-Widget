@@ -38,6 +38,8 @@ export interface WidgetState {
     instantlyOpenChatWidget?: boolean | null;
     showSubTitle?: boolean | null;
     subTitle?: string | null;
+    responseWaitingTime: number;
+    responseProcessingNotice: string;
   };
   chatId?: string | null;
 }
@@ -68,6 +70,8 @@ const initialState: WidgetState = {
     instantlyOpenChatWidget: null,
     showSubTitle: null,
     subTitle: null,
+    responseWaitingTime: 0,
+    responseProcessingNotice: '',
   },
   chatId: null,
 };
@@ -151,7 +155,9 @@ export const widgetSlice = createSlice({
         action.payload?.instantlyOpenChatWidget === "true";
       state.widgetConfig.showSubTitle =
         action.payload?.showSubTitle === "true";
-      state.widgetConfig.subTitle = action.payload?.subTitle ?? "";  
+      state.widgetConfig.subTitle = action.payload?.subTitle ?? "";
+      state.widgetConfig.responseWaitingTime = parseInt(action.payload?.responseWaitingTime ?? '0') || 0;
+      state.widgetConfig.responseProcessingNotice = action.payload?.responseProcessingNotice ?? '';
       if (
         state.chatId != null &&
         state.widgetConfig.isBurokrattActive === false
