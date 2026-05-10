@@ -365,6 +365,7 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
     if (
       isTabActive &&
       isFocused &&
+      !isChatEnded &&
       messages.length > 0 &&
       !messages[messages.length - 1].event &&
       messages[messages.length - 1].authorRole === AUTHOR_ROLES.BACKOFFICE_USER
