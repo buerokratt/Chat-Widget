@@ -55,7 +55,7 @@ class ChatService {
   }
 
   redirectToBackoffice(message: Message, holidays: string[], holidayNames: string): Promise<Document> {
-    return http.post(RUUTER_ENDPOINTS.REDIRECT_TO_BACKOFFICE, { message, holidays, holidayNames });
+    return http.post(RUUTER_ENDPOINTS.REDIRECT_TO_BACKOFFICE, { message, holidays, holidayNames, domain: getMultiDomainPath() });
   }
 
   getMessages(chatId: string): Promise<Message[]> {
