@@ -25,8 +25,8 @@ const LoadingMessage = (): JSX.Element => {
     <motion.div aria-hidden="true">
       <ChatMessageStyled className="admin">
         <div className="message">
-          <div className="main">
-            <div className="icon">
+          <div className="message-main">
+            <div className="message-icon">
               <img src={RobotIcon} alt="Robot icon" />
             </div>
             <div>
