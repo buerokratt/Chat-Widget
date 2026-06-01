@@ -88,8 +88,8 @@ const AdminMessage = ({message}: { message: Message }): JSX.Element => {
             {titleVisibility && message.csaTitle && message.event != CHAT_EVENTS.GREETING && (
               <div className="name">{message.csaTitle}</div>
             )}
-            <div className="main">
-              <div className="icon">
+            <div className="message-main">
+              <div className="message-icon">
                 {message.event === CHAT_EVENTS.EMERGENCY_NOTICE ? (
                   <div className="emergency">!</div>
                 ) : (

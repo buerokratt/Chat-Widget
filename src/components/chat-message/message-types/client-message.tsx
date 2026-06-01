@@ -48,7 +48,7 @@ const ClientMessage = (props: {
             >
                 <div>
                     <ChatMessageStyled className={messageClass}>
-                        <div className="icon">
+                        <div className="message-icon">
                             <img src={PersonIcon} alt="Person icon"/>
                         </div>
                         <div className="content file">
