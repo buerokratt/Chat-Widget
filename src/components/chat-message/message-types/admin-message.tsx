@@ -20,7 +20,7 @@ import {
 import {useAppDispatch} from "../../../store";
 import ChatButtonGroup from "./chat-button-group";
 import ChatOptionGroup from "./chat-option-group";
-import {parseButtons, parseOptions} from "../../../utils/chat-utils";
+import {filterDocReferences, parseButtons, parseOptions} from "../../../utils/chat-utils";
 import useChatSelector from "../../../hooks/use-chat-selector";
 import {useTranslation} from "react-i18next";
 import Markdownify from "./Markdownify";
@@ -139,7 +139,7 @@ const AdminMessage = ({message}: { message: Message }): JSX.Element => {
                     }}
                   />
                 ) : (
-                  <Markdownify message={message.content ?? ""} />
+                  <Markdownify message={filterDocReferences(message.content ?? "")} />
                 )}
                 {!message.content &&
                   (hasOptions || hasButtons ? t("widget.action.select") : <i>{t("widget.error.empty")}</i>)}
