@@ -2,6 +2,8 @@ import { AUTHOR_ROLES, CHAT_EVENTS, CHAT_MODES } from "../constants";
 import { Message, MessageButton } from "../model/message-model";
 import { EndUserContacts } from "../slices/chat-slice";
 
+export const filterDocReferences = (text: string): string => text.replaceAll(/\[do?c?\s*\d*\s*\]?/g, "");
+
 export const parseButtons = (message: Message): MessageButton[] => {
   try {
     if(!message?.buttons || message.buttons === '')

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import Markdownify from "./Markdownify";
 import { useScroll } from "../../../contexts/ScrollContext";
 import useChatSelector from "../../../hooks/use-chat-selector";
+import { filterDocReferences } from "../../../utils/chat-utils";
 
 interface SmoothStreamingMessageProps {
   message: string;
@@ -32,8 +33,6 @@ const SmoothStreamingMessage: React.FC<SmoothStreamingMessageProps> = ({
   const typingSpeed = window._env_.STREAM_TYPING_SPEED ?? 30;
   const { scrollToBottom, resetAutoScroll } = useScroll();
   const { stopTypingStream } = useChatSelector();
-  const filterDocReferences = (text: string): string => text.replaceAll(/\[do?c?\s*\d*\s*\]?/g, "");
-
   useEffect(() => {
     if (!stopTypingStream) {
       if (isNewStream.current || !message.startsWith(previousMessage.current)) {
