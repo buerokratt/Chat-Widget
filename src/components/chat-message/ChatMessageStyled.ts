@@ -81,7 +81,7 @@ export const ChatMessageStyled = styled.div`
     }
   }
 
-  .icon {
+  .message-icon {
     display: flex;
     width: 2.8em;
     height: 2.8em;
@@ -121,6 +121,11 @@ export const ChatMessageStyled = styled.div`
       filter: brightness(0.95);
     }
 
+    &:focus-visible {
+      outline: 2px solid white;
+      outline-offset: 2px;
+    }
+
     &.authenticated {
       color: gray;
       background-color: lightgray;
@@ -142,6 +147,11 @@ export const ChatMessageStyled = styled.div`
 
     &:hover {
       filter: brightness(0.95);
+    }
+
+    &:focus-visible {
+      outline: 2px solid white;
+      outline-offset: 2px;
     }
 
     &:active:not(:disabled) {
@@ -246,7 +256,7 @@ export const ChatMessageStyled = styled.div`
       padding-left: 3.4em;
     }
 
-    .main {
+    .message-main {
       display: flex;
       align-items: flex-start;
 
@@ -262,7 +272,7 @@ export const ChatMessageStyled = styled.div`
         background-color: ${colors.white};
       }
 
-      .icon {
+      .message-icon {
         padding-right: 0.5em;
 
         .emergency {
@@ -325,7 +335,7 @@ export const ChatMessageStyled = styled.div`
       }
     }
 
-    .icon {
+    .message-icon {
       padding-left: 0.5em;
     }
 

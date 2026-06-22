@@ -87,7 +87,7 @@ const ChatMessage = (props: { message: Message, previousMessage?: Message }): JS
       if (authorRole === AUTHOR_ROLES.END_USER) {
         return <ClientMessage message={message} />;
       } else {
-        return <AdminMessage aria-live="polite" message={message} />;
+        return <AdminMessage message={message} />;
       }
   }
 };

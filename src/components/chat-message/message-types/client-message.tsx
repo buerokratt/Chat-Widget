@@ -44,10 +44,11 @@ const ClientMessage = (props: {
         return (
             <motion.div
                 ref={messageRef}
+                aria-live="off"
             >
                 <div>
                     <ChatMessageStyled className={messageClass}>
-                        <div className="icon">
+                        <div className="message-icon">
                             <img src={PersonIcon} alt="Person icon"/>
                         </div>
                         <div className="content file">
@@ -66,6 +67,7 @@ const ClientMessage = (props: {
     return (
         <motion.div
             ref={messageRef}
+            aria-live="off"
         >
             <div>
                 <ChatMessageStyled className={messageClass}>
@@ -73,7 +75,7 @@ const ClientMessage = (props: {
                         <img src={PersonIcon} alt="Person icon"/>
                     </div>
                     <div className={classNames("content", {clientTallContent: isTall})}>
-                        <Markdownify message={content ?? ""} sanitizeLinks/>
+                        <Markdownify message={content ?? ""} isClientMessage={true} sanitizeLinks />
                     </div>
                 </ChatMessageStyled>
                 {!props.message?.id &&

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {MutableRefObject, useEffect, useState} from "react";
 import {motion} from "framer-motion";
 import {useTranslation} from "react-i18next";
 import {setIsChatOpen} from "../../slices/chat-slice";
@@ -6,18 +6,28 @@ import Buerokratt from "../../static/icons/buerokratt.svg";
 import {useAppDispatch} from "../../store";
 import useWidgetSelector from "../../hooks/use-widget-selector";
 import useReloadChatEndEffect from "../../hooks/use-reload-chat-end-effect";
-import {getFromLocalStorage} from "../../utils/local-storage-utils";
+import {getFromLocalStorage, setToLocalStorage} from "../../utils/local-storage-utils";
 import {ProfileStyles} from "./ProfileStyles";
+import { LOCAL_STORAGE_INSTANTLY_OPEN_CHAT_WIDGET_KEY } from "../../constants";
+import useChatSelector from "../../hooks/use-chat-selector";
 
-export const Profile = (): JSX.Element => {
+interface ProfileProps {
+    triggerRef?: MutableRefObject<HTMLButtonElement | null>;
+}
+
+export const Profile = ({ triggerRef }: ProfileProps): JSX.Element => {
     const {t} = useTranslation();
     const dispatch = useAppDispatch();
     const {widgetConfig} = useWidgetSelector();
     const [delayFinished, setDelayFinished] = useState(false);
     const newMessagesAmount = getFromLocalStorage("newMessagesAmount");
+    const { chatId } = useChatSelector();
 
     const openChat = () => {
         dispatch(setIsChatOpen(true));
+        if (!chatId) {
+           setToLocalStorage(LOCAL_STORAGE_INSTANTLY_OPEN_CHAT_WIDGET_KEY, true); 
+        }
     };
 
     const variants = {
@@ -42,10 +52,11 @@ export const Profile = (): JSX.Element => {
     };
 
     return (
-        <ProfileStyles>
+        <ProfileStyles as="aside" aria-label={t("profile.landmark.label")}>
             <ProfileStyles className="profile__wrapper">
                 <ProfileStyles>
                 <motion.button
+                    ref={triggerRef}
                     className={`profile ${getActiveProfileClass()}`}
                     variants={variants}
                     initial="initial"

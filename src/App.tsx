@@ -1,7 +1,8 @@
-import React, { FC, useEffect, useLayoutEffect, useState } from "react";
+import React, { FC, Suspense, lazy, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { isOfficeHours } from "./utils/office-hours-utils";
-import Profile from "./components/profile/profile";
-import Chat from "./components/chat/chat";
+
+const Profile = lazy(() => import("./components/profile/profile"));
+const Chat = lazy(() => import("./components/chat/chat"));
 import useChatSelector from "./hooks/use-chat-selector";
 import useInterval from "./hooks/use-interval";
 import {
@@ -12,6 +13,7 @@ import {
   ONLINE_CHECK_INTERVAL_ACTIVE_CHAT,
   EXTEND_JWT_COOKIE_IN_MS,
   CHAT_SESSIONS,
+  LOCAL_STORAGE_INSTANTLY_OPEN_CHAT_WIDGET_KEY,
 } from "./constants";
 import {
   getChat,
@@ -30,10 +32,10 @@ import { getWidgetConfig } from "./slices/widget-slice";
 import useWidgetSelector from "./hooks/use-widget-selector";
 import useGetEmergencyNotice from "./hooks/use-get-emergency-notice";
 import { customJwtExtend } from "./slices/authentication-slice";
-import { getFromLocalStorage } from "./utils/local-storage-utils";
+import { getFromLocalStorage, setToLocalStorage } from "./utils/local-storage-utils";
 import useNameAndTitleVisibility from "./hooks/use-name-title-visibility";
 import { generateUEID } from "./utils/generators";
-import { isMobileWidth } from "./utils/browser-utils";
+import { isMobile, isMobileWidth } from "./utils/browser-utils";
 import { ScrollProvider } from "./contexts/ScrollContext";
 
 declare global {
@@ -57,6 +59,7 @@ declare global {
       ENABLE_MULTI_DOMAIN: string;
       WIDGET_HEIGHT: number;
       WIDGET_WIDTH: number;
+      TERMINATION_TIMEOUT: number;
       STREAM_TYPING_SPEED: number;
       IFRAME_TARGET_OIRGIN: string;
       SMAX_INTEGRATION: { enabled: boolean };
@@ -221,13 +224,27 @@ const App: FC = () => {
     if (!widgetConfig.isLoaded) dispatch(getWidgetConfig());
   }, [chatId, dispatch, messages, widgetConfig]);
 
+  useEffect(() => {
+    if (!widgetConfig.instantlyOpenChatWidget || isMobile() || chatId) return;
+
+    const localStorageValue = getFromLocalStorage(LOCAL_STORAGE_INSTANTLY_OPEN_CHAT_WIDGET_KEY);
+    const shouldOpen = localStorageValue === true || localStorageValue === null;
+
+    dispatch(setIsChatOpen(shouldOpen));
+    setToLocalStorage(LOCAL_STORAGE_INSTANTLY_OPEN_CHAT_WIDGET_KEY, shouldOpen);
+  }, [widgetConfig]);
+
   useNameAndTitleVisibility();
+
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
 
   if (burokrattOnlineStatus !== true) return <></>;
   if (displayWidget && widgetConfig.isLoaded)
     return (
       <ScrollProvider>
-        {isChatOpen ? <Chat /> : <Profile />}
+        <Suspense fallback={null}>
+          {isChatOpen ? <Chat triggerRef={triggerRef} /> : <Profile triggerRef={triggerRef} />}
+        </Suspense>
       </ScrollProvider>
     );
   return <></>;

@@ -32,4 +32,19 @@ export const LoadingAnimationStyles = styled.div`
         animation-delay: 0.4s;
     }
 
+    .processing-notice {
+        margin: 0.2em;
+        background: linear-gradient(90deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0.4) 100%);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: shimmer-text 2s linear infinite;
+    }
+
+    @keyframes shimmer-text {
+        from { background-position: 200% center; }
+        to { background-position: -200% center; }
+    }
+
 `

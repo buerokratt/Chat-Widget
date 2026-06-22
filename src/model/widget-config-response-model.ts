@@ -15,4 +15,10 @@ export interface WidgetConfigResponse {
   feedbackQuestion: string;
   feedbackNoticeActive: string;
   feedbackNotice: string;
+  isFiveRatingScale: string;
+  instantlyOpenChatWidget: string;
+  showSubTitle: string;
+  subTitle: string;
+  responseWaitingTime: string;
+  responseProcessingNotice: string;
 }

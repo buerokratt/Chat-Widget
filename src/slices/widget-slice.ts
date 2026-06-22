@@ -5,11 +5,13 @@ import {
   CHAT_BUBBLE_MESSAGE_DELAY_SECONDS,
   CHAT_BUBBLE_PROACTIVE_SECONDS,
   CHAT_SHOW_BUBBLE_MESSAGE,
+  CHAT_STATUS,
   IDLE_CHAT_INTERVAL,
 } from "../constants";
 import WidgetService from "../services/widget-service";
-import { endChat } from "./chat-slice";
+import { endChat, resetState } from "./chat-slice";
 import { RootState } from "../store";
+import chatService from "../services/chat-service";
 
 export interface WidgetState {
   showConfirmationModal: boolean;
@@ -32,6 +34,12 @@ export interface WidgetState {
     feedbackQuestion: string;
     feedbackNoticeActive: boolean | null;
     feedbackNotice: string;
+    isFiveRatingScale: boolean | null;
+    instantlyOpenChatWidget?: boolean | null;
+    showSubTitle?: boolean | null;
+    subTitle?: string | null;
+    responseWaitingTime: number;
+    responseProcessingNotice: string;
   };
   chatId?: string | null;
 }
@@ -58,6 +66,12 @@ const initialState: WidgetState = {
     feedbackQuestion: "",
     feedbackNoticeActive: null,
     feedbackNotice: "",
+    isFiveRatingScale: null,
+    instantlyOpenChatWidget: null,
+    showSubTitle: null,
+    subTitle: null,
+    responseWaitingTime: 0,
+    responseProcessingNotice: '',
   },
   chatId: null,
 };
@@ -66,6 +80,16 @@ export const getWidgetConfig = createAsyncThunk(
   "widget/getWidgetConfig",
   async (_, { getState, dispatch }) => {
     const state = getState() as RootState;
+    const previousChatId = localStorage.getItem("previousChatId");
+
+    if (previousChatId) {
+      const chat = await chatService.getChatById(previousChatId);
+      if (chat.status === CHAT_STATUS.ENDED) {
+        dispatch(resetState());
+        localStorage.removeItem("previousChatId");
+      }
+    }
+
     dispatch(setChatId(state.chat.chatId));
     return WidgetService.getWidgetConfig();
   }
@@ -126,6 +150,14 @@ export const widgetSlice = createSlice({
       state.widgetConfig.feedbackNoticeActive =
         action.payload?.feedbackNoticeActive === "true";
       state.widgetConfig.feedbackNotice = action.payload?.feedbackNotice ?? "";
+      state.widgetConfig.isFiveRatingScale = action.payload?.isFiveRatingScale === "true";
+      state.widgetConfig.instantlyOpenChatWidget =
+        action.payload?.instantlyOpenChatWidget === "true";
+      state.widgetConfig.showSubTitle =
+        action.payload?.showSubTitle === "true";
+      state.widgetConfig.subTitle = action.payload?.subTitle ?? "";
+      state.widgetConfig.responseWaitingTime = parseInt(action.payload?.responseWaitingTime ?? '0') || 0;
+      state.widgetConfig.responseProcessingNotice = action.payload?.responseProcessingNotice ?? '';
       if (
         state.chatId != null &&
         state.widgetConfig.isBurokrattActive === false

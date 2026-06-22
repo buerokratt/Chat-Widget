@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { memo, MutableRefObject, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import useFocusTrap from "../../hooks/useFocusTrap";
 import { useTranslation } from "react-i18next";
 import { Resizable, ResizeCallback } from "re-resizable";
 import useChatSelector from "../../hooks/use-chat-selector";
@@ -25,8 +26,10 @@ import {
   sendNewMessage,
   setChatDimensions,
   setIdleChat,
+  setIsChatOpen,
   setIsFeedbackConfirmationShown,
 } from "../../slices/chat-slice";
+import { showConfirmationModal } from "../../slices/widget-slice";
 import WarningNotification from "../warning-notification/warning-notification";
 import ChatFeedback from "../chat-feedback/chat-feedback";
 import ChatFeedbackConfirmation from "../chat-feedback/chat-feedback-confirmation";
@@ -43,11 +46,12 @@ import useWindowDimensions from "../../hooks/useWindowDimensions";
 import ResponseErrorNotification from "../response-error-notification/response-error-notification";
 import useTabActive from "../../hooks/useTabActive";
 import AskForwardToCsa from "../ask-forward-to-csa-modal/ask-forward-to-csa-modal";
-import { isIphone } from "../../utils/browser-utils";
 import { ChatStyles } from "./ChatStyled";
 import ResizeHandleIcon from "../../static/icons/resize-handle.svg";
 import useWidgetSelector from "../../hooks/use-widget-selector";
 import PostChatMessage from "../post-chat-message/post-chat-message";
+import { format } from "date-fns";
+import EmergencyNotice from "../emergency-notice/emergency-notice";
 
 const RESIZABLE_HANDLES = {
   topLeft: true,
@@ -68,7 +72,11 @@ const RESIZE_HANDLE_COMPONENTS = {
   ),
 };
 
-const Chat = (): JSX.Element => {
+interface ChatProps {
+  triggerRef?: MutableRefObject<HTMLButtonElement | null>;
+}
+
+const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
   const dispatch = useAppDispatch();
   const [showWidgetDetails, setShowWidgetDetails] = useState(false);
   const [showFeedbackResult, setShowFeedbackResult] = useState(false);
@@ -90,36 +98,76 @@ const Chat = (): JSX.Element => {
     chatDimensions,
     chatMode,
     showResponseError,
+    emergencyNotice,
   } = useChatSelector();
   const [ idleTimerSelection, setIdleTimerSelection ] = useState<number>(IDLE_CHAT_CHOICES_INTERVAL)
   const [ displayEndMessage, setDisplayEndMessage ] = useState<boolean>(false)
+
+  const showEmergencyNotice = useMemo(() => {
+    if (!emergencyNotice?.isVisible) return false;
+    const toDate = (d: Date) => new Date(format(d, "yyyy-MM-dd"));
+    const now = toDate(new Date());
+    return toDate(new Date(emergencyNotice.start)) <= now && toDate(new Date(emergencyNotice.end)) >= now;
+  }, [emergencyNotice]);
 
   const isTabActive = useTabActive();
 
   const [isFocused, setIsFocused] = useState(true);
 
-  const { burokrattOnlineStatus, showConfirmationModal } = useAppSelector(
+  const { burokrattOnlineStatus, showConfirmationModal: isConfirmationModalVisible } = useAppSelector(
     (state) => state.widget
   );
 
-  const chatRef = useRef<HTMLDivElement>(null);
+  const handleEscape = useCallback(() => {
+    if (chatId) {
+      dispatch(showConfirmationModal());
+    } else {
+      dispatch(setIsChatOpen(false));
+    }
+  }, [chatId, dispatch]);
 
-  // Prevent chat from being cut off on iOS devices when on-screen keyboard is open
+  const chatRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(chatRef, { focusFirstOnMount: true, onEscape: handleEscape, returnFocusOnUnmount: false });
+
+  useEffect(() => {
+    return () => { triggerRef?.current?.focus(); };
+  }, []);
+  const dialogAnnouncementRef = useRef<HTMLDivElement>(null);
+  const isMobileLayout = width < 480 || height < 480;
   useEffect(() => {
     const vv = window.visualViewport;
     const currentRef = chatRef.current;
+    if (!vv || !isMobileLayout) return;
 
-    function setChatHeight() {
-      if (currentRef && vv && isIphone()) {
-        currentRef.style.height = `${vv.height}px`;
-      }
+    function setChatViewport() {
+      if (!currentRef || !vv) return;
+      currentRef.style.position = "fixed";
+      currentRef.style.height = `${vv.height}px`;
+      currentRef.style.width = `${vv.width}px`;
+      currentRef.style.top = `${vv.offsetTop}px`;
+      currentRef.style.left = `${vv.offsetLeft}px`;
+      currentRef.style.bottom = "auto";
+      currentRef.style.right = "auto";
     }
 
-    vv?.addEventListener("resize", setChatHeight);
-    setChatHeight();
+    setChatViewport();
+    vv.addEventListener("resize", setChatViewport);
+    vv.addEventListener("scroll", setChatViewport);
 
-    return () => vv?.removeEventListener("resize", setChatHeight);
-  }, []);
+    return () => {
+      vv.removeEventListener("resize", setChatViewport);
+      vv.removeEventListener("scroll", setChatViewport);
+      if (currentRef) {
+        currentRef.style.position = "";
+        currentRef.style.height = "";
+        currentRef.style.width = "";
+        currentRef.style.top = "";
+        currentRef.style.left = "";
+        currentRef.style.bottom = "";
+        currentRef.style.right = "";
+      }
+    };
+  }, [isMobileLayout]);
 
   useEffect(() => {
     if(!widgetConfig.showIdleWarningMessage) {
@@ -178,23 +226,40 @@ const Chat = (): JSX.Element => {
     dispatch(setChatDimensions(newDimensions));
   };
 
+  const checkIdleWarning = useCallback(() => {
+    if (isChatEnded || messages.length === 0) {
+      return;
+    }
+
+    let lastActive;
+
+    if (idleChat.lastActive === "") {
+      lastActive = messages[messages.length - 1].authorTimestamp;
+    } else {
+      lastActive = idleChat.lastActive;
+    }
+
+    const differenceInSeconds = getIdleTime(lastActive);
+    if (differenceInSeconds >= (widgetConfig.chatActiveDuration * 60)) {
+      dispatch(setIdleChat({ isIdle: true }));
+    }
+  }, [
+    isChatEnded,
+    messages,
+    idleChat.lastActive,
+    widgetConfig.chatActiveDuration,
+    dispatch
+  ]);
+
   useLayoutEffect(() => {
     if (!isChatEnded) {
       if (messages.length > 0) {
+        checkIdleWarning();
+        
         const interval = setInterval(() => {
-          let lastActive;
-
-          if (idleChat.lastActive === "") {
-            lastActive = messages[messages.length - 1].authorTimestamp;
-          } else {
-            lastActive = idleChat.lastActive;
-          }
-
-          const differenceInSeconds = getIdleTime(lastActive);
-          if (differenceInSeconds >= (widgetConfig.chatActiveDuration * 60)) {
-            dispatch(setIdleChat({ isIdle: true }));
-          }
-        }, widgetConfig.chatActiveDuration * 60 * 1000);
+          checkIdleWarning();
+        }, 1000);
+        
         return () => {
           clearInterval(interval);
         };
@@ -205,57 +270,102 @@ const Chat = (): JSX.Element => {
   }, [
     idleChat.isIdle,
     messages,
-    showConfirmationModal,
+    isConfirmationModalVisible,
     isChatEnded,
     feedback.isFeedbackConfirmationShown,
+    checkIdleWarning,
+  ]);
+
+  const checkInactivityTermination = useCallback(() => {
+    if (isChatEnded || displayEndMessage || messages.length === 0) {
+      return;
+    }
+
+    let lastActive;
+
+    if (idleChat.lastActive === "") {
+      lastActive = messages[messages.length - 1].authorTimestamp;
+    } else {
+      lastActive = idleChat.lastActive;
+    }
+    
+    const differenceInSeconds = getIdleTime(lastActive);
+    const terminationThreshold = (widgetConfig.chatActiveDuration * 60) + idleTimerSelection;
+    
+    if (differenceInSeconds >= terminationThreshold) {
+      if(widgetConfig.showAutoCloseText) {
+        setDisplayEndMessage(true);
+      }
+      dispatch(setIdleChat({ isIdle: false }));
+      dispatch(
+        endChat({
+          event: CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS,
+          isUpperCase: true,
+          keepChatOpen: widgetConfig.showAutoCloseText ?? false
+        })
+      );
+    }
+  }, [
+    isChatEnded,
+    displayEndMessage,
+    messages,
+    idleChat.lastActive,
+    widgetConfig.chatActiveDuration,
+    widgetConfig.showAutoCloseText,
+    idleTimerSelection,
+    dispatch
   ]);
 
   useLayoutEffect(() => {
-    if (!isChatEnded && !displayEndMessage) {
-      if (messages.length > 0) {
-        const interval = setInterval(() => {
-          let lastActive;
-
-          if (idleChat.lastActive === "") {
-            lastActive = messages[messages.length - 1].authorTimestamp;
-          } else {
-            lastActive = idleChat.lastActive;
-          }
-          const differenceInSeconds = getIdleTime(lastActive);
-          if (
-            differenceInSeconds >=
-              (widgetConfig.chatActiveDuration * 60) + idleTimerSelection
-          ) {
-            if(widgetConfig.showAutoCloseText) {
-              setDisplayEndMessage(true);
-            }
-            dispatch(setIdleChat({ isIdle: false }));
-            dispatch(
-              endChat({
-                event: CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS,
-                isUpperCase: true,
-                keepChatOpen: widgetConfig.showAutoCloseText ?? false
-              })
-            )
-          }
-        }, idleTimerSelection * 1000);
-        return () => {
-          clearInterval(interval);
-        };
-      }
+    if (!isChatEnded && !displayEndMessage && messages.length > 0) {
+      checkInactivityTermination();
+      
+      const interval = setInterval(() => {
+        checkInactivityTermination();
+      }, 1000);
+      
+      return () => {
+        clearInterval(interval);
+      };
     }
   }, [
-    idleChat.isIdle,
-    showConfirmationModal,
-    feedback.isFeedbackConfirmationShown,
+    isChatEnded,
+    displayEndMessage,
+    messages,
+    checkInactivityTermination
   ]);
 
+  useEffect(() => {
+    if (isTabActive && !isChatEnded && !displayEndMessage && messages.length > 0) {
+      checkInactivityTermination();
+    }
+  }, [isTabActive, isChatEnded, displayEndMessage, messages, checkInactivityTermination]);
+
+  useEffect(() => {
+    if (isTabActive && !isChatEnded && messages.length > 0) {
+      checkIdleWarning();
+    }
+  }, [isTabActive, isChatEnded, messages, checkIdleWarning]);
+
   useReloadChatEndEffect();
+
+  useEffect(() => {
+    const ref = dialogAnnouncementRef.current;
+    if (!ref) return;
+    ref.textContent = '';
+    const timeoutId = setTimeout(() => {
+      if (dialogAnnouncementRef.current) {
+        dialogAnnouncementRef.current.textContent = t('widget.dialog.label');
+      }
+    }, 100);
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   useEffect(() => {
     if (
       isTabActive &&
       isFocused &&
+      !isChatEnded &&
       messages.length > 0 &&
       !messages[messages.length - 1].event &&
       messages[messages.length - 1].authorRole === AUTHOR_ROLES.BACKOFFICE_USER
@@ -278,10 +388,16 @@ const Chat = (): JSX.Element => {
   };
 
   return (
-    <ChatStyles isFullScreen={isFullScreen} style={{ transition: 'none' }}>
+    <ChatStyles as="aside" aria-label={t("chat.landmark.label")} isFullScreen={isFullScreen} style={{ transition: "none !important" }}>
+      <div
+        ref={dialogAnnouncementRef}
+        aria-live="assertive"
+        aria-atomic="true"
+        style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', border: 0 }}
+      />
       <div className="chatWrapper">
         <Resizable
-          size={isFullScreen ? { width: window.innerWidth, height: window.innerHeight } : chatDimensions}
+          size={isFullScreen ? { width, height } : chatDimensions}
           minWidth={CHAT_MIN_WINDOW_WIDTH}
           minHeight={CHAT_MIN_WINDOW_HEIGHT}
           maxHeight={isFullScreen ? window.innerHeight : height - 50}
@@ -296,11 +412,18 @@ const Chat = (): JSX.Element => {
             animate={{ y: 0 }}
             style={{ y: 400 }}
             ref={chatRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('widget.dialog.label')}
           >
             <ChatHeader
               isDetailSelected={showWidgetDetails}
               detailHandler={() => setShowWidgetDetails(!showWidgetDetails)}
             />
+            {widgetConfig.showSubTitle === true && <div className="sub-title">{widgetConfig.subTitle}</div>}
+            {showEmergencyNotice && emergencyNotice && (
+              <EmergencyNotice text={emergencyNotice.text} />
+            )}
             {messageQueue.length >= 5 && <WarningNotification warningMessage={t("chat.error-message")} />}
             {burokrattOnlineStatus !== true && <OnlineStatusNotification />}
             {showWidgetDetails && <WidgetDetails />}

@@ -16,7 +16,7 @@ export const MESSAGE_VISIBILITY_LIMIT = 2750;
 export const MAXIMUM_MESSAGE_TEXT_LENGTH_FOR_ONE_ROW = 27;
 export const FEEDBACK_CONFIRMATION_TIMEOUT = 5000;
 export const FEEDBACK_MESSAGE_MAX_CHAR_LIMIT = 500;
-export const FEEDBACK_MESSAGE_LIMIT_WARNING_AT = 400;
+export const FEEDBACK_MESSAGE_LIMIT_WARNING_AT = 500;
 export const FEEDBACK_MESSAGE_LIMIT_VISIBILE_AT = 100;
 export const MESSAGE_QUE_MAX_LENGTH = 5;
 export const TERMS_AND_CONDITIONS_LINK =
@@ -40,6 +40,7 @@ export const CHAT_BUBBLE_COLOR = '#003CFF';
 export const CHAT_BUBBLE_ANIMATION = 'shockwave';
 export const CHAT_INPUT_DEBOUNCE_TIMEOUT = 500;
 export const CURRENT_COUNTRY = 'EE';
+export const LOCAL_STORAGE_INSTANTLY_OPEN_CHAT_WIDGET_KEY = 'instantly-open-chat-widget';
 
 export enum CHAT_MODES {
   FLOW = 'flow',
@@ -123,6 +124,7 @@ export enum RUUTER_ENDPOINTS {
   POST_MESSAGE = '/chats/messages/add',
   POST_MESSAGE_PREVIEW = '/chats/messages/preview',
   POST_LLM_MESSAGE = '/chats/messages/llm',
+  STOP_STREAM = '/chats/messages/stop-stream',
   GET_MESSAGES_BY_CHAT_ID = '/chats/messages/all',
   END_CHAT = '/chats/end',
   GET_GREETING = '/chats/greeting',

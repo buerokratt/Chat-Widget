@@ -1,20 +1,24 @@
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useAppDispatch } from "../../store";
 import {
-    addMessage,
-    clearMessageQueue,
-    initChat,
-    queueMessage,
-    resetState,
-    sendFeedbackMessage,
-    sendMessagePreview,
-    sendNewMessage,
-    setFeedbackMessageGiven,
-    setFeedbackWarning,
+  addMessage,
+  clearMessageQueue,
+  initChat,
+  queueMessage,
+  resetState,
+  sendFeedbackMessage,
+  sendMessagePreview,
+  sendNewMessage,
+  setFeedbackMessageGiven,
+  setFeedbackWarning,
+  setStopTypingStream,
+  setTypingStream,
+  stopStream,
 } from "../../slices/chat-slice";
 import Send from "../../static/icons/send.svg";
+import StopStream from "../../static/icons/stop-stream.svg";
 import File from "../../static/icons/file.svg";
 import useChatSelector from "../../hooks/use-chat-selector";
 import KeypadErrorMessage from "./keypad-error-message";
@@ -29,11 +33,7 @@ import {
   MESSAGE_QUE_MAX_LENGTH,
   StyledButtonType,
 } from "../../constants";
-import {
-  Attachment,
-  AttachmentTypes,
-  Message,
-} from "../../model/message-model";
+import { Attachment, AttachmentTypes, Message } from "../../model/message-model";
 import StyledButton from "../styled-components/styled-button";
 import Close from "../../static/icons/close.svg";
 import formatBytes from "../../utils/format-bytes";
@@ -44,14 +44,13 @@ import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import { isIphone } from "../../utils/browser-utils";
 import classNames from "classnames";
 import useWidgetSelector from "../../hooks/use-widget-selector";
+import sanitizeHtml from "sanitize-html";
 
 // Hacky workaround for iOS bug
 // Prevents unnecessary window scrolling when the on-screen keyboard is open
 const preventWindowScrolling = (e: TouchEvent, direction: "up" | "down") => {
   const target = e.target as HTMLElement;
-  const contentElement = document.getElementsByClassName(
-    "os-content"
-  )[0] as HTMLElement;
+  const contentElement = document.getElementsByClassName("os-content")[0] as HTMLElement;
   const top = contentElement.getBoundingClientRect().top;
 
   if (
@@ -79,6 +78,9 @@ const ChatKeyPad = (): JSX.Element => {
     messageQueue,
     chatStatus,
     showResponseError,
+    isTypingStream,
+    isChatOpen,
+    showLoadingMessage,
   } = useChatSelector();
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
@@ -86,7 +88,9 @@ const ChatKeyPad = (): JSX.Element => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [dynamicStyle, setdynamicStyle] = useState("");
   const touchStartYRef = useRef<number>(0);
-    const { widgetConfig } = useWidgetSelector();
+  const { widgetConfig } = useWidgetSelector();
+  const keypadDisableCheck = userInputFile ? true : isKeypadDisabled;
+  const isInputLocked = showLoadingMessage || keypadDisableCheck;
 
   const handleUploadClick = () => {
     hiddenFileInputRef.current?.click();
@@ -99,7 +103,7 @@ const ChatKeyPad = (): JSX.Element => {
 
     if (!base64) return;
 
-    setUserInput(e.target.files[0].name);
+    setUserInput(sanitizeHtml(e.target.files[0].name));
     setUserInputFile({
       chatId: chatId!,
       name: e.target.files[0].name,
@@ -117,7 +121,7 @@ const ChatKeyPad = (): JSX.Element => {
 
       const newHeight = textarea.scrollHeight;
 
-      setdynamicStyle((dynStyle) => {
+      setdynamicStyle(() => {
         if (newHeight >= 70 && newHeight <= 85) {
           return "threeLines";
         } else if (newHeight > 85) {
@@ -125,37 +129,49 @@ const ChatKeyPad = (): JSX.Element => {
         } else {
           return "";
         }
-        return dynStyle;
       });
     }
   };
 
   useEffect(() => {
+    setIsKeypadDisabled(isTypingStream);
+  }, [isTypingStream]);
+
+  useEffect(() => {
     adjustHeight();
   }, []);
 
-    const handleTextFeedback = () => {
-        if (widgetConfig.feedbackActive && !feedback.isFeedbackRatingGiven) {
-            dispatch(setFeedbackWarning(true));
-            return;
-        }
-        if (!widgetConfig.feedbackActive && !widgetConfig.feedbackNoticeActive) {
-          dispatch(resetState());
-          return;
-        }
-        dispatch(setFeedbackWarning(false));
-        if (widgetConfig.feedbackNoticeActive) dispatch(sendFeedbackMessage({ userInput }));
-        dispatch(setFeedbackMessageGiven(true));
-        setIsKeypadDisabled(true);
-        if (!widgetConfig.feedbackActive) {
-            dispatch(resetState());
-        }
-    };
-    useEffect(() => {
-        if (messageQueue.length >= MESSAGE_QUE_MAX_LENGTH) {
-            setIsKeypadDisabled(true);
-        }
-    }, [messageQueue]);
+  useEffect(() => {
+    if (isChatOpen && textareaRef.current && !isKeypadDisabled && !userInputFile) {
+      const timeoutId = setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isChatOpen, isKeypadDisabled, userInputFile]);
+
+  const handleTextFeedback = () => {
+    if (widgetConfig.feedbackActive && !feedback.isFeedbackRatingGiven) {
+      dispatch(setFeedbackWarning(true));
+      return;
+    }
+    if (!widgetConfig.feedbackActive && !widgetConfig.feedbackNoticeActive) {
+      dispatch(resetState());
+      return;
+    }
+    dispatch(setFeedbackWarning(false));
+    if (widgetConfig.feedbackNoticeActive) dispatch(sendFeedbackMessage({ userInput: sanitizeHtml(userInput) }));
+    dispatch(setFeedbackMessageGiven(true));
+    setIsKeypadDisabled(true);
+    if (!widgetConfig.feedbackActive) {
+      dispatch(resetState());
+    }
+  };
+  useEffect(() => {
+    if (messageQueue.length >= MESSAGE_QUE_MAX_LENGTH) {
+      setIsKeypadDisabled(true);
+    }
+  }, [messageQueue]);
 
   useEffect(() => {
     if (chatId && !loading && messageQueue.length > 0) {
@@ -170,20 +186,38 @@ const ChatKeyPad = (): JSX.Element => {
   }, [chatId, dispatch, loading, messageQueue]);
 
   const isInputValid = () => {
-    if (!userInput.trim()) return false;
+    if (!sanitizeHtml(userInput).trim()) return false;
 
-    if (userInput.length > MESSAGE_MAX_CHAR_LIMIT) {
-      setErrorMessage(t("keypad.long-message-warning"));
+    if (sanitizeHtml(userInput).length > MESSAGE_MAX_CHAR_LIMIT) {
+      setErrorMessage(t("keypad.long-message-warning", { limit: MESSAGE_MAX_CHAR_LIMIT }));
       return false;
     }
     return true;
+  };
+
+  useEffect(() => {
+    if (userInput.length > MESSAGE_MAX_CHAR_LIMIT) {
+      setErrorMessage(t("keypad.long-message-warning", { limit: MESSAGE_MAX_CHAR_LIMIT }));
+    } else {
+      setErrorMessage("");
+    }
+  }, [userInput, t]);
+
+  const handleSendStopButtonClick = () => {
+    if (isTypingStream && chatId) {
+      dispatch(setTypingStream(false));
+      dispatch(setStopTypingStream(true));
+      dispatch(stopStream(chatId));
+    } else {
+      addNewMessageToState();
+    }
   };
 
   const addNewMessageToState = (): void => {
     if (!isInputValid()) return;
     const message: Message = {
       chatId: chatId ?? "",
-      content: userInput,
+      content: sanitizeHtml(userInput),
       file: userInputFile,
       authorTimestamp: new Date().toISOString(),
       authorRole: AUTHOR_ROLES.END_USER,
@@ -236,7 +270,7 @@ const ChatKeyPad = (): JSX.Element => {
     debounce(() => {
       const message: Message = {
         chatId,
-        content: userInput,
+        content: sanitizeHtml(userInput),
         authorTimestamp: new Date().toISOString(),
       };
 
@@ -251,6 +285,7 @@ const ChatKeyPad = (): JSX.Element => {
     three_lines: dynamicStyle === "threeLines",
     four_lines: dynamicStyle === "fourLines",
   });
+  const paddingTopCheck = dynamicStyle === "fourLines" ? "30px" : "20px";
 
   // Create stable references to the event handlers
   // So that we can remove them later with window.removeEventListener
@@ -260,10 +295,7 @@ const ChatKeyPad = (): JSX.Element => {
 
   const touchMoveHandler = useCallback((e: TouchEvent) => {
     const touchEndY = e.touches[0].clientY;
-    preventWindowScrolling(
-      e,
-      touchEndY > touchStartYRef.current ? "down" : "up"
-    );
+    preventWindowScrolling(e, touchEndY > touchStartYRef.current ? "down" : "up");
   }, []);
 
   const disableIosWindowScroll = useCallback(() => {
@@ -289,17 +321,17 @@ const ChatKeyPad = (): JSX.Element => {
   return (
     <ChatKeypadStyled>
       <KeypadErrorMessage>{errorMessage}</KeypadErrorMessage>
-      <div className={`${keypadClasses}`}>
+      <div className={`${keypadClasses}`} style={{ paddingTop: errorMessage ? undefined : paddingTopCheck }}>
         <textarea
           ref={textareaRef}
-          disabled={userInputFile ? true : isKeypadDisabled}
+          readOnly={isInputLocked}
+          aria-disabled={isInputLocked}
           aria-label={t("keypad.input.label")}
           className="input"
           value={userInputFile ? userInputFile.name : userInput}
           placeholder={t("keypad.input.placeholder")}
           onChange={(e) => {
             setUserInput(e.target.value);
-            setErrorMessage("");
             adjustHeight();
           }}
           onKeyDown={(event) => {
@@ -323,12 +355,7 @@ const ChatKeyPad = (): JSX.Element => {
           onFocus={disableIosWindowScroll}
           onBlur={enableIosWindowScroll}
         />
-        <input
-          type="file"
-          ref={hiddenFileInputRef}
-          onChange={handleFileChange}
-          style={{ display: "none" }}
-        />
+        <input type="file" ref={hiddenFileInputRef} onChange={handleFileChange} style={{ display: "none" }} />
 
         {chatStatus === CHAT_STATUS.ENDED && !!chatId ? (
           <FeedbackButtonStyle
@@ -341,14 +368,23 @@ const ChatKeyPad = (): JSX.Element => {
         ) : (
           <>
             <button
-              onKeyDown={addNewMessageToState}
-              onClick={addNewMessageToState}
+              key={isTypingStream ? "stop" : "send"}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleSendStopButtonClick();
+                }
+              }}
+              onClick={handleSendStopButtonClick}
               className="button"
-              title={t("keypad.button.label")}
-              aria-label={t("keypad.button.label")}
+              title={t(isTypingStream ? "keypad.button.stop-stream" : "keypad.button.label")}
+              aria-label={t(isTypingStream ? "keypad.button.stop-stream" : "keypad.button.label")}
               tabIndex={0}
             >
-              <img src={Send} alt="Send message icon" />
+              <img
+                src={isTypingStream ? StopStream : Send}
+                alt={isTypingStream ? "Stop stream icon" : "Send message icon"}
+              />
             </button>
 
             {isHiddenFeatureEnabled && renderSendFileButton()}
@@ -400,9 +436,7 @@ const ChatKeyPad = (): JSX.Element => {
     }
 
     if (file.size > MESSAGE_FILE_SIZE_LIMIT) {
-      setErrorMessage(
-        `Max allowed file size is ${formatBytes(MESSAGE_FILE_SIZE_LIMIT)}`
-      );
+      setErrorMessage(`Max allowed file size is ${formatBytes(MESSAGE_FILE_SIZE_LIMIT)}`);
       return null;
     } else {
       return await convertBase64(file);

@@ -10,11 +10,17 @@ import {
     RATING_TYPES,
 } from "../../../constants";
 import Thumbs from "../../../static/icons/thumbs.svg";
-import {sendMessageWithRating, sendNewLlmMessage, updateMessage,} from "../../../slices/chat-slice";
+import {
+  sendMessageWithRating,
+  sendNewLlmMessage,
+  setTypingStream,
+  updateMessage,
+  setStopTypingStream,
+} from "../../../slices/chat-slice";
 import {useAppDispatch} from "../../../store";
 import ChatButtonGroup from "./chat-button-group";
 import ChatOptionGroup from "./chat-option-group";
-import {parseButtons, parseOptions} from "../../../utils/chat-utils";
+import {filterDocReferences, parseButtons, parseOptions} from "../../../utils/chat-utils";
 import useChatSelector from "../../../hooks/use-chat-selector";
 import {useTranslation} from "react-i18next";
 import Markdownify from "./Markdownify";
@@ -27,7 +33,7 @@ const AdminMessage = ({message}: { message: Message }): JSX.Element => {
     const dispatch = useAppDispatch();
     const messageRef = useRef<HTMLDivElement>(null);
     const [isTall, setIsTall] = useState(false);
-    const {nameVisibility, titleVisibility} = useChatSelector();
+    const {nameVisibility, titleVisibility, stopTypingStream} = useChatSelector();
 
     const setNewFeedbackRating = (newRating: string): void => {
         const updatedMessage = {
@@ -73,8 +79,8 @@ const AdminMessage = ({message}: { message: Message }): JSX.Element => {
         [message.authorFirstName, message.authorLastName]);
 
     return (
-      <motion.div ref={messageRef}>
-        <div hidden={message.content?.startsWith("$")}>
+      <motion.div ref={messageRef} aria-live="off">
+        <div hidden={message.content?.trimStart().startsWith("$")}>
           <ChatMessageStyled className={messageClass}>
             {nameVisibility && csaName && message.event != CHAT_EVENTS.GREETING && (
               <div className="name">{csaName}</div>
@@ -82,8 +88,8 @@ const AdminMessage = ({message}: { message: Message }): JSX.Element => {
             {titleVisibility && message.csaTitle && message.event != CHAT_EVENTS.GREETING && (
               <div className="name">{message.csaTitle}</div>
             )}
-            <div className="main">
-              <div className="icon">
+            <div className="message-main">
+              <div className="message-icon">
                 {message.event === CHAT_EVENTS.EMERGENCY_NOTICE ? (
                   <div className="emergency">!</div>
                 ) : (
@@ -95,6 +101,23 @@ const AdminMessage = ({message}: { message: Message }): JSX.Element => {
                   <SmoothStreamingMessage
                     message={message.content ?? ""}
                     isStreaming={message.isStreaming}
+                    onStopRequest={(displayedText) => {
+                      const updatedMessage = { ...message, isStreaming: undefined, content: displayedText };
+                      if (updatedMessage.id) {
+                        dispatch(
+                          sendNewLlmMessage({
+                            message: updatedMessage,
+                            context: updatedMessage.context,
+                            uuid: updatedMessage.id,
+                          })
+                        );
+                      }
+                      setTimeout(() => {
+                        dispatch(updateMessage(updatedMessage));
+                        dispatch(setTypingStream(false));
+                        dispatch(setStopTypingStream(false));
+                      }, 0);
+                    }}
                     onComplete={() => {
                       if (message.isStreaming === false) {
                         const updatedMessage = { ...message, isStreaming: undefined };
@@ -107,11 +130,16 @@ const AdminMessage = ({message}: { message: Message }): JSX.Element => {
                             })
                           );
                         }
+                        setTimeout(() => {
+                          dispatch(updateMessage(updatedMessage));
+                          dispatch(setTypingStream(false));
+                          dispatch(setStopTypingStream(false));
+                        }, 0);
                       }
                     }}
                   />
                 ) : (
-                  <Markdownify message={message.content ?? ""} />
+                  <Markdownify message={filterDocReferences(message.content ?? "")} />
                 )}
                 {!message.content &&
                   (hasOptions || hasButtons ? t("widget.action.select") : <i>{t("widget.error.empty")}</i>)}

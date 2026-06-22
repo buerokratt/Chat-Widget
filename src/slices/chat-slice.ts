@@ -24,14 +24,13 @@ import {
   getFromLocalStorage,
   setToLocalStorage,
 } from "../utils/local-storage-utils";
-import getHolidays from "../utils/holidays";
+import getHolidays from "../utils/holidays-estonia";
 import {
   filterDuplicatMessages,
   getChatModeBasedOnLastMessage,
 } from "../utils/chat-utils";
 import {
   isChatAboutToBeTerminated,
-  wasPageReloaded,
 } from "../utils/browser-utils";
 import {
   browserName,
@@ -118,6 +117,8 @@ export interface ChatState {
   showResponseError: boolean;
   responseErrorMessage: string;
   failedMessages: Message[];
+  isTypingStream: boolean;
+  stopTypingStream: boolean;
 }
 
 const initialEstimatedTime = {
@@ -190,6 +191,8 @@ const initialState: ChatState = {
   showResponseError: false,
   responseErrorMessage: "",
   failedMessages: [],
+  isTypingStream: false,
+  stopTypingStream: false,
 };
 
 const initialStateOpen: ChatState = {
@@ -257,6 +260,8 @@ const initialStateOpen: ChatState = {
     showResponseError: false,
     responseErrorMessage: "",
     failedMessages: [],
+    isTypingStream: false,
+    stopTypingStream: false,
 };
 
 export const initChat = createAsyncThunk(
@@ -285,7 +290,7 @@ export const getChat = createAsyncThunk(
     const {
       chat: { chatId },
     } = thunkApi.getState() as { chat: ChatState };
-    if (chatId) return ChatService.getChatById();
+    if (chatId) return ChatService.getChatById(chatId);
     return null;
   }
 );
@@ -296,7 +301,7 @@ export const getChatMessages = createAsyncThunk(
     const {
       chat: { chatId },
     } = thunkApi.getState() as { chat: ChatState };
-    return chatId ? ChatService.getMessages() : null;
+    return chatId ? ChatService.getMessages(chatId) : null;
   }
 );
 
@@ -379,7 +384,8 @@ export const addChatToTerminationQueue = createAsyncThunk(
     thunkApi.dispatch(resetState());
 
     if (chat.chatId) {
-      return ChatService.addChatToTerminationQueue(chat.chatId);
+      ChatService.addChatToTerminationQueue(chat.chatId);
+      return { success: true };
     }
   }
 );
@@ -387,17 +393,22 @@ export const addChatToTerminationQueue = createAsyncThunk(
 export const removeChatFromTerminationQueue = createAsyncThunk(
   "chat/removeChatFromTerminationQueue",
   async (args, thunkApi) => {
-    if (!wasPageReloaded() || !isChatAboutToBeTerminated()) {
+    const chatId = localStorage.getItem("previousChatId");
+
+    if (!chatId || !isChatAboutToBeTerminated()) {
       return null;
     }
 
-    const chatId = localStorage.getItem("previousChatId");
     setToLocalStorage(SESSION_STORAGE_CHAT_ID_KEY, chatId);
-    sessionStorage.removeItem("terminationTime");
 
-    if (chatId) {
-      thunkApi.dispatch(resetStateWithValue(chatId));
-      return ChatService.removeChatFromTerminationQueue(chatId);
+    thunkApi.dispatch(resetStateWithValue(chatId));
+    try {
+      await ChatService.removeChatFromTerminationQueue(chatId);
+      sessionStorage.removeItem("terminationTime");
+      return { success: true };
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
   }
 );
@@ -468,6 +479,11 @@ export const sendNewLlmMessage = createAsyncThunk("chat/sendNewLlmMessage", (pay
   const { holidays, holidayNames } = getHolidays();
   return ChatService.sendNewLlmMessage(payload.message, holidays, holidayNames, payload.context, payload.uuid);
 });
+
+export const stopStream = createAsyncThunk("chat/stopStream", async (channelId: string) => {
+  await ChatService.stopStream(channelId);
+});
+
 export const sendNewSilentMessage = createAsyncThunk(
   "chat/sendNewSilentMessage",
   (message: Message) => {
@@ -580,6 +596,7 @@ export const chatSlice = createSlice({
     closeFullScreen: (state) => {
       state.isFullScreen = false;
       setToLocalStorage(LOCAL_STORAGE_IS_FULL_SCREEN_KEY, false);
+      state.chatDimensions = getInitialChatDimensions();
     },
     clearMessageQueue: (state) => {
       state.messageQueue = [];
@@ -646,6 +663,12 @@ export const chatSlice = createSlice({
     setPhoneNumber: (state, action) => {
       state.endUserContacts.phoneNr = action.payload;
     },
+    setTypingStream: (state, action: PayloadAction<boolean>) => {
+      state.isTypingStream = action.payload;
+    },
+    setStopTypingStream: (state, action: PayloadAction<boolean>) => {
+      state.stopTypingStream = action.payload;
+    },
     setChat: (state, action: PayloadAction<Chat>) => {
       if (action.payload) {
         state.chatStatus = action.payload.status as CHAT_STATUS;
@@ -693,6 +716,7 @@ export const chatSlice = createSlice({
         return;
       }
 
+      state.showLoadingMessage = false;
       state.lastReadMessageTimestamp = new Date().toISOString();
       state.newMessagesAmount += receivedMessages.length;
       state.messages = filterDuplicatMessages([...newMessagesList, ...receivedMessages]);
@@ -977,6 +1001,8 @@ export const {
   updateStreamingMessage,
   clearStreamingMessage,
   addStreamError,
+  setTypingStream,
+  setStopTypingStream,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

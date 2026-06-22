@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useCallback, useRef, useMemo, useEffect } from 'react';
-import { OverlayScrollbarsComponent } from 'overlayscrollbars-react';
+import React, { createContext, useContext, useCallback, useRef, useMemo, useEffect } from "react";
+import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 
 interface ScrollContextType {
   scrollToBottom: () => void;
@@ -13,6 +13,7 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const scrollRef = useRef<OverlayScrollbarsComponent | null>(null);
   const userHasScrolledUp = useRef(false);
   const cleanupRef = useRef<(() => void) | null>(null);
+  const rafRef = useRef<number | null>(null);
 
   const setScrollRef = useCallback((ref: OverlayScrollbarsComponent | null) => {
     if (cleanupRef.current) {
@@ -64,33 +65,45 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (!instance) return;
 
     if (!userHasScrolledUp.current) {
-      instance.scroll({ y: "100%" }, 200);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+
+      rafRef.current = requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          instance.scroll({ y: "100%" }, 0);
+          rafRef.current = null;
+        });
+      });
     }
   }, []);
 
-  const contextValue = useMemo(() => ({
-    scrollToBottom,
-    setScrollRef,
-    resetAutoScroll,
-  }), [scrollToBottom, setScrollRef, resetAutoScroll]);
+  const contextValue = useMemo(
+    () => ({
+      scrollToBottom,
+      setScrollRef,
+      resetAutoScroll,
+    }),
+    [scrollToBottom, setScrollRef, resetAutoScroll]
+  );
 
   useEffect(() => {
     return () => {
       cleanupRef.current?.();
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
     };
   }, []);
 
-  return (
-    <ScrollContext.Provider value={contextValue}>
-      {children}
-    </ScrollContext.Provider>
-  );
+  return <ScrollContext.Provider value={contextValue}>{children}</ScrollContext.Provider>;
 };
 
 export const useScroll = () => {
   const context = useContext(ScrollContext);
   if (context === undefined) {
-    throw new Error('useScroll must be used within a ScrollProvider');
+    throw new Error("useScroll must be used within a ScrollProvider");
   }
   return context;
 };

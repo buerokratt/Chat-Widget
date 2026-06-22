@@ -6,10 +6,10 @@ const EventMessage = (props: { content: ReactElement }): JSX.Element => {
   const { content } = props;
 
   return (
-    <motion.div>
+    <motion.div aria-live="off">
       <ChatMessageStyled className={`message event`}>
         <div>
-          <div aria-live="polite">{content}</div>
+          <div>{content}</div>
         </div>
       </ChatMessageStyled>
     </motion.div>

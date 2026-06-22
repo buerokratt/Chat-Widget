@@ -1,13 +1,13 @@
 import React, {useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
-import StyledButton from "../styled-components/styled-button";
 import {useAppDispatch} from "../../store";
 import {downloadChat, sendChatNpmRating, setFeedbackRatingGiven} from "../../slices/chat-slice";
-import {isFeedbackRatingColorsEnabled, StyledButtonType} from "../../constants";
+import { isFeedbackRatingColorsEnabled } from "../../constants";
 import useChatSelector from "../../hooks/use-chat-selector";
 import {Download, DownloadElement} from "../../hooks/use-download-file";
 import {ChatFeedbackStyled} from "./ChatFeedbackStyled";
 import useWidgetSelector from "../../hooks/use-widget-selector";
+import { FeedbackRatingButton } from "./feedback-rating-view";
 
 const ChatFeedback = (): JSX.Element => {
     const dispatch = useAppDispatch();
@@ -25,7 +25,9 @@ const ChatFeedback = (): JSX.Element => {
         };
         if (feedbackRating === null) return;
         setSelectedFeedbackButtonValue(feedbackRating);
-        dispatch(sendChatNpmRating({NpmRating: parseInt(feedbackRating ?? "1", 10)}));
+        dispatch(
+          sendChatNpmRating({ NpmRating: parseInt(feedbackRating ?? "1") }),
+        );
         dispatch(setFeedbackRatingGiven(true));
     };
 
@@ -51,21 +53,29 @@ const ChatFeedback = (): JSX.Element => {
         )}
         {widgetConfig.feedbackActive && (
           <div className="feedback-box-input" style={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
-            {Array.from(Array(11).keys()).map((val: number) => {
-              const isMediumCheck = val <= 8 ? "yellow" : "green";
-              const color = val <= 6 ? "red" : isMediumCheck;
-              return (
-                <StyledButton
-                  className={`feedback-btn ${isFeedbackRatingColorsEnabled ? color : ""} ${val == 10 ? "last" : ""}`}
-                  onClick={(e) => handleFeedback(e.currentTarget.textContent)}
-                  styleType={StyledButtonType.GRAY}
-                  key={val}
-                  active={selectedFeedbackButtonValue === val.toString()}
-                >
-                  <span>{val}</span>
-                </StyledButton>
-              );
-            })}
+            {(() => {
+              const isFiveScale = !!widgetConfig.isFiveRatingScale;
+              const buttonCount = isFiveScale ? 5 : 11;
+              const startValue = isFiveScale ? 1 : 0;
+              const lastValue = isFiveScale ? 5 : 10;
+              
+              return Array.from(new Array(buttonCount).keys()).map((index: number) => {
+                const value = startValue + index;
+                const isLast = value === lastValue;
+                
+                return (
+                  <FeedbackRatingButton
+                    key={value}
+                    value={value}
+                    isLast={isLast}
+                    isColorsEnabled={isFeedbackRatingColorsEnabled}
+                    isFiveScale={isFiveScale}
+                    selectedValue={selectedFeedbackButtonValue}
+                    onClick={handleFeedback}
+                  />
+                );
+              });
+            })()}
           </div>
         )}
         <div className="downloadContainer">
