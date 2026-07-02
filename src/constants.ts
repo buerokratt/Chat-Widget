@@ -128,6 +128,7 @@ export enum RUUTER_ENDPOINTS {
   GET_MESSAGES_BY_CHAT_ID = '/chats/messages/all',
   END_CHAT = '/chats/end',
   GET_GREETING = '/chats/greeting',
+  INIT_GREETING_SERVICE = '/chats/init-greeting-service',
   GET_EMERGENCY_NOTICE = '/chats/config/emergency-notice',
   SEND_NPM_RATING = '/chats/feedbacks/rating',
   SEND_FEEDBACK_MESSAGE = '/chats/feedbacks/text',

@@ -76,6 +76,7 @@ export const initialChatState: ChatState = {
   isFullScreen: false,
   isTypingStream: false,
   stopTypingStream: false,
+  hasFetchedGreeting: false,
 };
 
 export const initialAuthState: AuthenticationState = {
