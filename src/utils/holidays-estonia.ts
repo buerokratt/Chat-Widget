@@ -44,7 +44,6 @@ function getHolidays(): HolidaysData {
     ["05-01", "kevadpüha"],
     ["06-23", "võidupüha"],
     ["06-24", "jaanipäev"],
-    ["07-08", "testipäev"],
     ["08-20", "taasiseseisvumispäev"],
     ["12-24", "jõululaupäev"],
     ["12-25", "esimene jõulupüha"],
