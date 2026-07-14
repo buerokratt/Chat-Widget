@@ -70,8 +70,12 @@ class ChatService {
     return http.post(RUUTER_ENDPOINTS.END_CHAT, { message: message, status: status });
   }
 
-  getGreeting(): Promise<{ eng: string; est: string; isActive: boolean }> {
+  getGreeting(): Promise<{ eng: string; est: string; isActive: boolean; type?: "message" | "service"; serviceName?: string }> {
     return http.get(RUUTER_ENDPOINTS.GET_GREETING + getMultiDomainUrl());
+  }
+
+  initGreetingService(endUserTechnicalData: EndUserTechnicalData): Promise<Chat> {
+    return http.post(RUUTER_ENDPOINTS.INIT_GREETING_SERVICE, { endUserTechnicalData, domain: getMultiDomainPath() });
   }
 
   getEmergencyNotice(): Promise<EmergencyNoticeResponse> {
