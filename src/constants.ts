@@ -22,9 +22,11 @@ export const MESSAGE_QUE_MAX_LENGTH = 5;
 export const TERMS_AND_CONDITIONS_LINK =
   'https://www.kratid.ee/kasutustingimused';
 export const ERROR_MESSAGE = 'An error has occured';
-export const CHAT_WINDOW_WIDTH = externalWidgetWidth ?? 400;
+export const CHAT_MAX_WINDOW_WIDTH = 500;
+export const CHAT_MAX_WINDOW_HEIGHT = 700;
+export const CHAT_WINDOW_WIDTH = Math.min(externalWidgetWidth ?? 400, CHAT_MAX_WINDOW_WIDTH);
 export const CHAT_MIN_WINDOW_WIDTH = 400;
-export const CHAT_WINDOW_HEIGHT = externalWidgetHeight ?? 460;
+export const CHAT_WINDOW_HEIGHT = Math.min(externalWidgetHeight ?? 460, CHAT_MAX_WINDOW_HEIGHT);
 export const CHAT_MIN_WINDOW_HEIGHT = 460;
 export const LOCAL_STORAGE_CHAT_DIMENSIONS_KEY = 'chat-dimensions';
 export const LOCAL_STORAGE_IS_FULL_SCREEN_KEY = "is-full-screen";

@@ -7,6 +7,8 @@ import useChatSelector from "../../hooks/use-chat-selector";
 import {
   AUTHOR_ROLES,
   CHAT_EVENTS,
+  CHAT_MAX_WINDOW_HEIGHT,
+  CHAT_MAX_WINDOW_WIDTH,
   CHAT_MIN_WINDOW_HEIGHT,
   CHAT_MIN_WINDOW_WIDTH,
   CHAT_MODES,
@@ -402,8 +404,8 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
           size={isFullScreen ? { width, height } : chatDimensions}
           minWidth={CHAT_MIN_WINDOW_WIDTH}
           minHeight={CHAT_MIN_WINDOW_HEIGHT}
-          maxHeight={isFullScreen ? window.innerHeight : height - 50}
-          maxWidth={isFullScreen ? window.innerWidth : width - 50}
+          maxHeight={isFullScreen ? window.innerHeight : Math.min(height - 50, CHAT_MAX_WINDOW_HEIGHT)}
+          maxWidth={isFullScreen ? window.innerWidth : Math.min(width - 50, CHAT_MAX_WINDOW_WIDTH)}
           enable={isFullScreen ? {} : RESIZABLE_HANDLES}
           handleComponent={RESIZE_HANDLE_COMPONENTS}
           onResizeStart={handleResizeStart}
