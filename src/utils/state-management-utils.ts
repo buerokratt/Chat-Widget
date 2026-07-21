@@ -2,6 +2,8 @@ import { DateTime } from 'luxon';
 import { Message } from '../model/message-model';
 import {
   CHAT_EVENTS,
+  CHAT_MAX_WINDOW_HEIGHT,
+  CHAT_MAX_WINDOW_WIDTH,
   CHAT_WINDOW_HEIGHT,
   CHAT_WINDOW_WIDTH,
   LOCAL_STORAGE_CHAT_DIMENSIONS_KEY,
@@ -77,7 +79,10 @@ export const getInitialChatDimensions = (): { width: number; height: number } =>
 
   const isValiedValue = !isNaN(storedDimensions?.width) && !isNaN(storedDimensions?.height);
   const dimensionsCheck = isValiedValue
-    ? storedDimensions
+    ? {
+        width: Math.min(storedDimensions.width, CHAT_MAX_WINDOW_WIDTH),
+        height: Math.min(storedDimensions.height, CHAT_MAX_WINDOW_HEIGHT),
+      }
     : {
         width: CHAT_WINDOW_WIDTH,
         height: CHAT_WINDOW_HEIGHT,
