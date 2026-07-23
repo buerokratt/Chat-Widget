@@ -19,4 +19,5 @@ window._env_ = {
   WIDGET_WIDTH: 400,
   STREAM_TYPING_SPEED: 30, // in milliseconds - lower is faster
   IFRAME_TARGET_OIRGIN: "*",
+  FALLBACK_LANGUAGE: "et",
 };
