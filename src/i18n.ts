@@ -23,8 +23,9 @@ i18n
       escapeValue: false,
     },
     detection: {
-      order: ['path'],
+      order: ['localStorage', 'path'],
       lookupFromPathIndex: 0,
+      caches: ['localStorage'],
     },
     react: {
       useSuspense: false,
