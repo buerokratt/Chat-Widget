@@ -1,11 +1,12 @@
 import { Middleware } from 'redux';
 import { SESSION_STORAGE_CHAT_ID_KEY } from '../../constants';
-import { endChat, generateForwardingRequest, initChat, resetNewMessagesAmount, resetState, setIsChatOpen } from '../../slices/chat-slice';
+import { endChat, generateForwardingRequest, initChat, initGreetingService, resetNewMessagesAmount, resetState, setIsChatOpen } from '../../slices/chat-slice';
 import { clearStateVariablesFromLocalStorage } from "../../utils/state-management-utils";
 import { setToLocalStorage } from '../../utils/local-storage-utils';
 
 const sessionStorageMiddleware: Middleware = () => (next) => (action) => {
   if (initChat.fulfilled.match(action)) setToLocalStorage(SESSION_STORAGE_CHAT_ID_KEY, action.payload.id);
+  if (initGreetingService.fulfilled.match(action)) setToLocalStorage(SESSION_STORAGE_CHAT_ID_KEY, action.payload.id);
   if (generateForwardingRequest.fulfilled.match(action) && action.payload[0].externalId) {
     setToLocalStorage(SESSION_STORAGE_CHAT_ID_KEY, action.payload[0].externalId);
   }
