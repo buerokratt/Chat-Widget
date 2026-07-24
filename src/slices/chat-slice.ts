@@ -882,6 +882,7 @@ export const chatSlice = createSlice({
       state.chatId = action.payload.id;
       state.loading = false;
       state.chatStatus = CHAT_STATUS.OPEN;
+      state.showLoadingMessage = false;
     });
     builder.addCase(initGreetingService.rejected, (state) => {
       state.showLoadingMessage = false;
