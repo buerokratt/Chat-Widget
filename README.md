@@ -58,6 +58,7 @@ Snippet can be embedded to any site using the following html:
     WIDGET_HEIGHT: 450;
     WIDGET_WIDTH: 400;
     STREAM_TYPING_SPEED: 30,
+    FALLBACK_LANGUAGE: 'et',
     other variables...
   };
 </script>
@@ -102,15 +103,28 @@ If you want to use the widget inside an Iframe use the following snippet or refe
 ## Configurable variables
 
 - `RUUTER_API_URL`: Location of newer back end for fetching data
+- `NOTIFICATION_NODE_URL`: Location of the notification node server, used for SSE connections and termination queue calls
+- `ENVIRONMENT`: `'development'` or `'production'`
 - `TIM_AUTHENTICATION_URL`: Link to authenticate user
+- `ORGANIZATION_NAME`: Name of the organization using the widget
+- `TERMS_AND_CONDITIONS_LINK`: Link opened when the user clicks the terms and conditions button
 - `OFFICE_HOURS`: If this variable is added, widget will be hidden when not in defined work hours. If this variable is not added, the widget will always be displayed
+  - `ENABLED`: Whether office hours restrictions are enforced
   - `TIMEZONE`: Used for comparing the following variables against a specific timezone.
   - `BEGIN`: Beginning of office hours. If current time is before this hour (24H), the widget will not be displayed
   - `END`: End of office hours. If current time is after this hour (24H), the widget will not be displayed
   - `DAYS`: List of days in numbers, where 1=monday, 2=tuesday, 3=wednesday... If current day is in the list of days, the widget will be displayed according to
     BEGIN and END times.
 - `ENABLE_HIDDEN_FEATURES`: set it to `'TRUE'` will show experimental features, `'FALSE'` will hide them
+- `FEEDBACK_RATING_COLORS_ENABLED`: set it to `'TRUE'` to show colors on the NPS/feedback rating widget, `'FALSE'` to hide them
+- `ENABLE_MULTI_DOMAIN`: set it to `'TRUE'` to append the current page's domain to multi-domain related requests, `'FALSE'` to disable
+- `TERMINATION_TIMEOUT`: Timeout (in seconds) sent to the notification node when queuing a chat for termination
+- `WIDGET_HEIGHT`: Default height (in pixels) of the chat window
+- `WIDGET_WIDTH`: Default width (in pixels) of the chat window
+- `STREAM_TYPING_SPEED`: Delay (in milliseconds) between characters when streaming LLM responses - lower is faster
+- `IFRAME_TARGET_OIRGIN`: Target origin used when posting messages to the parent window (e.g. widget open/full-screen state)
 - `SMAX_INTEGRATION`: { enabled: true; } -- For SMAX integration. Default is false.
+- `FALLBACK_LANGUAGE`: Language used when a translation is missing for the current locale. Default is `'et'`.
 
 ## Licence
 
