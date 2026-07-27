@@ -244,7 +244,7 @@ const App: FC = () => {
     return (
       <ScrollProvider>
         <Suspense fallback={null}>
-          {isChatOpen ? <Chat triggerRef={triggerRef} /> : <Profile triggerRef={triggerRef} />}
+          {isChatOpen || isMobile() ? <Chat triggerRef={triggerRef} /> : <Profile triggerRef={triggerRef} />}
         </Suspense>
       </ScrollProvider>
     );

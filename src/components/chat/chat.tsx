@@ -28,6 +28,7 @@ import {
   setIdleChat,
   setIsChatOpen,
   setIsFeedbackConfirmationShown,
+  setIsFullScreen,
 } from "../../slices/chat-slice";
 import { showConfirmationModal } from "../../slices/widget-slice";
 import WarningNotification from "../warning-notification/warning-notification";
@@ -52,6 +53,7 @@ import useWidgetSelector from "../../hooks/use-widget-selector";
 import PostChatMessage from "../post-chat-message/post-chat-message";
 import { format } from "date-fns";
 import EmergencyNotice from "../emergency-notice/emergency-notice";
+import { isMobile } from "../../utils/browser-utils";
 
 const RESIZABLE_HANDLES = {
   topLeft: true,
@@ -133,6 +135,12 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
   useEffect(() => {
     return () => { triggerRef?.current?.focus(); };
   }, []);
+
+  useEffect(() => {
+    if (isMobile() && !isFullScreen) {
+      dispatch(setIsFullScreen(true));
+    }
+  }, [isFullScreen]);
   const dialogAnnouncementRef = useRef<HTMLDivElement>(null);
   const isMobileLayout = width < 480 || height < 480;
   useEffect(() => {
@@ -404,7 +412,7 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
           minHeight={CHAT_MIN_WINDOW_HEIGHT}
           maxHeight={isFullScreen ? window.innerHeight : height - 50}
           maxWidth={isFullScreen ? window.innerWidth : width - 50}
-          enable={isFullScreen ? {} : RESIZABLE_HANDLES}
+          enable={isFullScreen || isMobile() ? {} : RESIZABLE_HANDLES}
           handleComponent={RESIZE_HANDLE_COMPONENTS}
           onResizeStart={handleResizeStart}
           onResizeStop={handleChatResize}

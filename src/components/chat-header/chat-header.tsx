@@ -15,6 +15,7 @@ import {ChatHeaderInitialStyles, ChatHeaderStyles} from "./ChatHeaderStyled";
 import { useScroll } from '../../contexts/ScrollContext';
 import { setToLocalStorage } from '../../utils/local-storage-utils';
 import { LOCAL_STORAGE_INSTANTLY_OPEN_CHAT_WIDGET_KEY } from '../../constants';
+import { isMobile } from '../../utils/browser-utils';
 
 interface ChatHeaderType {
     detailHandler: MouseEventHandler<HTMLButtonElement>;
@@ -65,18 +66,22 @@ const ChatHeader = (props: ChatHeaderType): JSX.Element => {
                     {t('widget.title')}
                 </h2>
                 <div className="actions">
-                    <button title={t('header.button.minimize.label')} onClick={minimizeChat}
-                            aria-label={t('header.button.minimize.label')} type="button">
-                        <img src={Minimize} alt="Minimize icon"/>
-                    </button>
-                    <button
-                        title={t(`header.button.${isFullScreen ? 'close-' : ''}fullscreen.label`)}
-                        onClick={() => setFullScreen(!isFullScreen)}
-                        aria-label={t(`header.button.${isFullScreen ? 'close-' : ''}fullscreen.label`)}
-                        type="button"
-                    >
-                        <img src={isFullScreen ? CloseFullScreen : FullScreen} alt={t(`header.button.${isFullScreen ? 'close-' : ''}fullscreen.label`)}/>
-                    </button>
+                    {!isMobile() && (
+                        <button title={t('header.button.minimize.label')} onClick={minimizeChat}
+                                aria-label={t('header.button.minimize.label')} type="button">
+                            <img src={Minimize} alt="Minimize icon"/>
+                        </button>
+                    )}
+                    {!isMobile() && (
+                        <button
+                            title={t(`header.button.${isFullScreen ? 'close-' : ''}fullscreen.label`)}
+                            onClick={() => setFullScreen(!isFullScreen)}
+                            aria-label={t(`header.button.${isFullScreen ? 'close-' : ''}fullscreen.label`)}
+                            type="button"
+                        >
+                            <img src={isFullScreen ? CloseFullScreen : FullScreen} alt={t(`header.button.${isFullScreen ? 'close-' : ''}fullscreen.label`)}/>
+                        </button>
+                    )}
                     <button
                         title={t('header.button.close.label')}
                         onClick={() => {
