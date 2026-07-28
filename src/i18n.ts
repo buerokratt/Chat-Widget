@@ -8,7 +8,7 @@ i18n
   .use(I18nextBrowserLanguageDetector)
   .use(initReactI18next)
   .init({
-    fallbackLng: window._env_.FALLBACK_LANGUAGE,
+    fallbackLng: window._env_.FALLBACK_LANGUAGE ?? "et",
     supportedLngs: ['et', 'en'],
     resources: {
       en: {
