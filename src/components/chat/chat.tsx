@@ -53,7 +53,7 @@ import useWidgetSelector from "../../hooks/use-widget-selector";
 import PostChatMessage from "../post-chat-message/post-chat-message";
 import { format } from "date-fns";
 import EmergencyNotice from "../emergency-notice/emergency-notice";
-import { isMobile } from "../../utils/browser-utils";
+import { isMobileApp } from "../../utils/browser-utils";
 
 const RESIZABLE_HANDLES = {
   topLeft: true,
@@ -137,7 +137,7 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
   }, []);
 
   useEffect(() => {
-    if (isMobile() && !isFullScreen) {
+    if (isMobileApp() && !isFullScreen) {
       dispatch(setIsFullScreen(true));
     }
   }, [isFullScreen]);
@@ -412,7 +412,7 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
           minHeight={CHAT_MIN_WINDOW_HEIGHT}
           maxHeight={isFullScreen ? window.innerHeight : height - 50}
           maxWidth={isFullScreen ? window.innerWidth : width - 50}
-          enable={isFullScreen || isMobile() ? {} : RESIZABLE_HANDLES}
+          enable={isFullScreen || isMobileApp() ? {} : RESIZABLE_HANDLES}
           handleComponent={RESIZE_HANDLE_COMPONENTS}
           onResizeStart={handleResizeStart}
           onResizeStop={handleChatResize}
