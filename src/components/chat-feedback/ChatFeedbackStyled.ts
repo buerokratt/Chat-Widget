@@ -74,7 +74,7 @@ export const ChatFeedbackStyled = styled.div`
 
         :hover,
         :focus {
-            background-color: #003cff !important;
+            background-color: ${colors.primary} !important;
         }
     }
 
@@ -82,7 +82,7 @@ export const ChatFeedbackStyled = styled.div`
         width: 14px;
         height: 14px;
         border: 2px solid transparent;
-        border-top-color: blue;
+        border-top-color: ${colors.primary};
         border-radius: 50%;
         animation: spin 0.6s linear infinite;
         display: inline-block;
@@ -99,5 +99,52 @@ export const ChatFeedbackStyled = styled.div`
         display: flex;
         flex-flow: row nowrap;
         margin: 1rem 0 2rem;
+    }
+
+    .app-feedback-container {
+        padding-bottom: 1rem;
+    }
+
+    .feedback-textarea {
+        width: 100%;
+        min-height: 80px;
+        padding: 0.75rem;
+        border-radius: 6px;
+        border: 1px solid ${colors.hellamaa};
+        resize: none;
+        box-sizing: border-box;
+        font-family: ${fontChat};
+        font-size: 14px;
+        color: ${colors.mustakivi};
+        background: ${colors.chatSurface};
+
+        &::placeholder {
+            color: ${colors.placeholderGray};
+        }
+    }
+
+    .feedback-submit {
+        width: 100%;
+        margin-top: 0.5rem;
+        padding: 0.75rem;
+        border: 0;
+        border-radius: 6px;
+        background-color: ${colors.primary};
+        color: ${colors.white};
+        font-family: ${fontChat};
+        font-size: 14px;
+        cursor: pointer;
+
+        &:disabled {
+            background-color: ${colors.hellamaa};
+            color: ${colors.placeholderGray};
+            cursor: not-allowed;
+        }
+    }
+
+    .app-download-link {
+        position: static;
+        margin-top: 0.5rem;
+        text-align: center;
     }
 `

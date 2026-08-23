@@ -6,6 +6,7 @@ import App from "./App";
 import { store } from "./store";
 import "./i18n";
 import "./index.scss";
+import { isMobileApp } from "./utils/browser-utils";
 
 const getBasePath = () => {
   const { pathname } = window.location;
@@ -15,6 +16,8 @@ const getBasePath = () => {
 };
 
 const baseName = getBasePath();
+
+document.getElementById("byk-va")?.setAttribute("data-mobile-app", String(isMobileApp()));
 
 ReactDOM.render(
   <Provider store={store}>
