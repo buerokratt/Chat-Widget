@@ -119,6 +119,7 @@ export interface ChatState {
   failedMessages: Message[];
   isTypingStream: boolean;
   stopTypingStream: boolean;
+  hasFetchedGreeting: boolean;
 }
 
 const initialEstimatedTime = {
@@ -193,6 +194,7 @@ const initialState: ChatState = {
   failedMessages: [],
   isTypingStream: false,
   stopTypingStream: false,
+  hasFetchedGreeting: false,
 };
 
 const initialStateOpen: ChatState = {
@@ -262,6 +264,7 @@ const initialStateOpen: ChatState = {
     failedMessages: [],
     isTypingStream: false,
     stopTypingStream: false,
+    hasFetchedGreeting: false,
 };
 
 export const initChat = createAsyncThunk(
@@ -458,8 +461,30 @@ export const sendUserContacts = createAsyncThunk(
   }
 );
 
-export const getGreeting = createAsyncThunk("chat/getGreeting", async () =>
-  ChatService.getGreeting()
+export const getGreeting = createAsyncThunk(
+  "chat/getGreeting",
+  async (_args, thunkApi) => {
+    const response = await ChatService.getGreeting();
+    if (response.isActive && response.type === "service") {
+      thunkApi.dispatch(initGreetingService());
+      return { ...response, isActive: false };
+    }
+    return response;
+  }
+);
+
+export const initGreetingService = createAsyncThunk(
+  "chat/initGreetingService",
+  async () => {
+    const userAgent = parseUserAgent(navigator.userAgent);
+    const userDevice = userAgent.device.vendor ?? 'unknown';
+    const userDeviceModel = userAgent.device.model != undefined ? ` (${userAgent.device.model})` : '';
+    const agentInfo = `Agent: ${browserName} (v${fullBrowserVersion}), OS: ${osName} (v${osVersion}), device: ${userDevice}${userDeviceModel}`;
+    return ChatService.initGreetingService({
+      endUserUrl: window.location.href.toString(),
+      endUserOs: agentInfo,
+    });
+  }
 );
 
 export const getEmergencyNotice = createAsyncThunk(
@@ -848,6 +873,22 @@ export const chatSlice = createSlice({
         state.responseErrorMessage = "widget.error.technicalProblems";
       }
     });
+    builder.addCase(initGreetingService.pending, (state) => {
+      state.lastReadMessageTimestamp = new Date().toISOString();
+      state.loading = true;
+      state.showLoadingMessage = true;
+    });
+    builder.addCase(initGreetingService.fulfilled, (state, action) => {
+      state.chatId = action.payload.id;
+      state.loading = false;
+      state.chatStatus = CHAT_STATUS.OPEN;
+      state.showLoadingMessage = false;
+    });
+    builder.addCase(initGreetingService.rejected, (state) => {
+      state.showLoadingMessage = false;
+      state.showResponseError = true;
+      state.responseErrorMessage = "widget.error.technicalProblems";
+    });
     builder.addCase(sendNewMessage.pending, (state) => {
       if (state.customerSupportId === "chatbot") {
         state.showLoadingMessage = true;
@@ -874,6 +915,9 @@ export const chatSlice = createSlice({
       state.messages = filterDuplicatMessages(action.payload);
 
       state.chatMode = getChatModeBasedOnLastMessage(state.messages);
+    });
+    builder.addCase(getGreeting.pending, (state) => {
+      state.hasFetchedGreeting = true;
     });
     builder.addCase(getGreeting.fulfilled, (state, action) => {
       if (!action.payload.isActive) return;

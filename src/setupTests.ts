@@ -30,6 +30,7 @@ window._env_ = {
   STREAM_TYPING_SPEED: 30,
   IFRAME_TARGET_OIRGIN: "*",
   SMAX_INTEGRATION: { enabled: false },
+  FALLBACK_LANGUAGE: "et",
 };
 
 beforeAll(() => {

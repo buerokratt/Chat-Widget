@@ -99,6 +99,7 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
     chatMode,
     showResponseError,
     emergencyNotice,
+    hasFetchedGreeting,
   } = useChatSelector();
   const [ idleTimerSelection, setIdleTimerSelection ] = useState<number>(IDLE_CHAT_CHOICES_INTERVAL)
   const [ displayEndMessage, setDisplayEndMessage ] = useState<boolean>(false)
@@ -199,13 +200,14 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
   useEffect(() => {
     if (
       !chatId &&
+      !hasFetchedGreeting &&
       !feedback.isFeedbackConfirmationShown &&
       (!messages.length ||
         !messages.map((m) => m.event).includes(CHAT_EVENTS.GREETING))
     ) {
       dispatch(getGreeting());
     }
-  }, [dispatch, chatId, feedback.isFeedbackConfirmationShown, messages]);
+  }, [dispatch, chatId, hasFetchedGreeting, feedback.isFeedbackConfirmationShown, messages]);
 
   const handleResizeStart = () => {
     if (isFullScreen) {

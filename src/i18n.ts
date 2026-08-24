@@ -8,7 +8,7 @@ i18n
   .use(I18nextBrowserLanguageDetector)
   .use(initReactI18next)
   .init({
-    fallbackLng: 'et',
+    fallbackLng: window._env_.FALLBACK_LANGUAGE ?? "et",
     supportedLngs: ['et', 'en'],
     resources: {
       en: {
@@ -23,8 +23,9 @@ i18n
       escapeValue: false,
     },
     detection: {
-      order: ['path'],
+      order: ['localStorage', 'path'],
       lookupFromPathIndex: 0,
+      caches: ['localStorage'],
     },
     react: {
       useSuspense: false,

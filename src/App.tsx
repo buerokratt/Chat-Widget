@@ -63,6 +63,7 @@ declare global {
       STREAM_TYPING_SPEED: number;
       IFRAME_TARGET_OIRGIN: string;
       SMAX_INTEGRATION: { enabled: boolean };
+      FALLBACK_LANGUAGE: string;
     };
   }
 }
