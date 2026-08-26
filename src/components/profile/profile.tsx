@@ -1,4 +1,4 @@
-import React, {MutableRefObject, useEffect, useState} from "react";
+import React, {MutableRefObject, useEffect, useRef, useState} from "react";
 import {motion} from "framer-motion";
 import {useTranslation} from "react-i18next";
 import {setIsChatOpen} from "../../slices/chat-slice";
@@ -10,6 +10,7 @@ import {getFromLocalStorage, setToLocalStorage} from "../../utils/local-storage-
 import {ProfileStyles} from "./ProfileStyles";
 import { LOCAL_STORAGE_INSTANTLY_OPEN_CHAT_WIDGET_KEY } from "../../constants";
 import useChatSelector from "../../hooks/use-chat-selector";
+import {useAvoidFixedOverlap} from "../../hooks/use-avoid-fixed-overlap";
 
 interface ProfileProps {
     triggerRef?: MutableRefObject<HTMLButtonElement | null>;
@@ -22,6 +23,8 @@ export const Profile = ({ triggerRef }: ProfileProps): JSX.Element => {
     const [delayFinished, setDelayFinished] = useState(false);
     const newMessagesAmount = getFromLocalStorage("newMessagesAmount");
     const { chatId } = useChatSelector();
+    const profileWrapperRef = useRef<HTMLDivElement>(null);
+    const overlapOffset = useAvoidFixedOverlap(profileWrapperRef);
 
     const openChat = () => {
         dispatch(setIsChatOpen(true));
@@ -53,7 +56,11 @@ export const Profile = ({ triggerRef }: ProfileProps): JSX.Element => {
 
     return (
         <ProfileStyles as="aside" aria-label={t("profile.landmark.label")}>
-            <ProfileStyles className="profile__wrapper">
+            <ProfileStyles
+                className="profile__wrapper"
+                ref={profileWrapperRef}
+                style={overlapOffset > 0 ? { transform: `translateY(-${overlapOffset}px)` } : undefined}
+            >
                 <ProfileStyles>
                 <motion.button
                     ref={triggerRef}
