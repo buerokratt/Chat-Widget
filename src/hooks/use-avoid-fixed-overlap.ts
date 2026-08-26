@@ -1,4 +1,4 @@
-import { RefObject, useEffect, useState } from "react";
+import { RefObject, useEffect, useRef, useState } from "react";
 
 const GAP_PX = 12;
 
@@ -7,9 +7,12 @@ const isVisible = (style: CSSStyleDeclaration): boolean =>
   style.visibility !== "hidden" &&
   parseFloat(style.opacity || "1") > 0;
 
-const computeOverlapOffset = (el: HTMLElement): number => {
-  const ownRect = el.getBoundingClientRect();
-  if (ownRect.width === 0 || ownRect.height === 0) return 0;
+const computeOverlapOffset = (el: HTMLElement, currentOffset: number): number => {
+  const rect = el.getBoundingClientRect();
+  if (rect.width === 0 || rect.height === 0) return 0;
+
+  const naturalTop = rect.top + currentOffset;
+  const naturalBottom = rect.bottom + currentOffset;
 
   let offset = 0;
 
@@ -20,14 +23,14 @@ const computeOverlapOffset = (el: HTMLElement): number => {
     const style = window.getComputedStyle(candidate);
     if (style.position !== "fixed" || !isVisible(style)) continue;
 
-    const rect = candidate.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) continue;
+    const candidateRect = candidate.getBoundingClientRect();
+    if (candidateRect.width === 0 || candidateRect.height === 0) continue;
 
-    const horizontalOverlap = rect.left < ownRect.right && rect.right > ownRect.left;
-    const verticalOverlap = rect.top < ownRect.bottom && rect.bottom > ownRect.top;
+    const horizontalOverlap = candidateRect.left < rect.right && candidateRect.right > rect.left;
+    const verticalOverlap = candidateRect.top < naturalBottom && candidateRect.bottom > naturalTop;
     if (!horizontalOverlap || !verticalOverlap) continue;
 
-    offset = Math.max(offset, ownRect.bottom - rect.top + GAP_PX);
+    offset = Math.max(offset, naturalBottom - candidateRect.top + GAP_PX);
   }
 
   return offset;
@@ -35,9 +38,11 @@ const computeOverlapOffset = (el: HTMLElement): number => {
 
 export const useAvoidFixedOverlap = (ref: RefObject<HTMLElement>, enabled = true): number => {
   const [offset, setOffset] = useState(0);
+  const offsetRef = useRef(0);
 
   useEffect(() => {
     if (!enabled) {
+      offsetRef.current = 0;
       setOffset(0);
       return;
     }
@@ -45,7 +50,12 @@ export const useAvoidFixedOverlap = (ref: RefObject<HTMLElement>, enabled = true
     let rafId: number | null = null;
     const recompute = () => {
       rafId = null;
-      if (ref.current) setOffset(computeOverlapOffset(ref.current));
+      if (!ref.current) return;
+      const next = computeOverlapOffset(ref.current, offsetRef.current);
+      if (next !== offsetRef.current) {
+        offsetRef.current = next;
+        setOffset(next);
+      }
     };
     const scheduleRecompute = () => {
       if (rafId !== null) return;
