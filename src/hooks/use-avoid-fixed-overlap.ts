@@ -14,23 +14,33 @@ const computeOverlapOffset = (el: HTMLElement, currentOffset: number): number =>
   const naturalTop = rect.top + currentOffset;
   const naturalBottom = rect.bottom + currentOffset;
 
+  const points: Array<[number, number]> = [
+    [rect.left + 1, naturalTop + 1],
+    [rect.right - 1, naturalTop + 1],
+    [rect.left + 1, naturalBottom - 1],
+    [rect.right - 1, naturalBottom - 1],
+    [(rect.left + rect.right) / 2, (naturalTop + naturalBottom) / 2],
+  ];
+
   let offset = 0;
+  const checked = new Set<Element>();
 
-  for (const candidate of Array.from(document.body.children)) {
-    if (!(candidate instanceof HTMLElement)) continue;
-    if (candidate === el || candidate.contains(el) || el.contains(candidate)) continue;
+  for (const [x, y] of points) {
+    if (x < 0 || y < 0 || x > window.innerWidth || y > window.innerHeight) continue;
 
-    const style = window.getComputedStyle(candidate);
-    if (style.position !== "fixed" || !isVisible(style)) continue;
+    for (const candidate of document.elementsFromPoint(x, y)) {
+      if (checked.has(candidate) || !(candidate instanceof HTMLElement)) continue;
+      checked.add(candidate);
+      if (candidate === el || candidate.contains(el) || el.contains(candidate)) continue;
 
-    const candidateRect = candidate.getBoundingClientRect();
-    if (candidateRect.width === 0 || candidateRect.height === 0) continue;
+      const style = window.getComputedStyle(candidate);
+      if (style.position !== "fixed" || !isVisible(style)) continue;
 
-    const horizontalOverlap = candidateRect.left < rect.right && candidateRect.right > rect.left;
-    const verticalOverlap = candidateRect.top < naturalBottom && candidateRect.bottom > naturalTop;
-    if (!horizontalOverlap || !verticalOverlap) continue;
+      const candidateRect = candidate.getBoundingClientRect();
+      if (candidateRect.width === 0 || candidateRect.height === 0) continue;
 
-    offset = Math.max(offset, naturalBottom - candidateRect.top + GAP_PX);
+      offset = Math.max(offset, naturalBottom - candidateRect.top + GAP_PX);
+    }
   }
 
   return offset;
