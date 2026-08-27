@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { memo, MutableRefObject, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import useFocusTrap from "../../hooks/useFocusTrap";
+import { useAvoidFixedOverlap } from "../../hooks/use-avoid-fixed-overlap";
 import { useTranslation } from "react-i18next";
 import { Resizable, ResizeCallback } from "re-resizable";
 import useChatSelector from "../../hooks/use-chat-selector";
@@ -84,6 +85,7 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
   const { isAuthenticated } = useAuthenticationSelector();
   const { isFullScreen } = useChatSelector();
   const chatWrapperRef = useRef<HTMLDivElement>(null);
+  const overlapOffset = useAvoidFixedOverlap(chatWrapperRef, !isFullScreen);
   const { height, width } = useWindowDimensions();
   const { widgetConfig } = useWidgetSelector();
   const {
@@ -401,6 +403,7 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
       <div
         className="chatWrapper"
         ref={chatWrapperRef}
+        style={overlapOffset > 0 ? { transform: `translateY(-${overlapOffset}px)` } : undefined}
       >
         <Resizable
           size={isFullScreen ? { width, height } : chatDimensions}
