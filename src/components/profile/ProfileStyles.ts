@@ -16,9 +16,8 @@ const elements = {
 export const ProfileStyles = styled.div `
     .profile__wrapper {
         z-index: 9999;
-        position: fixed;
-        bottom: 0;
-        right: 0;
+        position: unset;
+        transition: all 250ms;
     }
 
     .profile__shockwave {
@@ -75,9 +74,8 @@ export const ProfileStyles = styled.div `
 
         .profile__wrapper {
             z-index: 9999;
-            position: fixed;
-            bottom: 0;
-            right: 0;
+            position: unset;
+            transition: all 250ms;
         }
     }
 
