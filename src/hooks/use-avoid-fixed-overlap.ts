@@ -27,37 +27,46 @@ const getNaturalRect = (el: HTMLElement): Rect => {
   return { top: bottom - height, bottom, left: right - width, right, width, height };
 };
 
-const computeOverlapOffset = (el: HTMLElement): number => {
-  const rect = getNaturalRect(el);
-  if (rect.width === 0 || rect.height === 0) return 0;
+const rectsOverlap = (a: Rect, b: Rect): boolean =>
+  a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
 
-  const points: Array<[number, number]> = [
-    [rect.left + 1, rect.top + 1],
-    [rect.right - 1, rect.top + 1],
-    [rect.left + 1, rect.bottom - 1],
-    [rect.right - 1, rect.bottom - 1],
-    [(rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2],
-  ];
+const getFixedCandidates = (el: HTMLElement): Rect[] => {
+  const candidates: Rect[] = [];
+
+  for (const candidate of Array.from(document.body.querySelectorAll("*"))) {
+    if (!(candidate instanceof HTMLElement)) continue;
+    if (candidate === el || candidate.contains(el) || el.contains(candidate)) continue;
+
+    const style = window.getComputedStyle(candidate);
+    if (style.position !== "fixed" || !isVisible(style)) continue;
+
+    const rect = candidate.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) continue;
+
+    candidates.push(rect);
+  }
+
+  return candidates;
+};
+
+const MAX_ITERATIONS = 8;
+
+const computeOverlapOffset = (el: HTMLElement): number => {
+  const natural = getNaturalRect(el);
+  if (natural.width === 0 || natural.height === 0) return 0;
+
+  const candidates = getFixedCandidates(el);
 
   let offset = 0;
-  const checked = new Set<Element>();
-
-  for (const [x, y] of points) {
-    if (x < 0 || y < 0 || x > window.innerWidth || y > window.innerHeight) continue;
-
-    for (const candidate of document.elementsFromPoint(x, y)) {
-      if (checked.has(candidate) || !(candidate instanceof HTMLElement)) continue;
-      checked.add(candidate);
-      if (candidate === el || candidate.contains(el) || el.contains(candidate)) continue;
-
-      const style = window.getComputedStyle(candidate);
-      if (style.position !== "fixed" || !isVisible(style)) continue;
-
-      const candidateRect = candidate.getBoundingClientRect();
-      if (candidateRect.width === 0 || candidateRect.height === 0) continue;
-
-      offset = Math.max(offset, rect.bottom - candidateRect.top + GAP_PX);
+  for (let i = 0; i < MAX_ITERATIONS; i++) {
+    const hypothetical: Rect = { ...natural, top: natural.top - offset, bottom: natural.bottom - offset };
+    let required = offset;
+    for (const candidateRect of candidates) {
+      if (!rectsOverlap(hypothetical, candidateRect)) continue;
+      required = Math.max(required, natural.bottom - candidateRect.top + GAP_PX);
     }
+    if (required <= offset) break;
+    offset = required;
   }
 
   return offset;
