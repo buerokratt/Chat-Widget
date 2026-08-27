@@ -19,6 +19,7 @@ export const ProfileStyles = styled.div `
         position: fixed;
         bottom: 0;
         right: 0;
+        transition: transform 250ms ease;
     }
 
     .profile__shockwave {
@@ -78,6 +79,7 @@ export const ProfileStyles = styled.div `
             position: fixed;
             bottom: 0;
             right: 0;
+            transition: transform 250ms ease;
         }
     }
 
