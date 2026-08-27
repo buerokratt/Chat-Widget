@@ -7,19 +7,36 @@ const isVisible = (style: CSSStyleDeclaration): boolean =>
   style.visibility !== "hidden" &&
   parseFloat(style.opacity || "1") > 0;
 
-const computeOverlapOffset = (el: HTMLElement, currentOffset: number): number => {
-  const rect = el.getBoundingClientRect();
+interface Rect {
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+  width: number;
+  height: number;
+}
+
+const getNaturalRect = (el: HTMLElement): Rect => {
+  const style = window.getComputedStyle(el);
+  const marginRight = parseFloat(style.marginRight) || 0;
+  const marginBottom = parseFloat(style.marginBottom) || 0;
+  const width = el.offsetWidth;
+  const height = el.offsetHeight;
+  const right = window.innerWidth - marginRight;
+  const bottom = window.innerHeight - marginBottom;
+  return { top: bottom - height, bottom, left: right - width, right, width, height };
+};
+
+const computeOverlapOffset = (el: HTMLElement): number => {
+  const rect = getNaturalRect(el);
   if (rect.width === 0 || rect.height === 0) return 0;
 
-  const naturalTop = rect.top + currentOffset;
-  const naturalBottom = rect.bottom + currentOffset;
-
   const points: Array<[number, number]> = [
-    [rect.left + 1, naturalTop + 1],
-    [rect.right - 1, naturalTop + 1],
-    [rect.left + 1, naturalBottom - 1],
-    [rect.right - 1, naturalBottom - 1],
-    [(rect.left + rect.right) / 2, (naturalTop + naturalBottom) / 2],
+    [rect.left + 1, rect.top + 1],
+    [rect.right - 1, rect.top + 1],
+    [rect.left + 1, rect.bottom - 1],
+    [rect.right - 1, rect.bottom - 1],
+    [(rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2],
   ];
 
   let offset = 0;
@@ -39,7 +56,7 @@ const computeOverlapOffset = (el: HTMLElement, currentOffset: number): number =>
       const candidateRect = candidate.getBoundingClientRect();
       if (candidateRect.width === 0 || candidateRect.height === 0) continue;
 
-      offset = Math.max(offset, naturalBottom - candidateRect.top + GAP_PX);
+      offset = Math.max(offset, rect.bottom - candidateRect.top + GAP_PX);
     }
   }
 
@@ -61,7 +78,7 @@ export const useAvoidFixedOverlap = (ref: RefObject<HTMLElement>, enabled = true
     const recompute = () => {
       rafId = null;
       if (!ref.current) return;
-      const next = computeOverlapOffset(ref.current, offsetRef.current);
+      const next = computeOverlapOffset(ref.current);
       if (next !== offsetRef.current) {
         offsetRef.current = next;
         setOffset(next);
