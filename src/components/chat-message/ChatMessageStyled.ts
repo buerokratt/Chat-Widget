@@ -83,7 +83,6 @@ export const ChatMessageStyled = styled.div`
 
   .message-icon {
     display: flex;
-    width: 2.8em;
     height: 2.8em;
     flex-shrink: 0;
   }
