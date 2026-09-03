@@ -89,7 +89,7 @@ export const ChatMessageStyled = styled.div`
   }
 
   .edited-message {
-    color: #9799a4;
+    color: ${colors.placeholderGray};
     font-size: 11px;
     line-height: 20px;
     -webkit-user-select: none;
@@ -181,8 +181,8 @@ export const ChatMessageStyled = styled.div`
     font-size: 1em;
     margin: 0.7rem 0.3rem 0.3rem 0.3rem;
     padding: 0.3rem 1.5rem;
-    background-color: #f0f1f2;
-    color: #003cff;
+    background-color: ${colors.backgroundGray};
+    color: ${colors.primary};
     border: none;
     box-shadow: 2px 1px 4px grey;
 
@@ -238,7 +238,7 @@ export const ChatMessageStyled = styled.div`
     align-items: center;
     background-color: ${colors.gray};
     text-align: center;
-    color: #575a5d;
+    color: ${colors.majakivi};
     border-radius: 6px;
     margin-right: 0.8em;
     margin-left: 0.8em;
@@ -278,7 +278,7 @@ export const ChatMessageStyled = styled.div`
         .emergency {
           height: 100%;
           width: 100%;
-          background-color: #003cff;
+          background-color: ${colors.primary};
           border-radius: 50%;
           text-align: center;
           font-size: 32px;
