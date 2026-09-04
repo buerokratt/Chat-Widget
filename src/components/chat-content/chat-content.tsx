@@ -85,7 +85,7 @@ const ChatContent = (): JSX.Element => {
         showLoadingMessage ||
         messages.some((message) => message.isStreaming === true) ||
         isAwaitingHiddenMessageContent;
-    const hasStreamingMessage = messages.some((message) => message.isStreaming !== undefined);
+    const hasActiveStreamingMessage = messages.some((message) => message.isStreaming === true);
     const thinkingMessage = t('widget.status.thinking');
 
     useEffect(() => {
@@ -199,7 +199,7 @@ const ChatContent = (): JSX.Element => {
                             );
                         })}
                         {isThinking &&
-                            (!hasStreamingMessage || isAwaitingHiddenMessageContent) && <LoadingMessage/>}
+                            (!hasActiveStreamingMessage || isAwaitingHiddenMessageContent) && <LoadingMessage/>}
                     </div>
                 </OverlayScrollbarsComponent>
             </ChatContentStyles>
@@ -208,4 +208,3 @@ const ChatContent = (): JSX.Element => {
 };
 
 export default ChatContent;
-
