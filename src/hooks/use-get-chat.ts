@@ -1,45 +1,36 @@
-import { useEffect, useState } from 'react';
-import { useAppDispatch } from '../store';
-import sse from '../services/sse-service';
-import useChatSelector from './use-chat-selector';
+import { useEffect } from "react";
+import { useNotificationEvents } from "@buerokratt-ria/notifications/react";
+import { useAppDispatch } from "../store";
+import useChatSelector from "./use-chat-selector";
 import useAuthenticationSelector from "./use-authentication-selector";
-import { setChat } from '../slices/chat-slice';
+import { setChat } from "../slices/chat-slice";
 import { setIsNotAuthenticated } from "../slices/authentication-slice";
-import chatService from '../services/chat-service';
+import chatService from "../services/chat-service";
 
 const useGetChat = (): void => {
   const { isAuthenticated } = useAuthenticationSelector();
   const { isChatEnded, chatId } = useChatSelector();
   const dispatch = useAppDispatch();
-  const [sseUrl, setSseUrl] = useState('');
+
+  useNotificationEvents({
+    eventTypes: "*",
+    listener: async ({ data }) => {
+      if (isChatEnded || !chatId) return;
+      if (typeof data !== "object" || data === null) return;
+      if ((data as { type?: string }).type !== "message") return;
+
+      const chat = await chatService.getChatById(chatId);
+      dispatch(setChat(chat));
+    },
+  });
 
   useEffect(() => {
     if (isChatEnded || !chatId) {
-      setSseUrl("");
       if (isAuthenticated) {
         dispatch(setIsNotAuthenticated());
       }
-    } else if (chatId) {
-      setSseUrl("/notifications/chat-list");
     }
-  }, [chatId, isChatEnded]);
-
-  useEffect(() => {
-    let events: EventSource | undefined;
-    if (sseUrl) {  
-      const onMessage = async (data: any) => {   
-        if (data) {
-          const chat = await chatService.getChatById(chatId ?? '');
-          dispatch(setChat(chat));
-        } 
-      };
-
-      events = sse(sseUrl, onMessage);
-    }
-    return () => {
-      events?.close();
-    };
-  }, [sseUrl]);
+  }, [chatId, dispatch, isAuthenticated, isChatEnded]);
 };
 
 export default useGetChat;

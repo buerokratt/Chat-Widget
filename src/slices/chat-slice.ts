@@ -275,7 +275,7 @@ export const initChat = createAsyncThunk(
     const userDevice = userAgent.device.vendor ?? 'unknown';
     const userDeviceModel = userAgent.device.model != undefined ? ` (${userAgent.device.model})` : '';
     const agentInfo = `Agent: ${browserName} (v${fullBrowserVersion}), OS: ${osName} (v${osVersion}), device: ${userDevice}${userDeviceModel}`;
-    return ChatService.init(
+    const chat = await ChatService.init(
       message,
       {
         endUserUrl: window.location.href.toString(),
@@ -284,6 +284,10 @@ export const initChat = createAsyncThunk(
       holidays,
       holidayNames
     );
+    // Fetch messages explicitly because SSE requires cookies set during initialization;
+    // otherwise, a race condition can cause the first message to be missed.
+    const messages = await ChatService.getMessages(chat.id);
+    return { ...chat, messages };
   }
 );
 
@@ -862,6 +866,13 @@ export const chatSlice = createSlice({
       state.chatId = action.payload.id;
       state.loading = false;
       state.chatStatus = CHAT_STATUS.OPEN;
+      state.customerSupportId = action.payload.customerSupportId;
+      state.showLoadingMessage = false;
+      state.messages = filterDuplicatMessages(action.payload.messages);
+      state.lastReadMessageTimestamp =
+        action.payload.messages[action.payload.messages.length - 1]?.created ??
+        new Date().toISOString();
+      state.chatMode = getChatModeBasedOnLastMessage(state.messages);
     });
     builder.addCase(initChat.rejected, (state, action) => {
       state.showLoadingMessage = false;
@@ -911,8 +922,15 @@ export const chatSlice = createSlice({
     });
     builder.addCase(getChatMessages.fulfilled, (state, action) => {
       if (!action.payload) return;
-      state.lastReadMessageTimestamp = new Date().toISOString();
-      state.messages = filterDuplicatMessages(action.payload);
+      state.lastReadMessageTimestamp =
+        action.payload[action.payload.length - 1]?.created ??
+        state.lastReadMessageTimestamp ??
+        new Date().toISOString();
+      state.messages = filterDuplicatMessages([
+        ...state.messages,
+        ...action.payload,
+      ]);
+      state.showLoadingMessage = false;
 
       state.chatMode = getChatModeBasedOnLastMessage(state.messages);
     });
