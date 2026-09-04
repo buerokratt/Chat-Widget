@@ -21,6 +21,15 @@ module.exports = {
   },
   module: {
     rules: [
+      // The notifications SDK is a strict ESM package and imports
+      // react/jsx-runtime without the .js extension. Webpack otherwise
+      // treats the request as fully specified and fails to resolve it.
+      {
+        test: /node_modules\/.*\.m?js$/,
+        resolve: {
+          fullySpecified: false,
+        },
+      },
       {
         test: /\.m?js$/,
         exclude: /node_modules/,

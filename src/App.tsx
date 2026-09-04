@@ -1,4 +1,6 @@
 import React, { FC, Suspense, lazy, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createNotificationsClient } from "@buerokratt-ria/notifications";
+import { NotificationsProvider } from "@buerokratt-ria/notifications/react";
 import { isOfficeHours } from "./utils/office-hours-utils";
 
 const Profile = lazy(() => import("./components/profile/profile"));
@@ -28,12 +30,13 @@ import useNewMessageNotification from "./hooks/use-new-message-notification";
 import useAuthentication from "./hooks/use-authentication";
 import useGetNewMessages from "./hooks/use-get-new-messages";
 import useGetChat from "./hooks/use-get-chat";
+import useNotificationsConnection from "./hooks/use-notifications-connection";
 import { getWidgetConfig } from "./slices/widget-slice";
 import useWidgetSelector from "./hooks/use-widget-selector";
 import useGetEmergencyNotice from "./hooks/use-get-emergency-notice";
-import { customJwtExtend } from "./slices/authentication-slice";
 import { getFromLocalStorage, setToLocalStorage } from "./utils/local-storage-utils";
 import useNameAndTitleVisibility from "./hooks/use-name-title-visibility";
+import useExtendJwt from "./hooks/use-extend-jwt";
 import { generateUEID } from "./utils/generators";
 import { isMobile, isMobileWidth } from "./utils/browser-utils";
 import { namespacedKey } from "./utils/widget-instance-utils";
@@ -44,6 +47,7 @@ declare global {
     _env_: {
       RUUTER_API_URL: string;
       NOTIFICATION_NODE_URL: string;
+      NOTIFICATIONS_VAPID_PUBLIC_KEY: string;
       ENVIRONMENT: "development"; // 'developement | production'
       TIM_AUTHENTICATION_URL: string;
       ORGANIZATION_NAME: string;
@@ -69,8 +73,14 @@ declare global {
   }
 }
 
-const App: FC = () => {
+const notificationsClient = createNotificationsClient({
+  apiBaseUrl: window._env_.NOTIFICATION_NODE_URL.replace(/\/+$/, ""),
+  vapidPublicKey: window._env_.NOTIFICATIONS_VAPID_PUBLIC_KEY,
+});
+
+const AppContent: FC = () => {
   const dispatch = useAppDispatch();
+  const extendJwt = useExtendJwt();
   const { isChatOpen, messages, chatId, emergencyNotice, isFullScreen } = useChatSelector();
   const { widgetConfig } = useWidgetSelector();
   const [displayWidget, setDisplayWidget] = useState(
@@ -114,6 +124,7 @@ const App: FC = () => {
   useAuthentication();
   useGetChat();
   useGetNewMessages();
+  useNotificationsConnection();
   useNewMessageNotification();
 
   useEffect(() => {
@@ -201,11 +212,11 @@ const App: FC = () => {
     if (!displayWidget || !isChatOpen || !chatId) return;
     const interval = setInterval(() => {
       if (!displayWidget || !isChatOpen || !chatId) return;
-      dispatch(customJwtExtend());
+      void extendJwt();
     }, EXTEND_JWT_COOKIE_IN_MS);
 
     return () => clearInterval(interval);
-  }, [messages]);
+  }, [extendJwt, messages]);
 
   useEffect(() => {
     const sessionStorageChatId = getFromLocalStorage(
@@ -251,5 +262,11 @@ const App: FC = () => {
     );
   return <></>;
 };
+
+const App: FC = () => (
+  <NotificationsProvider client={notificationsClient}>
+    <AppContent />
+  </NotificationsProvider>
+);
 
 export default App;
