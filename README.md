@@ -41,7 +41,8 @@ Snippet can be embedded to any site using the following html:
 <script>
   window._env_ = {
     RUUTER_API_URL: 'LOCATION_OF_RUUTER',
-    NOTIFICATION_NODE_URL: 'Notification Node Server Url'
+    NOTIFICATION_NODE_URL: 'Notification Node Server Url',
+    NOTIFICATIONS_VAPID_PUBLIC_KEY: 'Public VAPID key supplied by application configuration',
     ENVIRONMENT: 'development', // 'developement | production'
     TIM_AUTHENTICATION_URL: 'TIM url with callback parameter',
     OFFICE_HOURS: {
@@ -103,7 +104,8 @@ If you want to use the widget inside an Iframe use the following snippet or refe
 ## Configurable variables
 
 - `RUUTER_API_URL`: Location of newer back end for fetching data
-- `NOTIFICATION_NODE_URL`: Location of the notification node server, used for SSE connections and termination queue calls
+- `NOTIFICATION_NODE_URL`: Location of the notification node server, used by the notifications SDK and termination queue calls
+- `NOTIFICATIONS_VAPID_PUBLIC_KEY`: Required base64url-encoded public VAPID key matching the notification server
 - `ENVIRONMENT`: `'development'` or `'production'`
 - `TIM_AUTHENTICATION_URL`: Link to authenticate user
 - `ORGANIZATION_NAME`: Name of the organization using the widget
