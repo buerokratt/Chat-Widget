@@ -29,8 +29,8 @@ export const ChatStyles = styled.div<{isFullScreen?: boolean}>`
     .sub-title {
       flex-shrink: 0;
       width: 100%;
-      background-color: #F0F1F2;
-      color: #003cff;
+      background-color: ${colors.backgroundGray};
+      color: ${colors.primary};
       padding: 5px 0px;
       font-size: 22px;
       text-align: center;
@@ -43,22 +43,22 @@ export const ChatStyles = styled.div<{isFullScreen?: boolean}>`
 
     .emergency-notice {
       width: 100%;
-      background-color: #ffffff;
+      background-color: ${colors.emergencyNoticeBg};
       padding: 8px 12px;
       box-sizing: border-box;
       display: flex;
       align-items: center;
       gap: 12px;
-      border-bottom: 1px solid #e5e5e5;
+      border-bottom: 1px solid ${colors.hellamaa};
       box-shadow: 0 0.2px 0px rgba(0, 0, 0, 0.1);
     }
 
     .emergency-notice-icon {
       width: 1.4em;
       height: 1.4em;
-      background-color: #003cff;
+      background-color: ${colors.primary};
+      color: ${colors.white};
       border-radius: 50%;
-      color: #ffffff;
       font-size: 2em;
       font-weight: bold;
       display: flex;
@@ -77,7 +77,7 @@ export const ChatStyles = styled.div<{isFullScreen?: boolean}>`
     }
 
     .emergency-notice-text {
-      color: #333333;
+      color: ${colors.emergencyNoticeText};
       font-size: 1.2em;
       line-height: 1.5;
       text-align: left;
@@ -111,7 +111,7 @@ export const ChatStyles = styled.div<{isFullScreen?: boolean}>`
       border: none;
       background: none;
       padding: 0;
-      color: #003cff;
+      color: ${colors.primary};
       cursor: pointer;
       font-family: ${fontChatBold};
       font-size: 1em;
@@ -142,7 +142,7 @@ export const ChatStyles = styled.div<{isFullScreen?: boolean}>`
         display: flex;
         flex-direction: column;
         font-family: ${fontChat};
-        background: #ffffff;
+        background: ${colors.chatSurface};
         box-shadow: 0 4px 4px ${colors.gray};
         height: ${props => props.isFullScreen ? '100vh' : '100%'};
         width: ${props => props.isFullScreen ? '100vw' : '100%'};

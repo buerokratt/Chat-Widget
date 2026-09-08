@@ -1,13 +1,16 @@
 import React, {useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {useAppDispatch} from "../../store";
-import {downloadChat, sendChatNpmRating, setFeedbackRatingGiven} from "../../slices/chat-slice";
-import { isFeedbackRatingColorsEnabled } from "../../constants";
+import {downloadChat, sendChatNpmRating, sendFeedbackMessage, setFeedbackMessageGiven, setFeedbackRatingGiven} from "../../slices/chat-slice";
+import { FEEDBACK_MESSAGE_MAX_CHAR_LIMIT, isFeedbackRatingColorsEnabled } from "../../constants";
 import useChatSelector from "../../hooks/use-chat-selector";
 import {Download, DownloadElement} from "../../hooks/use-download-file";
 import {ChatFeedbackStyled} from "./ChatFeedbackStyled";
 import useWidgetSelector from "../../hooks/use-widget-selector";
 import { FeedbackRatingButton } from "./feedback-rating-view";
+import { FeedbackEmojiRating } from "./feedback-emoji-rating";
+import ChatKeypadCharCounter from "../chat-keypad/chat-keypad-char-counter";
+import { isMobileApp } from "../../utils/browser-utils";
 
 const ChatFeedback = (): JSX.Element => {
     const dispatch = useAppDispatch();
@@ -16,7 +19,9 @@ const ChatFeedback = (): JSX.Element => {
     const { widgetConfig } = useWidgetSelector();
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedFeedbackButtonValue, setSelectedFeedbackButtonValue] = useState<string>("");
+    const [feedbackText, setFeedbackText] = useState<string>("");
     const downloadRef = useRef<DownloadElement>(null);
+    const isApp = isMobileApp();
 
     const handleFeedback = (feedbackRating: string | null) => {
         if (!widgetConfig.feedbackActive) {
@@ -25,11 +30,29 @@ const ChatFeedback = (): JSX.Element => {
         };
         if (feedbackRating === null) return;
         setSelectedFeedbackButtonValue(feedbackRating);
+        if (isApp) return;
         dispatch(
           sendChatNpmRating({ NpmRating: parseInt(feedbackRating ?? "1") }),
         );
         dispatch(setFeedbackRatingGiven(true));
     };
+
+    const handleAppSubmit = () => {
+        if (widgetConfig.feedbackActive) {
+            if (!selectedFeedbackButtonValue) return;
+            dispatch(sendChatNpmRating({ NpmRating: parseInt(selectedFeedbackButtonValue) }));
+        }
+        if (widgetConfig.feedbackNoticeActive && feedbackText.trim() !== "" && feedbackText.trim().length <= FEEDBACK_MESSAGE_MAX_CHAR_LIMIT) {
+            dispatch(sendFeedbackMessage({ userInput: feedbackText }));
+        }
+        dispatch(setFeedbackRatingGiven(true));
+        dispatch(setFeedbackMessageGiven(true));
+    };
+
+    const isAppSubmitDisabled = !!(
+      (widgetConfig.feedbackActive && !selectedFeedbackButtonValue) ||
+      (widgetConfig.feedbackNoticeActive && feedbackText.trim().length > FEEDBACK_MESSAGE_MAX_CHAR_LIMIT)
+    );
 
     const handleDownload = async () => {
         setLoading(true)
@@ -45,6 +68,45 @@ const ChatFeedback = (): JSX.Element => {
         }
     };
 
+    if (isApp) {
+      return (
+        <ChatFeedbackStyled>
+          <div className="app-feedback-container">
+            {widgetConfig.feedbackActive && <div className="feedback-paragraph above p-style">{widgetConfig.feedbackQuestion}</div>}
+            {widgetConfig.feedbackActive && (
+              <FeedbackEmojiRating selectedValue={selectedFeedbackButtonValue} onClick={handleFeedback} />
+            )}
+            {widgetConfig.feedbackNoticeActive && (
+              <>
+                <textarea
+                  className="feedback-textarea"
+                  aria-label={t("keypad.input.label")}
+                  placeholder={t("feedback.textareaPlaceholder")}
+                  value={feedbackText}
+                  onChange={(e) => setFeedbackText(e.target.value)}
+                />
+                <ChatKeypadCharCounter userInput={feedbackText} isFeedback isConfirmationFeedback />
+              </>
+            )}
+            <button
+              type="button"
+              className="feedback-submit"
+              disabled={isAppSubmitDisabled}
+              onClick={handleAppSubmit}
+            >
+              {t("feedback.submit")}
+            </button>
+            <div className="downloadContainer app-download-link">
+              <Download ref={downloadRef} />
+              <a onClick={handleDownload} className="downloadLink">
+                {loading ? <span className="spinner"></span> : t("widget.action.download-chat")}
+              </a>
+            </div>
+          </div>
+        </ChatFeedbackStyled>
+      );
+    }
+
     return (
       <ChatFeedbackStyled>
         {widgetConfig.feedbackActive && <div className="feedback-paragraph above p-style">{widgetConfig.feedbackQuestion}</div>}
@@ -58,11 +120,11 @@ const ChatFeedback = (): JSX.Element => {
               const buttonCount = isFiveScale ? 5 : 11;
               const startValue = isFiveScale ? 1 : 0;
               const lastValue = isFiveScale ? 5 : 10;
-              
+
               return Array.from(new Array(buttonCount).keys()).map((index: number) => {
                 const value = startValue + index;
                 const isLast = value === lastValue;
-                
+
                 return (
                   <FeedbackRatingButton
                     key={value}

@@ -1,0 +1,44 @@
+#byk-va {
+  --color-primary: #003cff;
+  --color-secondary: #3c0078;
+  --color-black: #000;
+  --color-mustakivi: #323334;
+  --color-gray: #a7a9ab33;
+  --color-hellamaa: #cfd1d2;
+  --color-majakivi: #575a5d;
+  --color-placeholder-gray: #a7a9ab;
+  --color-input-border-gray: #83878b;
+  --color-background-gray: #f0f1f2;
+  --color-white: #ffffff;
+  --color-focus-light: #ffffff5e;
+  --color-focus-dark: #003cff26;
+  --color-scrollbar-normal: rgba(0, 0, 0, 0.2);
+  --color-scrollbar-hover: rgba(0, 0, 0, 0.3);
+  --color-scrollbar-active: rgba(0, 0, 0, 0.5);
+  --color-header-bottom-border: #ffffff30;
+
+  // Semantic tokens for spots that previously hardcoded hex with no matching token
+  --color-chat-surface: #ffffff;
+  --color-emergency-notice-bg: #ffffff;
+  --color-emergency-notice-text: #333333;
+}
+
+@media (prefers-color-scheme: dark) {
+  #byk-va[data-mobile-app="true"] {
+    --color-mustakivi: #f0f1f2;
+    --color-majakivi: #c7c9cb;
+    --color-hellamaa: #48484a;
+    --color-placeholder-gray: #8e8e93;
+    --color-input-border-gray: #6c6c70;
+    --color-background-gray: #1c1c1e;
+    --color-white: #2c2c2e;
+    --color-black: #ffffff;
+    --color-header-bottom-border: #ffffff20;
+
+    --color-chat-surface: #1c1c1e;
+    --color-emergency-notice-bg: #2c2c2e;
+    --color-emergency-notice-text: #f0f1f2;
+
+    // --color-primary intentionally unchanged — header stays blue in both light and dark mockup frames
+  }
+}

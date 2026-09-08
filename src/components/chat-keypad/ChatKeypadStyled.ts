@@ -14,7 +14,7 @@ export const ChatKeypadStyled = styled.div`
       user-select: none;
 
       path {
-        stroke: #575a5d;
+        stroke: ${colors.majakivi};
       }
     }
 
@@ -76,7 +76,7 @@ export const ChatKeypadStyled = styled.div`
   }
 
   .button_cancelUpload {
-    background: #003cff;
+    background: ${colors.primary};
     width: 32px;
     height: 32px;
     cursor: pointer;
