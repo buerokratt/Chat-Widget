@@ -22,6 +22,12 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /node_modules\/.*\.m?js$/,
+        resolve: {
+          fullySpecified: false,
+        },
+      },
+      {
         test: /\.m?js$/,
         exclude: /node_modules/,
         use: {
