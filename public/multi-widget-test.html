@@ -226,12 +226,20 @@
       };
     </script>
 
-    <!-- Widget A: default target ("byk-va"), no instance id -> unprefixed
-         storage keys, identical to the single-widget localhost:3003 setup. -->
-    <script type="text/javascript" src="./widget_bundle.js" crossorigin=""></script>
+    <!-- Both widgets get an explicit data-instance-id here: with more than
+         one widget on the page, whichever one is "unnamed" would silently
+         rely on the backend's default-chatId fallback, which drifts to
+         whichever chat was initialized most recently - not necessarily this
+         widget's own. That only stays correct for genuine single-widget
+         pages, so every instance on a multi-widget page needs its own id. -->
+    <script
+      type="text/javascript"
+      src="./widget_bundle.js"
+      data-target="byk-va"
+      data-instance-id="widget-a"
+      crossorigin=""
+    ></script>
 
-    <!-- Widget B: separate mount point + instance id -> independent
-         storage, sessionStorage, DOM and chat token. -->
     <script
       type="text/javascript"
       src="./widget_bundle.js"

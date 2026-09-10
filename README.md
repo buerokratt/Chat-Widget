@@ -69,9 +69,9 @@ Snippet can be embedded to any site using the following html:
 
 Every persisted key (chat id, open/closed state, dimensions, language, etc.) is namespaced by an
 instance id, and the mount point is configurable, so more than one widget can run on the same page
-without the instances overwriting each other's `localStorage`/`sessionStorage` data. To embed a
-second (or further) instance, give its container a unique id and add `data-target` and
-`data-instance-id` attributes to that instance's `<script id="script-bundle">` tag:
+without the instances overwriting each other's `localStorage`/`sessionStorage` data. Give each
+instance's container a unique id and add `data-target` and `data-instance-id` attributes to that
+instance's `<script id="script-bundle">` tag:
 
 ```
 <div id="byk-va-2"></div>
@@ -90,13 +90,25 @@ second (or further) instance, give its container a unique id and add `data-targe
 
 - `data-target` — id of the container `<div>` this instance should render into. Defaults to `byk-va`.
 - `data-instance-id` — any unique string. When present, it's appended to every storage key this
-  instance reads/writes, so it never collides with another instance's data. Omit it on a
-  single-widget page to keep the original, unprefixed keys.
+  instance reads/writes, so it never collides with another instance's data, and it's sent as a
+  `chatId` query parameter on the instance's API calls so the backend can tell its chat apart from
+  another instance's. Omit it only on a genuine single-widget page, to keep the original, unprefixed
+  keys and behavior.
 
-Note this only namespaces `localStorage`/`sessionStorage`. The authentication cookie
-(`clientCustomJwtCookie`) is set by the backend and is shared across instances on the page — this is
-usually desirable (one login shared by both widgets), but two instances cannot have independent TIM
-logins on the same page without a backend-side change.
+**Important:** on a page with more than one widget, every instance needs its own `data-instance-id`
+— including what might otherwise look like "the main" one. An instance with no id never sends a
+`chatId` query parameter, so it relies on the backend's default-chat fallback (the `chatJwt` cookie's
+own `chatId` field) — but that field always points at whichever chat was initialized most recently,
+across *all* widgets on the page. Leave one instance unnamed on a multi-widget page and its requests
+will silently start resolving against a different widget's chat as soon as that other widget
+initializes.
+
+The `chatJwt` cookie itself stays shared and `HttpOnly` across all instances — it tracks every
+active chat's id in a `chatIds` array, and each instance's `chatId` query parameter selects which of
+those the request concerns (validated against that array server-side; a chatId not in the array is
+rejected). One consequence: `auth/jwt/extend` refreshes the cookie's expiry for *all* tracked chats
+at once, since there's only one cookie — there's no way for one widget's activity to keep the cookie
+alive while another's expires independently.
 
 ## Iframe Support
 

@@ -15,7 +15,10 @@ const http = axios.create({
 
 http.interceptors.request.use((config: any) => {
   if (WIDGET_INSTANCE_ID) {
-    const chatId = getFromLocalStorage(SESSION_STORAGE_CHAT_ID_KEY);
+    const chatId =
+      config.data?.chatId ||
+      config.data?.message?.chatId ||
+      getFromLocalStorage(SESSION_STORAGE_CHAT_ID_KEY);
     if (chatId) {
       config.params = { ...config.params, chatId };
     }
