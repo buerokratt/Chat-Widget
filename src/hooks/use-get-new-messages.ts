@@ -64,7 +64,13 @@ const useGetNewMessages = (): void => {
               dispatch(handleStateChangingEventMessages(messages.filter(isStateChangingEventMessage)));
             }
           }
-        } else if (type === "stream_start") {
+        } else if (type === "stream_start" && data.channelId === chatId) {
+          if (currentStreamId.current) {
+            // One active stream per chat: a duplicate start (e.g. a retried
+            // request after a dropped connection) must not reset the
+            // in-progress stream and produce a second overlapping response.
+            return;
+          }
           currentStreamContent.current = "";
           currentStreamId.current = data.streamId;
           currentStreamUuid.current = uuidv4();
