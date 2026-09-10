@@ -391,7 +391,10 @@ const ChatKeyPad = (): JSX.Element => {
           </>
         )}
       </div>
-      <ChatKeypadCharCounter userInput={userInput} />
+      <ChatKeypadCharCounter
+        userInput={userInput}
+        isFeedback={chatStatus === CHAT_STATUS.ENDED && !!chatId}
+      />
     </ChatKeypadStyled>
   );
 

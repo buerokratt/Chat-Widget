@@ -14,10 +14,6 @@ const render = (
     return <Provider store={store}>{children}</Provider>;
   }
 
-  Wrapper.propTypes = {
-    children: PropTypes.node.isRequired,
-  };
-
   return rtlRender(ui, { wrapper: Wrapper, ...renderOptions });
 };
 

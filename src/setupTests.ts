@@ -1,7 +1,5 @@
 import "@testing-library/jest-dom";
 import { Settings } from "luxon";
-import { server } from "./mocks/server";
-import "./i18n";
 
 const { getComputedStyle } = window;
 window.getComputedStyle = (elt) => getComputedStyle(elt);
@@ -32,6 +30,14 @@ window._env_ = {
   SMAX_INTEGRATION: { enabled: false },
   FALLBACK_LANGUAGE: "et",
 };
+
+// window._env_ must exist before these modules load: ./mocks/server pulls in
+// constants.ts, which reads window._env_ at import time (ES imports hoist, so
+// require them here instead).
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { server } = require("./mocks/server");
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+require("./i18n");
 
 beforeAll(() => {
   Settings.now = () => new Date(2021, 12, 18, 12).valueOf();
