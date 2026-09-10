@@ -2,13 +2,23 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 import { configureStore, EnhancedStore } from '@reduxjs/toolkit';
-import { screen } from '@testing-library/react';
+import { fireEvent, render as rtlRender, screen } from '@testing-library/react';
 import { render } from '../../utils/test-utils';
 import ChatKeyPad from './chat-keypad';
 import { waitForRequest } from '../../mocks/server';
-import { RUUTER_ENDPOINTS } from '../../constants';
+import { CHAT_STATUS, RUUTER_ENDPOINTS } from '../../constants';
 import chatReducer from '../../slices/chat-slice';
+import widgetReducer from '../../slices/widget-slice';
+import authenticationReducer from '../../slices/authentication-slice';
+import { initialChatState } from '../../test-initial-states';
 import KeypadErrorMessage from './keypad-error-message';
+
+// sanitize-html (via htmlparser2) ships ESM that react-scripts jest does not
+// transform; the counter behavior under test does not depend on sanitizing.
+jest.mock('sanitize-html', () => ({
+  __esModule: true,
+  default: (value: string) => value,
+}));
 
 let store: EnhancedStore;
 
@@ -68,5 +78,37 @@ describe('Keypad', () => {
       </Provider>,
     );
     screen.getByText(testMessage);
+  });
+});
+
+describe('Keypad feedback char counter', () => {
+  function createEndedChatStore() {
+    return configureStore({
+      reducer: {
+        chat: chatReducer,
+        widget: widgetReducer,
+        authentication: authenticationReducer,
+      },
+      preloadedState: {
+        chat: { ...initialChatState, chatId: '1', chatStatus: CHAT_STATUS.ENDED },
+      },
+    });
+  }
+
+  it('uses the 500-char feedback limit once the chat has ended', () => {
+    const endedStore = createEndedChatStore();
+    rtlRender(
+      <Provider store={endedStore}>
+        <ChatKeyPad />
+      </Provider>,
+    );
+
+    fireEvent.change(screen.getByPlaceholderText('keypad.input.placeholder'), {
+      target: { value: 'a'.repeat(600) },
+    });
+
+    // 600 chars is over the 500-char feedback limit but well under the
+    // 3000-char message limit, so the counter must show the feedback limit.
+    screen.getByText('600/500');
   });
 });
