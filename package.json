@@ -90,6 +90,7 @@
     "prettier:check": "prettier --check \"{,src/**/,webpack/}*.{json,yml,html,js,ts,tsx,css,scss}\"",
     "prettier:format": "prettier --write \"{,src/**/,webpack/}*.{json,yml,html,js,ts,tsx,css,scss}\"",
     "webpack": "webpack",
+    "start:multi-widget": "npm run webpack && cp public/multi-widget-test.html dist/index.html && npx --yes serve dist -l 3006",
     "prepare": " ",
     "changelog": "./generate-changelog.sh"
   },

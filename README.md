@@ -65,6 +65,39 @@ Snippet can be embedded to any site using the following html:
 <script id="script-bundle" type="text/javascript" src="LOCATION_OF_WIDGET_BUNDLE" crossorigin=""></script>
 ```
 
+## Multiple widgets on the same page
+
+Every persisted key (chat id, open/closed state, dimensions, language, etc.) is namespaced by an
+instance id, and the mount point is configurable, so more than one widget can run on the same page
+without the instances overwriting each other's `localStorage`/`sessionStorage` data. To embed a
+second (or further) instance, give its container a unique id and add `data-target` and
+`data-instance-id` attributes to that instance's `<script id="script-bundle">` tag:
+
+```
+<div id="byk-va-2"></div>
+<script>
+  window._env_ = { ...same as above... };
+</script>
+<script
+  id="script-bundle"
+  type="text/javascript"
+  src="LOCATION_OF_WIDGET_BUNDLE"
+  data-target="byk-va-2"
+  data-instance-id="search-widget"
+  crossorigin=""
+></script>
+```
+
+- `data-target` — id of the container `<div>` this instance should render into. Defaults to `byk-va`.
+- `data-instance-id` — any unique string. When present, it's appended to every storage key this
+  instance reads/writes, so it never collides with another instance's data. Omit it on a
+  single-widget page to keep the original, unprefixed keys.
+
+Note this only namespaces `localStorage`/`sessionStorage`. The authentication cookie
+(`clientCustomJwtCookie`) is set by the backend and is shared across instances on the page — this is
+usually desirable (one login shared by both widgets), but two instances cannot have independent TIM
+logins on the same page without a backend-side change.
+
 ## Iframe Support
 
 If you want to use the widget inside an Iframe use the following snippet or reference iframe-index.html

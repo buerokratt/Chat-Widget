@@ -1,14 +1,15 @@
 import {CHAT_SESSIONS, LOCAL_STORAGE_TARA_LOGIN_REDIRECT} from "../constants";
+import { namespacedKey } from "./widget-instance-utils";
 
 export const isLastSession = (): boolean => {
   const currentState = JSON.parse(
-    localStorage.getItem(CHAT_SESSIONS.SESSION_STATE_KEY) as string
+    localStorage.getItem(namespacedKey(CHAT_SESSIONS.SESSION_STATE_KEY)) as string
   ) || { ids: [], count: 0 };
   return currentState.count <= 1;
 };
 
 export const isWentToTim = () : boolean => {
-  return localStorage.getItem(LOCAL_STORAGE_TARA_LOGIN_REDIRECT) === 'true'
+  return localStorage.getItem(namespacedKey(LOCAL_STORAGE_TARA_LOGIN_REDIRECT)) === 'true'
 }
 
 export const wasPageReloaded = () => {
@@ -26,7 +27,7 @@ export const wasPageReloadedNavigate = () => {
 };
 
 export const isChatAboutToBeTerminated = () => {
-  const terminationTime = sessionStorage.getItem("terminationTime");
+  const terminationTime = sessionStorage.getItem(namespacedKey("terminationTime"));
 
   if (!terminationTime) return false;
   const terminationTimeout = window._env_.TERMINATION_TIMEOUT;

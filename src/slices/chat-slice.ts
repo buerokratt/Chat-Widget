@@ -32,6 +32,7 @@ import {
 import {
   isChatAboutToBeTerminated,
 } from "../utils/browser-utils";
+import { namespacedKey } from "../utils/widget-instance-utils";
 import {
   browserName,
   fullBrowserVersion,
@@ -381,8 +382,8 @@ export const addChatToTerminationQueue = createAsyncThunk(
   async (args, thunkApi) => {
     const { chat } = thunkApi.getState() as { chat: ChatState };
 
-    sessionStorage.setItem("terminationTime", Date.now().toString());
-    localStorage.setItem("previousChatId", chat.chatId ?? "");
+    sessionStorage.setItem(namespacedKey("terminationTime"), Date.now().toString());
+    localStorage.setItem(namespacedKey("previousChatId"), chat.chatId ?? "");
 
     thunkApi.dispatch(resetState());
 
@@ -396,7 +397,7 @@ export const addChatToTerminationQueue = createAsyncThunk(
 export const removeChatFromTerminationQueue = createAsyncThunk(
   "chat/removeChatFromTerminationQueue",
   async (args, thunkApi) => {
-    const chatId = localStorage.getItem("previousChatId");
+    const chatId = localStorage.getItem(namespacedKey("previousChatId"));
 
     if (!chatId || !isChatAboutToBeTerminated()) {
       return null;
@@ -407,7 +408,7 @@ export const removeChatFromTerminationQueue = createAsyncThunk(
     thunkApi.dispatch(resetStateWithValue(chatId));
     try {
       await ChatService.removeChatFromTerminationQueue(chatId);
-      sessionStorage.removeItem("terminationTime");
+      sessionStorage.removeItem(namespacedKey("terminationTime"));
       return { success: true };
     } catch (error) {
       console.error(error);
@@ -947,7 +948,7 @@ export const chatSlice = createSlice({
       state.feedback.isFeedbackMessageGiven = false;
       state.feedback.isFeedbackRatingGiven = false;
       clearStateVariablesFromLocalStorage();
-      localStorage.removeItem("previousChatId");
+      localStorage.removeItem(namespacedKey("previousChatId"));
     });
     builder.addCase(addChatToTerminationQueue.fulfilled, (state) => {
       state.chatStatus = CHAT_STATUS.ENDED;
