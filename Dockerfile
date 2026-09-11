@@ -4,7 +4,8 @@ ARG nginx_version=nginx:1.26.0-alpine
 
 FROM $node_version AS image
 WORKDIR /usr/app
-COPY ./package*.json ./
+COPY ./package.json ./
+COPY ./notifications-sdk.tgz ./
 
 FROM image AS build
 RUN npm pkg set scripts.prepare=" "
