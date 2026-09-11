@@ -12,6 +12,7 @@ import WidgetService from "../services/widget-service";
 import { endChat, resetState } from "./chat-slice";
 import { RootState } from "../store";
 import chatService from "../services/chat-service";
+import { namespacedKey } from "../utils/widget-instance-utils";
 
 export interface WidgetState {
   showConfirmationModal: boolean;
@@ -80,13 +81,13 @@ export const getWidgetConfig = createAsyncThunk(
   "widget/getWidgetConfig",
   async (_, { getState, dispatch }) => {
     const state = getState() as RootState;
-    const previousChatId = localStorage.getItem("previousChatId");
+    const previousChatId = localStorage.getItem(namespacedKey("previousChatId"));
 
     if (previousChatId) {
       const chat = await chatService.getChatById(previousChatId);
       if (chat.status === CHAT_STATUS.ENDED) {
         dispatch(resetState());
-        localStorage.removeItem("previousChatId");
+        localStorage.removeItem(namespacedKey("previousChatId"));
       }
     }
 

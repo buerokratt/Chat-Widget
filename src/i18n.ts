@@ -3,6 +3,7 @@ import { initReactI18next } from 'react-i18next';
 import I18nextBrowserLanguageDetector from 'i18next-browser-languagedetector';
 import commonEn from './translations/en/common.json';
 import commonEt from './translations/et/common.json';
+import { namespacedKey } from './utils/widget-instance-utils';
 
 i18n
   .use(I18nextBrowserLanguageDetector)
@@ -26,6 +27,7 @@ i18n
       order: ['localStorage', 'path'],
       lookupFromPathIndex: 0,
       caches: ['localStorage'],
+      lookupLocalStorage: namespacedKey('i18nextLng'),
     },
     react: {
       useSuspense: false,
