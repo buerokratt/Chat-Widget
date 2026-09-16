@@ -50,8 +50,8 @@ class ChatService {
     return http.post(RUUTER_ENDPOINTS.POST_MESSAGE, { message, holidays, holidayNames, silent: true, domain: getMultiDomainPath() });
   }
 
-  sendMessagePreview({ chatId, content }: Message): Promise<void> {
-    return http.post(RUUTER_ENDPOINTS.POST_MESSAGE_PREVIEW, { chatId, content: content != "" ? '_' : '' });
+  sendMessagePreview({ chatId }: Message): Promise<void> {
+    return http.post(RUUTER_ENDPOINTS.POST_MESSAGE_PREVIEW, { chatId });
   }
 
   redirectToBackoffice(message: Message, holidays: string[], holidayNames: string): Promise<Document> {

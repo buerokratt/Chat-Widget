@@ -20,6 +20,12 @@ describe('ChatService', () => {
     expect(http.post).toHaveBeenCalledWith(RUUTER_ENDPOINTS.POST_MESSAGE, messageToSend);
   });
 
+  it('should send preview with chat id only', () => {
+    const messageToSend: Message = { chatId: '1', content: 'hey', authorTimestamp: new Date().toString() };
+    chatService.sendMessagePreview(messageToSend);
+    expect(http.post).toHaveBeenCalledWith(RUUTER_ENDPOINTS.POST_MESSAGE_PREVIEW, { chatId: '1' });
+  });
+
   it('should query all messages of a chat', () => {
     chatService.getMessages('1');
     expect(http.post).toHaveBeenCalledWith(RUUTER_ENDPOINTS.GET_MESSAGES_BY_CHAT_ID, { id: '1' });
