@@ -35,7 +35,7 @@ import { customJwtExtend } from "./slices/authentication-slice";
 import { getFromLocalStorage, setToLocalStorage } from "./utils/local-storage-utils";
 import useNameAndTitleVisibility from "./hooks/use-name-title-visibility";
 import { generateUEID } from "./utils/generators";
-import { isMobile, isMobileWidth } from "./utils/browser-utils";
+import { isMobile, isMobileApp, isMobileWidth } from "./utils/browser-utils";
 import { namespacedKey } from "./utils/widget-instance-utils";
 import { ScrollProvider } from "./contexts/ScrollContext";
 
@@ -245,7 +245,7 @@ const App: FC = () => {
     return (
       <ScrollProvider>
         <Suspense fallback={null}>
-          {isChatOpen ? <Chat triggerRef={triggerRef} /> : <Profile triggerRef={triggerRef} />}
+          {isMobileApp() || isChatOpen ? <Chat triggerRef={triggerRef} /> : <Profile triggerRef={triggerRef} />}
         </Suspense>
       </ScrollProvider>
     );

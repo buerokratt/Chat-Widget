@@ -173,6 +173,10 @@ export const ChatMessageStyled = styled.div`
     margin-left: 2.8em;
   }
 
+  &.mobile-app .buttonsRow {
+    margin-left: 0.8em;
+  }
+
   .decline-event-button,
   .redirect-event-button {
     cursor: pointer;
@@ -363,5 +367,61 @@ export const ChatMessageStyled = styled.div`
 
   .adminTallContent {
     border-radius: 6px 27px 27px 27px !important;
+  }
+
+  &.mobile-app.admin {
+    margin-right: 3em;
+
+    .name {
+      padding-left: 0;
+    }
+
+    .message-main .content {
+      border-radius: 4px 18px 18px 18px;
+      background-color: #005aa3;
+      color: ${colors.white};
+    }
+
+    .message-main .emergency_content {
+      border-radius: 4px 18px 18px 18px;
+    }
+  }
+
+  &.mobile-app.admin.tall .content {
+    border-radius: 4px 18px 18px 18px !important;
+  }
+
+  &.mobile-app.client {
+    margin-left: 3em;
+
+    .content {
+      border-radius: 18px 4px 18px 18px;
+      background-color: ${colors.white};
+      color: ${colors.mustakivi};
+      border: 1px solid ${colors.hellamaa};
+    }
+
+    a {
+      color: ${colors.primary} !important;
+      background-image: none !important;
+      padding-right: 0 !important;
+      text-decoration: underline;
+    }
+  }
+
+  &.mobile-app .clientTallContent {
+    border-radius: 18px 4px 18px 18px !important;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    &.mobile-app.client .content {
+      background-color: #2c2c2e;
+      color: ${colors.white};
+      border-color: #48484a;
+    }
+
+    &.mobile-app.client a {
+      color: #6ea8ff !important;
+    }
   }
 `;

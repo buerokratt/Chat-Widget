@@ -54,3 +54,17 @@ export const isMobile = () => {
 export const isMobileApp = (): boolean => {
   return /BurokrattApp/i.test(window.navigator.userAgent);
 };
+
+declare global {
+  interface Window {
+    BurokrattApp?: {
+      postMessage: (message: string) => void;
+    };
+  }
+}
+
+export type MobileAppAction = "minimize" | "close";
+
+export const notifyMobileApp = (action: MobileAppAction): void => {
+  window.BurokrattApp?.postMessage(JSON.stringify({ action }));
+};

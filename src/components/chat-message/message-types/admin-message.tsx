@@ -27,6 +27,7 @@ import Markdownify from "./Markdownify";
 import {ChatMessageStyled} from "../ChatMessageStyled";
 import { format } from "date-fns";
 import SmoothStreamingMessage from "./smooth-streaming-message";
+import { isMobileApp } from "../../../utils/browser-utils";
 
 const AdminMessage = ({message}: { message: Message }): JSX.Element => {
     const {t} = useTranslation();
@@ -61,7 +62,8 @@ const AdminMessage = ({message}: { message: Message }): JSX.Element => {
         };
     }, []);
 
-    const messageClass = `admin  ${isTall ? "tall" : ""}`;
+    const mobileApp = isMobileApp();
+    const messageClass = `admin ${isTall ? "tall" : ""} ${mobileApp ? "mobile-app" : ""}`.trim();
 
     const hasButtons = useMemo(() => {
         return parseButtons(message).length > 0;
@@ -89,13 +91,15 @@ const AdminMessage = ({message}: { message: Message }): JSX.Element => {
               <div className="name">{message.csaTitle}</div>
             )}
             <div className="message-main">
-              <div className="message-icon">
-                {message.event === CHAT_EVENTS.EMERGENCY_NOTICE ? (
-                  <div className="emergency">!</div>
-                ) : (
-                  <img src={RobotIcon} alt="Robot icon" />
-                )}
-              </div>
+              {!mobileApp && (
+                <div className="message-icon">
+                  {message.event === CHAT_EVENTS.EMERGENCY_NOTICE ? (
+                    <div className="emergency">!</div>
+                  ) : (
+                    <img src={RobotIcon} alt="Robot icon" />
+                  )}
+                </div>
+              )}
               <div className={`content ${message.event === CHAT_EVENTS.EMERGENCY_NOTICE && "emergency_content"}`}>
                 {message.isStreaming != undefined ? (
                   <SmoothStreamingMessage
