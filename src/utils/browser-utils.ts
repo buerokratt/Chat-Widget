@@ -50,3 +50,7 @@ export const isMobile = () => {
     isMobileWidth()
   );
 };
+
+export const isMobileApp = (): boolean => {
+  return /BurokrattApp/i.test(window.navigator.userAgent);
+};
