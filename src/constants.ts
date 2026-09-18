@@ -170,3 +170,5 @@ export const isFeedbackRatingColorsEnabled =
 export const isMultiDomainEnabled =
     window._env_.ENABLE_MULTI_DOMAIN?.toLowerCase().trim() == 'true' ||
     window._env_.ENABLE_MULTI_DOMAIN?.toLowerCase().trim() == '1';
+
+export const multiDomainWidgetDomain = window._env_.WIDGET_DOMAIN?.trim();

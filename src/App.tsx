@@ -58,6 +58,7 @@ declare global {
       ENABLE_HIDDEN_FEATURES: string;
       FEEDBACK_RATING_COLORS_ENABLED: string;
       ENABLE_MULTI_DOMAIN: string;
+      WIDGET_DOMAIN: string;
       WIDGET_HEIGHT: number;
       WIDGET_WIDTH: number;
       TERMINATION_TIMEOUT: number;

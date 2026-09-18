@@ -6,5 +6,8 @@ export const WIDGET_INSTANCE_ID =
 export const WIDGET_TARGET_ELEMENT_ID =
   currentScript?.getAttribute("data-target")?.trim() || "byk-va";
 
+export const WIDGET_DOMAIN_OVERRIDE =
+  currentScript?.getAttribute("data-domain")?.trim() || "";
+
 export const namespacedKey = (key: string): string =>
   WIDGET_INSTANCE_ID ? `${key}::${WIDGET_INSTANCE_ID}` : key;
