@@ -370,7 +370,7 @@ export const ChatMessageStyled = styled.div`
   }
 
   &.mobile-app.admin {
-    margin-right: 3em;
+    margin-right: 48px;
 
     .name {
       padding-left: 0;
@@ -392,7 +392,7 @@ export const ChatMessageStyled = styled.div`
   }
 
   &.mobile-app.client {
-    margin-left: 3em;
+    margin-left: 48px;
 
     .content {
       border-radius: 18px 4px 18px 18px;
