@@ -94,6 +94,9 @@ instance's `<script id="script-bundle">` tag:
   `chatId` query parameter on the instance's API calls so the backend can tell its chat apart from
   another instance's. Omit it only on a genuine single-widget page, to keep the original, unprefixed
   keys and behavior.
+- `data-domain` — overrides `WIDGET_DOMAIN` for this instance only, when multi-domain requests need
+  to report a different domain per instance. Optional; falls back to `WIDGET_DOMAIN`, then
+  `window.location`.
 
 **Important:** on a page with more than one widget, every instance needs its own `data-instance-id`
 — including what might otherwise look like "the main" one. An instance with no id never sends a
@@ -163,6 +166,7 @@ If you want to use the widget inside an Iframe use the following snippet or refe
 - `ENABLE_HIDDEN_FEATURES`: set it to `'TRUE'` will show experimental features, `'FALSE'` will hide them
 - `FEEDBACK_RATING_COLORS_ENABLED`: set it to `'TRUE'` to show colors on the NPS/feedback rating widget, `'FALSE'` to hide them
 - `ENABLE_MULTI_DOMAIN`: set it to `'TRUE'` to append the current page's domain to multi-domain related requests, `'FALSE'` to disable
+- `WIDGET_DOMAIN`: domain sent with multi-domain requests instead of `window.location` (e.g. when the widget is embedded on a page whose own URL isn't the domain the backend should recognize). Optional — falls back to `window.location` when unset. Can be overridden per instance via the `data-domain` script attribute, see [Multiple widgets on the same page](#multiple-widgets-on-the-same-page)
 - `TERMINATION_TIMEOUT`: Timeout (in seconds) sent to the notification node when queuing a chat for termination
 - `WIDGET_HEIGHT`: Default height (in pixels) of the chat window
 - `WIDGET_WIDTH`: Default width (in pixels) of the chat window
