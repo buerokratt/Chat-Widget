@@ -9,8 +9,7 @@ window._env_ = {
   RUUTER_API_URL: "http://localhost:8086/backoffice",
   NOTIFICATION_NODE_URL: "http://localhost:4040",
   ENVIRONMENT: "development",
-  TIM_AUTHENTICATION_URL:
-    "http://localhost:8085/oauth2/authorization/tara",
+  TIM_AUTHENTICATION_URL: "http://localhost:8085/oauth2/authorization/tara",
   TERMS_AND_CONDITIONS_LINK: "https://www.kratid.ee/kasutustingimused",
   ORGANIZATION_NAME: "TEST",
   OFFICE_HOURS: {
@@ -24,6 +23,7 @@ window._env_ = {
   ENABLE_HIDDEN_FEATURES: "TRUE",
   FEEDBACK_RATING_COLORS_ENABLED: "FALSE",
   ENABLE_MULTI_DOMAIN: "FALSE",
+  WIDGET_DOMAIN: "http://localhost:3003/",
   TERMINATION_TIMEOUT: 10,
   WIDGET_HEIGHT: 450,
   WIDGET_WIDTH: 400,
