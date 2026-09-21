@@ -89,4 +89,54 @@ export const ChatKeypadStyled = styled.div`
       font-size: 16px !important;
     }
   }
+
+  .keypad.mobile-app {
+    height: auto;
+    padding: 8px 15px;
+    background: ${colors.white};
+    gap: 8px;
+
+    .input {
+      margin: 0;
+      padding: 8px 14px;
+      background: ${colors.white};
+      border: 1px solid ${colors.hellamaa};
+      border-radius: 20px;
+      max-height: 5.6em;
+
+      &:disabled {
+        background: ${colors.white};
+        border: 1px solid ${colors.hellamaa};
+      }
+    }
+
+    .button {
+      flex-shrink: 0;
+      width: 55px;
+      height: 55px;
+
+      img {
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      background: #1c1c1e;
+
+      .input {
+        background: #1c1c1e;
+        border: 1px solid #48484a;
+        color: ${colors.white};
+
+        &::placeholder {
+          color: #8e8e93;
+        }
+
+        &:disabled {
+          background: #1c1c1e;
+        }
+      }
+    }
+  }
 `;

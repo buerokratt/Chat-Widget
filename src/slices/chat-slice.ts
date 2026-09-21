@@ -33,6 +33,7 @@ import {
   isChatAboutToBeTerminated,
 } from "../utils/browser-utils";
 import { namespacedKey } from "../utils/widget-instance-utils";
+import { isMobileApp, notifyMobileApp } from "../utils/browser-utils";
 import {
   browserName,
   fullBrowserVersion,
@@ -348,6 +349,9 @@ export const endChat = createAsyncThunk(
       chat: { chatStatus, chatId },
     } = thunkApi.getState() as { chat: ChatState };
     thunkApi.dispatch(args.keepChatOpen ? resetStateOpen() : resetState());
+    if (!args.keepChatOpen && isMobileApp()) {
+      notifyMobileApp("close");
+    }
 
     const endEvent = args.isUpperCase
       ? args.event?.toUpperCase()
