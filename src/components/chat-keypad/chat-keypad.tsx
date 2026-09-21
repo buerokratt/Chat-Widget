@@ -26,6 +26,7 @@ import ChatKeypadCharCounter from "./chat-keypad-char-counter";
 import {
   AUTHOR_ROLES,
   CHAT_STATUS,
+  CHAT_INPUT_DEBOUNCE_TIMEOUT,
   FEEDBACK_MESSAGE_MAX_CHAR_LIMIT,
   isHiddenFeatureEnabled,
   MESSAGE_FILE_SIZE_LIMIT,
@@ -37,10 +38,7 @@ import { Attachment, AttachmentTypes, Message } from "../../model/message-model"
 import StyledButton from "../styled-components/styled-button";
 import Close from "../../static/icons/close.svg";
 import formatBytes from "../../utils/format-bytes";
-import debounce from "../../utils/debounce";
 import { ChatKeypadStyled } from "./ChatKeypadStyled";
-import { Subject } from "rxjs";
-import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import { isIphone } from "../../utils/browser-utils";
 import classNames from "classnames";
 import useWidgetSelector from "../../hooks/use-widget-selector";
@@ -77,6 +75,7 @@ const ChatKeyPad = (): JSX.Element => {
     loading,
     messageQueue,
     chatStatus,
+    customerSupportId,
     showResponseError,
     isTypingStream,
     isChatOpen,
@@ -86,6 +85,8 @@ const ChatKeyPad = (): JSX.Element => {
   const dispatch = useAppDispatch();
   const hiddenFileInputRef = useRef<HTMLInputElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const canSendPreviewRef = useRef(true);
+  const previewResetTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const [dynamicStyle, setdynamicStyle] = useState("");
   const touchStartYRef = useRef<number>(0);
   const { widgetConfig } = useWidgetSelector();
@@ -213,8 +214,17 @@ const ChatKeyPad = (): JSX.Element => {
     }
   };
 
+  const resetPreviewState = useCallback(() => {
+    canSendPreviewRef.current = true;
+    if (previewResetTimeoutRef.current) {
+      clearTimeout(previewResetTimeoutRef.current);
+      previewResetTimeoutRef.current = undefined;
+    }
+  }, []);
+
   const addNewMessageToState = (): void => {
     if (!isInputValid()) return;
+    resetPreviewState();
     const message: Message = {
       chatId: chatId ?? "",
       content: sanitizeHtml(userInput),
@@ -238,22 +248,9 @@ const ChatKeyPad = (): JSX.Element => {
     }
   };
 
-  const [previewSubject] = useState(() => new Subject<Message>());
   useEffect(() => {
-    const subscription = previewSubject
-      .pipe(
-        distinctUntilChanged(),
-        debounceTime(1000),
-        switchMap((message: Message) => {
-          return dispatch(sendMessagePreview(message));
-        })
-      )
-      .subscribe((_) => {});
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+    return resetPreviewState;
+  }, [resetPreviewState]);
 
   useEffect(() => {
     if (showResponseError && chatId) {
@@ -265,21 +262,6 @@ const ChatKeyPad = (): JSX.Element => {
       dispatch(sendMessagePreview(message));
     }
   }, [showResponseError, chatId, dispatch]);
-
-  const handleKeyUp = useCallback(
-    debounce(() => {
-      const message: Message = {
-        chatId,
-        content: sanitizeHtml(userInput),
-        authorTimestamp: new Date().toISOString(),
-      };
-
-      if (chatId) {
-        previewSubject.next(message);
-      }
-    }),
-    [chatId, userInput]
-  );
 
   const keypadClasses = classNames("keypad", {
     three_lines: dynamicStyle === "threeLines",
@@ -318,6 +300,31 @@ const ChatKeyPad = (): JSX.Element => {
     }
   }, [touchStartHandler, touchMoveHandler]);
 
+  const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    setUserInput(e.target.value);
+    adjustHeight();
+    const content = sanitizeHtml(e.target.value);
+    if (content.length > 0 && chatStatus === CHAT_STATUS.OPEN && chatId && customerSupportId && customerSupportId !== "chatbot") {
+      if (canSendPreviewRef.current) {
+        canSendPreviewRef.current = false;
+        dispatch(sendMessagePreview({
+          chatId,
+          content,
+          authorTimestamp: new Date().toISOString(),
+        }));
+      }
+
+      if (previewResetTimeoutRef.current) {
+        clearTimeout(previewResetTimeoutRef.current);
+      }
+      previewResetTimeoutRef.current = setTimeout(() => {
+        canSendPreviewRef.current = true;
+      }, CHAT_INPUT_DEBOUNCE_TIMEOUT);
+    } else {
+      resetPreviewState();
+    }
+  };
+
   return (
     <ChatKeypadStyled>
       <KeypadErrorMessage>{errorMessage}</KeypadErrorMessage>
@@ -330,10 +337,7 @@ const ChatKeyPad = (): JSX.Element => {
           className="input"
           value={userInputFile ? userInputFile.name : userInput}
           placeholder={t("keypad.input.placeholder")}
-          onChange={(e) => {
-            setUserInput(e.target.value);
-            adjustHeight();
-          }}
+          onChange={handleInputChange}
           onKeyDown={(event) => {
             if (event.key === "Enter") {
               if (chatStatus === CHAT_STATUS.ENDED && !!chatId) {
@@ -347,10 +351,6 @@ const ChatKeyPad = (): JSX.Element => {
                 addNewMessageToState();
               }
             }
-          }}
-          onKeyUp={(e) => {
-            handleKeyUp();
-            adjustHeight();
           }}
           onFocus={disableIosWindowScroll}
           onBlur={enableIosWindowScroll}

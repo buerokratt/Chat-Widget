@@ -2,11 +2,12 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 import { configureStore, EnhancedStore } from '@reduxjs/toolkit';
-import { screen } from '@testing-library/react';
+import { act, fireEvent, screen } from '@testing-library/react';
 import { render } from '../../utils/test-utils';
 import ChatKeyPad from './chat-keypad';
 import { waitForRequest } from '../../mocks/server';
-import { RUUTER_ENDPOINTS } from '../../constants';
+import ChatService from '../../services/chat-service';
+import { CHAT_STATUS, RUUTER_ENDPOINTS } from '../../constants';
 import chatReducer from '../../slices/chat-slice';
 import KeypadErrorMessage from './keypad-error-message';
 
@@ -30,6 +31,112 @@ function createTestStore() {
 describe('Keypad', () => {
   beforeEach(() => {
     store = createTestStore();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.restoreAllMocks();
+  });
+
+  it('sends a preview immediately after input changes in an open agent chat', () => {
+    jest.useFakeTimers();
+    const sendMessagePreview = jest.spyOn(ChatService, 'sendMessagePreview').mockResolvedValue();
+    const preloadedState = {
+      chat: {
+        chatId: '1',
+        chatStatus: CHAT_STATUS.OPEN,
+        customerSupportId: 'agent-1',
+        messages: [],
+        messageQueue: [],
+      },
+    };
+
+    render(<ChatKeyPad />, { preloadedState });
+    const input = screen.getByRole('textbox') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'pasted text' } });
+
+    expect(sendMessagePreview).toHaveBeenCalledWith(expect.objectContaining({
+      chatId: '1',
+      content: 'pasted text',
+    }));
+
+    act(() => { jest.advanceTimersByTime(500); });
+    expect(sendMessagePreview).toHaveBeenCalledTimes(1);
+  });
+
+  it('resets preview state when the message is sent', () => {
+    jest.useFakeTimers();
+    const sendMessagePreview = jest.spyOn(ChatService, 'sendMessagePreview').mockResolvedValue();
+    jest.spyOn(ChatService, 'sendNewMessage').mockResolvedValue({ _id: 'id' });
+    const preloadedState = {
+      chat: {
+        chatId: '1',
+        chatStatus: CHAT_STATUS.OPEN,
+        customerSupportId: 'agent-1',
+        messages: [],
+        messageQueue: [],
+      },
+    };
+
+    render(<ChatKeyPad />, { preloadedState });
+    const input = screen.getByRole('textbox') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'sent message' } });
+    fireEvent.click(screen.getByRole('button', { name: 'keypad.button.label' }));
+
+    fireEvent.change(input, { target: { value: 'new message' } });
+    expect(sendMessagePreview).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not send a preview when the input is cleared', () => {
+    jest.useFakeTimers();
+    const sendMessagePreview = jest.spyOn(ChatService, 'sendMessagePreview').mockResolvedValue();
+    const preloadedState = {
+      chat: {
+        chatId: '1',
+        chatStatus: CHAT_STATUS.OPEN,
+        customerSupportId: 'agent-1',
+        messages: [],
+        messageQueue: [],
+      },
+    };
+
+    render(<ChatKeyPad />, { preloadedState });
+    const input = screen.getByRole('textbox') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'typing' } });
+    fireEvent.change(input, { target: { value: '' } });
+
+    expect(sendMessagePreview).toHaveBeenCalledTimes(1);
+  });
+
+  it('sends another preview after a longer pause in typing', () => {
+    jest.useFakeTimers();
+    const sendMessagePreview = jest.spyOn(ChatService, 'sendMessagePreview').mockResolvedValue();
+    const preloadedState = {
+      chat: {
+        chatId: '1',
+        chatStatus: CHAT_STATUS.OPEN,
+        customerSupportId: 'agent-1',
+        messages: [],
+        messageQueue: [],
+      },
+    };
+
+    render(<ChatKeyPad />, { preloadedState });
+    const input = screen.getByRole('textbox') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 't' } });
+    act(() => { jest.advanceTimersByTime(200); });
+    fireEvent.change(input, { target: { value: 'ty' } });
+    act(() => { jest.advanceTimersByTime(200); });
+    fireEvent.change(input, { target: { value: 'typ' } });
+    act(() => { jest.advanceTimersByTime(100); });
+
+    expect(sendMessagePreview).toHaveBeenCalledTimes(1);
+    expect(sendMessagePreview).toHaveBeenLastCalledWith(expect.objectContaining({ content: 'typ' }));
+
+    act(() => { jest.advanceTimersByTime(500); });
+    fireEvent.change(input, { target: { value: 'typi' } });
+    expect(sendMessagePreview).toHaveBeenCalledTimes(2);
+    expect(sendMessagePreview).toHaveBeenLastCalledWith(expect.objectContaining({ content: 'typi' }));
   });
 
   it('clears input after pressing enter', () => {

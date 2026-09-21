@@ -67,7 +67,6 @@ export const getContactFormFulfilledNewMessage = (
     authorTimestamp: new Date().toISOString(),
     content: message,
     event: CHAT_EVENTS.CONTACT_INFORMATION_FULFILLED,
-    preview: "",
   };
 }
 
@@ -86,7 +85,6 @@ export const getContactCommentNewMessage = (
     authorTimestamp: new Date().toISOString(),
     content: message,
     event: "",
-    preview: "",
   };
 }
 

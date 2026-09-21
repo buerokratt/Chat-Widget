@@ -33,7 +33,6 @@ const EndUserContacts = (): JSX.Element => {
             id: contactMsgId,
             chatId,
             content: "",
-            preview: "",
             authorRole: AUTHOR_ROLES.END_USER,
             authorTimestamp: new Date().toISOString(),
             event: CHAT_EVENTS.CONTACT_INFORMATION_REJECTED,

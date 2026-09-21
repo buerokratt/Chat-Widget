@@ -21,7 +21,6 @@ export interface Message {
   authorLastName?: string;
   authorRole?: string;
   created?: string;
-  preview?: string;
   updated?: string;
   csaTitle?: string;
   isStreaming?: boolean;
