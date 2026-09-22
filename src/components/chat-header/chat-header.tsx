@@ -1,7 +1,7 @@
 import React, {memo, MouseEventHandler} from 'react';
 import {useTranslation} from 'react-i18next';
 import {motion} from 'framer-motion';
-import {setIsChatOpen, setIsFullScreen} from '../../slices/chat-slice';
+import {resetChatState, setIsChatOpen, setIsFullScreen} from '../../slices/chat-slice';
 import {showConfirmationModal} from '../../slices/widget-slice';
 import Close from '../../static/icons/close.svg';
 import FullScreen from '../../static/icons/full-screen.svg';
@@ -29,12 +29,16 @@ interface ChatHeaderType {
 const ChatHeader = (props: ChatHeaderType): JSX.Element => {
     const {detailHandler, isDetailSelected} = props;
     const {t} = useTranslation();
-    const { chatId, isChatOpen, isFullScreen } = useChatSelector();
+    const { chatId, isChatOpen, isFullScreen, isChatEnded } = useChatSelector();
     const { scrollToBottom } = useScroll();
     const {isAuthenticated} = useAuthenticationSelector();
     const mobileApp = isMobileApp();
     const closeChatState = () => {
-        dispatch(setIsChatOpen(false));
+        if (isChatEnded) {
+            dispatch(resetChatState({ event: null }));
+        } else {
+            dispatch(setIsChatOpen(false));
+        }
         if (!chatId) {
             setToLocalStorage(LOCAL_STORAGE_INSTANTLY_OPEN_CHAT_WIDGET_KEY, false);
         }
@@ -69,7 +73,7 @@ const ChatHeader = (props: ChatHeaderType): JSX.Element => {
                     <button
                         title={t('header.button.close.label')}
                         onClick={() => {
-                            if (chatId) {
+                            if (chatId && !isChatEnded) {
                                 dispatch(showConfirmationModal());
                             } else {
                                 closeChatState();
@@ -124,7 +128,7 @@ const ChatHeader = (props: ChatHeaderType): JSX.Element => {
                     <button
                         title={t('header.button.close.label')}
                         onClick={() => {
-                            chatId ? dispatch(showConfirmationModal()) : closeChatState();
+                            chatId && !isChatEnded ? dispatch(showConfirmationModal()) : closeChatState();
                         }}
                         aria-label={t('header.button.close.label')}
                         type="button"
