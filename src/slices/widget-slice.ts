@@ -114,6 +114,9 @@ export const widgetSlice = createSlice({
     builder.addCase(endChat.pending, (state) => {
       state.showConfirmationModal = false;
     });
+    builder.addCase(resetState, (state) => {
+      state.showConfirmationModal = false;
+    });
     builder.addCase(getWidgetConfig.rejected, (state) => {
       state.widgetConfig.isLoaded = true;
       state.burokrattOnlineStatus = false;

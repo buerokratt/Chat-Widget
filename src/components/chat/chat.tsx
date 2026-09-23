@@ -122,12 +122,14 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
   );
 
   const handleEscape = useCallback(() => {
-    if (chatId) {
+    if (chatId && !isChatEnded) {
       dispatch(showConfirmationModal());
+    } else if (isChatEnded) {
+      dispatch(resetChatState({ event: null }));
     } else {
       dispatch(setIsChatOpen(false));
     }
-  }, [chatId, dispatch]);
+  }, [chatId, isChatEnded, dispatch]);
 
   const chatRef = useRef<HTMLDivElement>(null);
   useFocusTrap(chatRef, { focusFirstOnMount: true, onEscape: handleEscape, returnFocusOnUnmount: false });
@@ -187,10 +189,12 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
       !feedback.isFeedbackConfirmationShown
     ) {
       setShowFeedbackResult(true);
-      setTimeout(async () => {
+      const timeoutId = setTimeout(() => {
         dispatch(setIsFeedbackConfirmationShown(true));
         setShowFeedbackResult(false);
       }, FEEDBACK_CONFIRMATION_TIMEOUT);
+
+      return () => clearTimeout(timeoutId);
     }
   }, [
     dispatch,
