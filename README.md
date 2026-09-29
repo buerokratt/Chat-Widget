@@ -96,12 +96,13 @@ instance's `<script id="script-bundle">` tag:
   keys and behavior.
 
 **Important:** on a page with more than one widget, every instance needs its own `data-instance-id`
-— including what might otherwise look like "the main" one. An instance with no id never sends a
-`chatId` query parameter, so it relies on the backend's default-chat fallback (the `chatJwt` cookie's
-own `chatId` field) — but that field always points at whichever chat was initialized most recently,
-across *all* widgets on the page. Leave one instance unnamed on a multi-widget page and its requests
-will silently start resolving against a different widget's chat as soon as that other widget
-initializes.
+— including what might otherwise look like "the main" one. Two unnamed instances on the same page
+share the same localStorage keys, so they would read and overwrite each other's stored chat id.
+
+Every instance, named or not, sends its own stored chat id as the `chatId` query parameter once a chat
+has started. It doesn't rely on the backend's default-chat fallback (the `chatJwt` cookie's own `chatId`
+field), because that field always points at whichever chat was initialized most recently — including
+chats started by widgets on sibling subdomains, when the cookie is set on the parent domain.
 
 The `chatJwt` cookie itself stays shared and `HttpOnly` across all instances — it tracks every
 active chat's id in a `chatIds` array, and each instance's `chatId` query parameter selects which of
