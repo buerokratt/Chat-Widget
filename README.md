@@ -46,14 +46,15 @@ Snippet can be embedded to any site using the following html:
     TIM_AUTHENTICATION_URL: 'TIM url with callback parameter',
     OFFICE_HOURS: {
       TIMEZONE: 'Europe/Tallinn',
-      BEGIN: 8,
-      END: 17,
-      DAYS: [1, 2, 4, 5],
+      BEGIN: 0,
+      END: 24,
+      DAYS: [1, 2, 3, 4, 5, 6, 7],
     },
     ENABLE_HIDDEN_FEATURES: 'FALSE',
     IFRAME_TARGET_OIRGIN: "*",
     FEEDBACK_RATING_COLORS_ENABLED: 'FALSE',
     ENABLE_MULTI_DOMAIN: 'FALSE',
+    WIDGET_DOMAIN: "url of webpage",
     TERMINATION_TIMEOUT: 10,
     WIDGET_HEIGHT: 450;
     WIDGET_WIDTH: 400;
