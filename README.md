@@ -65,6 +65,33 @@ Snippet can be embedded to any site using the following html:
 <script id="script-bundle" type="text/javascript" src="LOCATION_OF_WIDGET_BUNDLE" crossorigin=""></script>
 ```
 
+### Default config from the widget server
+
+The embedding page doesn't have to list every variable. Before the widget starts, it loads
+`env-config.js` from the same place it loaded `widget_bundle.js` from (the widget server's own config) and uses it to fill in every key the page's `window._env_` leaves out:
+
+- Every value the page sets wins.
+- Nested objects such as `OFFICE_HOURS` are merged key by key, so the page can set only `BEGIN`/`END`
+  and still get `TIMEZONE`/`DAYS` from the defaults. Arrays are replaced as a whole.
+- Only a missing (`undefined`) value falls back to the default. To switch something off that the
+  defaults turn on, set it explicitly, e.g. `OFFICE_HOURS: null`.
+- The keys that were filled in are listed in the browser console (`[Bürokratt widget] Using default
+  config from ...`), so an outdated embed snippet is easy to spot.
+- If `env-config.js` can't be loaded within 5 seconds, the widget starts with the page's config only.
+
+When `env-config.js` doesn't live next to the bundle (e.g. the bundle is served from a CDN), point to
+it with a `data-env-config` attribute on the script tag:
+
+```
+<script
+  id="script-bundle"
+  type="text/javascript"
+  src="LOCATION_OF_WIDGET_BUNDLE"
+  data-env-config="LOCATION_OF_ENV_CONFIG"
+  crossorigin=""
+></script>
+```
+
 ## Multiple widgets on the same page
 
 Every persisted key (chat id, open/closed state, dimensions, language, etc.) is namespaced by an

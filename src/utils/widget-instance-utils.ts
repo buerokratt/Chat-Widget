@@ -1,5 +1,7 @@
 const currentScript = document.currentScript as HTMLScriptElement | null;
 
+export const WIDGET_SCRIPT = currentScript;
+
 export const WIDGET_INSTANCE_ID =
   currentScript?.getAttribute("data-instance-id")?.trim() || "";
 
