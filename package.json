@@ -114,6 +114,7 @@
     ],
     "coveragePathIgnorePatterns": [
       "<rootDir>/src/index.tsx",
+      "<rootDir>/src/main.tsx",
       "<rootDir>/src/i18n.ts",
       "<rootDir>/src/mocks"
     ],

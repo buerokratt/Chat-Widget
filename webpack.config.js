@@ -97,5 +97,8 @@ module.exports = {
     new webpack.ProvidePlugin({
       React: "react",
     }),
+    new webpack.optimize.LimitChunkCountPlugin({
+      maxChunks: 1,
+    }),
   ],
 };
