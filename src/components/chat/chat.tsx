@@ -85,6 +85,7 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
   const { isAuthenticated } = useAuthenticationSelector();
   const mobileApp = isMobileApp();
   const { isFullScreen } = useChatSelector();
+  const chatWrapperRef = useRef<HTMLDivElement>(null);
   const { height, width } = useWindowDimensions();
   const { widgetConfig } = useWidgetSelector();
   const {
@@ -403,7 +404,10 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
         aria-atomic="true"
         style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', border: 0 }}
       />
-      <div className="chatWrapper">
+      <div
+        className="chatWrapper"
+        ref={chatWrapperRef}
+      >
         <Resizable
           size={isFullScreen ? { width, height } : chatDimensions}
           minWidth={CHAT_MIN_WINDOW_WIDTH}
