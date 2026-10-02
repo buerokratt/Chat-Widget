@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useAppDispatch } from "../store";
 import useChatSelector from "./use-chat-selector";
 import {isLastSession, isWentToTim} from "../utils/browser-utils";
+import { namespacedKey } from "../utils/widget-instance-utils";
 
 const useReloadChatEndEffect = () => {
   const { chatId } = useChatSelector();
@@ -10,7 +11,7 @@ const useReloadChatEndEffect = () => {
   useEffect(() => {
     const handleBeforeUnload = () => {
       if (chatId && isLastSession() && !isWentToTim()) {
-        localStorage.setItem("previousChatId", chatId);
+        localStorage.setItem(namespacedKey("previousChatId"), chatId);
       }
     };
 

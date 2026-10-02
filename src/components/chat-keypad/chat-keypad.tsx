@@ -19,6 +19,8 @@ import {
 } from "../../slices/chat-slice";
 import Send from "../../static/icons/send.svg";
 import StopStream from "../../static/icons/stop-stream.svg";
+import SendCircle from "../../static/icons/send-circle.svg";
+import StopStreamCircle from "../../static/icons/stop-stream-circle.svg";
 import File from "../../static/icons/file.svg";
 import useChatSelector from "../../hooks/use-chat-selector";
 import KeypadErrorMessage from "./keypad-error-message";
@@ -41,7 +43,7 @@ import debounce from "../../utils/debounce";
 import { ChatKeypadStyled } from "./ChatKeypadStyled";
 import { Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
-import { isIphone } from "../../utils/browser-utils";
+import { isIphone, isMobileApp } from "../../utils/browser-utils";
 import classNames from "classnames";
 import useWidgetSelector from "../../hooks/use-widget-selector";
 import sanitizeHtml from "sanitize-html";
@@ -281,9 +283,11 @@ const ChatKeyPad = (): JSX.Element => {
     [chatId, userInput]
   );
 
+  const mobileApp = isMobileApp();
   const keypadClasses = classNames("keypad", {
     three_lines: dynamicStyle === "threeLines",
     four_lines: dynamicStyle === "fourLines",
+    "mobile-app": mobileApp,
   });
   const paddingTopCheck = dynamicStyle === "fourLines" ? "30px" : "20px";
 
@@ -319,9 +323,9 @@ const ChatKeyPad = (): JSX.Element => {
   }, [touchStartHandler, touchMoveHandler]);
 
   return (
-    <ChatKeypadStyled>
+    <ChatKeypadStyled className={mobileApp ? "mobile-app" : ""}>
       <KeypadErrorMessage>{errorMessage}</KeypadErrorMessage>
-      <div className={`${keypadClasses}`} style={{ paddingTop: errorMessage ? undefined : paddingTopCheck }}>
+      <div className={`${keypadClasses}`} style={{ paddingTop: mobileApp || errorMessage ? undefined : paddingTopCheck }}>
         <textarea
           ref={textareaRef}
           readOnly={isInputLocked}
@@ -367,27 +371,29 @@ const ChatKeyPad = (): JSX.Element => {
           </FeedbackButtonStyle>
         ) : (
           <>
-            <button
-              key={isTypingStream ? "stop" : "send"}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleSendStopButtonClick();
-                }
-              }}
-              onClick={handleSendStopButtonClick}
-              className="button"
-              title={t(isTypingStream ? "keypad.button.stop-stream" : "keypad.button.label")}
-              aria-label={t(isTypingStream ? "keypad.button.stop-stream" : "keypad.button.label")}
-              tabIndex={0}
-            >
-              <img
-                src={isTypingStream ? StopStream : Send}
-                alt={isTypingStream ? "Stop stream icon" : "Send message icon"}
-              />
-            </button>
+            {(!mobileApp || isTypingStream || userInput.trim().length > 0 || !!userInputFile) && (
+              <button
+                key={isTypingStream ? "stop" : "send"}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleSendStopButtonClick();
+                  }
+                }}
+                onClick={handleSendStopButtonClick}
+                className="button"
+                title={t(isTypingStream ? "keypad.button.stop-stream" : "keypad.button.label")}
+                aria-label={t(isTypingStream ? "keypad.button.stop-stream" : "keypad.button.label")}
+                tabIndex={0}
+              >
+                <img
+                  src={mobileApp ? (isTypingStream ? StopStreamCircle : SendCircle) : (isTypingStream ? StopStream : Send)}
+                  alt={isTypingStream ? "Stop stream icon" : "Send message icon"}
+                />
+              </button>
+            )}
 
-            {isHiddenFeatureEnabled && renderSendFileButton()}
+            {!mobileApp && isHiddenFeatureEnabled && renderSendFileButton()}
           </>
         )}
       </div>

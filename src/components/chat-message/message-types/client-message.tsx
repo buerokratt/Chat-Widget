@@ -17,6 +17,7 @@ import {
 import { useAppDispatch } from "../../../store";
 import useChatSelector from "../../../hooks/use-chat-selector";
 import {ChatMessageStyled, MessageFailedWrapperStyled} from "../ChatMessageStyled";
+import { isMobileApp } from "../../../utils/browser-utils";
 
 const ClientMessage = (props: {
   message?: Message;
@@ -37,7 +38,8 @@ const ClientMessage = (props: {
     }
   }, [content, props.message?.file]);
 
-    const messageClass = `client`;
+    const mobileApp = isMobileApp();
+    const messageClass = `client ${mobileApp ? "mobile-app" : ""}`.trim();
     const contentTallClass = `content  ${isTall ? "clientTallContent" : ""}`;
 
     if (props.message?.file) {
@@ -48,9 +50,11 @@ const ClientMessage = (props: {
             >
                 <div>
                     <ChatMessageStyled className={messageClass}>
-                        <div className="message-icon">
-                            <img src={PersonIcon} alt="Person icon"/>
-                        </div>
+                        {!mobileApp && (
+                            <div className="message-icon">
+                                <img src={PersonIcon} alt="Person icon"/>
+                            </div>
+                        )}
                         <div className="content file">
                             <img className="fileIcon" src={File} alt="File icon"/>
                             <div className="fileName p-style">{props.message?.file.name}</div>
@@ -71,9 +75,11 @@ const ClientMessage = (props: {
         >
             <div>
                 <ChatMessageStyled className={messageClass}>
-                    <div className="client icon">
-                        <img src={PersonIcon} alt="Person icon"/>
-                    </div>
+                    {!mobileApp && (
+                        <div className="client icon">
+                            <img src={PersonIcon} alt="Person icon"/>
+                        </div>
+                    )}
                     <div className={classNames("content", {clientTallContent: isTall})}>
                         <Markdownify message={content ?? ""} isClientMessage={true} sanitizeLinks />
                     </div>

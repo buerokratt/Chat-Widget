@@ -160,6 +160,12 @@ export const ChatStyles = styled.div<{isFullScreen?: boolean}>`
         box-shadow: 0 0 8px 2px #0078ff;
     }
 
+    &.mobile-app .chat {
+        @media (prefers-color-scheme: dark) {
+            background: #1c1c1e;
+        }
+    }
+
     @media screen and (max-width: 480px) {
         .chat {
             position: fixed;

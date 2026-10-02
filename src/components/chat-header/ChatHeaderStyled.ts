@@ -33,6 +33,26 @@ export const ChatHeaderStyles = styled.div<{isFullScreen?: boolean}> `
     .hidden {
         opacity: 0;
     }
+
+    &.mobile-app-header {
+        background: ${colors.white};
+        border-bottom: 1px solid ${colors.hellamaa};
+
+        button {
+            height: 40px;
+            width: 40px;
+
+            img {
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            background: #1c1c1e;
+            border-bottom: 1px solid #3a3a3c;
+        }
+    }
 `
 
 export const ChatHeaderInitialStyles = styled.div`
@@ -74,5 +94,32 @@ export const ChatHeaderInitialStyles = styled.div`
         display: flex;
         margin-right: 1rem;
         opacity: 1;
+    }
+
+    &.mobile-app-header {
+        h2.title {
+            width: auto;
+            flex: 1;
+            margin-right: 0;
+            color: ${colors.mustakivi};
+
+            @media (prefers-color-scheme: dark) {
+                color: ${colors.white};
+            }
+        }
+
+        .mobile-icon-dark {
+            display: none;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .mobile-icon-light {
+                display: none;
+            }
+
+            .mobile-icon-dark {
+                display: block;
+            }
+        }
     }
 `;

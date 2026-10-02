@@ -52,6 +52,7 @@ import useWidgetSelector from "../../hooks/use-widget-selector";
 import PostChatMessage from "../post-chat-message/post-chat-message";
 import { format } from "date-fns";
 import EmergencyNotice from "../emergency-notice/emergency-notice";
+import { isMobileApp } from "../../utils/browser-utils";
 
 const RESIZABLE_HANDLES = {
   topLeft: true,
@@ -82,6 +83,7 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
   const [showFeedbackResult, setShowFeedbackResult] = useState(false);
   const { t } = useTranslation();
   const { isAuthenticated } = useAuthenticationSelector();
+  const mobileApp = isMobileApp();
   const { isFullScreen } = useChatSelector();
   const chatWrapperRef = useRef<HTMLDivElement>(null);
   const { height, width } = useWindowDimensions();
@@ -121,12 +123,14 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
   );
 
   const handleEscape = useCallback(() => {
-    if (chatId) {
+    if (chatId && !isChatEnded) {
       dispatch(showConfirmationModal());
+    } else if (isChatEnded) {
+      dispatch(resetChatState({ event: null }));
     } else {
       dispatch(setIsChatOpen(false));
     }
-  }, [chatId, dispatch]);
+  }, [chatId, isChatEnded, dispatch]);
 
   const chatRef = useRef<HTMLDivElement>(null);
   useFocusTrap(chatRef, { focusFirstOnMount: true, onEscape: handleEscape, returnFocusOnUnmount: false });
@@ -186,10 +190,12 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
       !feedback.isFeedbackConfirmationShown
     ) {
       setShowFeedbackResult(true);
-      setTimeout(async () => {
+      const timeoutId = setTimeout(() => {
         dispatch(setIsFeedbackConfirmationShown(true));
         setShowFeedbackResult(false);
       }, FEEDBACK_CONFIRMATION_TIMEOUT);
+
+      return () => clearTimeout(timeoutId);
     }
   }, [
     dispatch,
@@ -391,7 +397,7 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
   };
 
   return (
-    <ChatStyles as="aside" aria-label={t("chat.landmark.label")} isFullScreen={isFullScreen} style={{ transition: "none !important" }}>
+    <ChatStyles as="aside" aria-label={t("chat.landmark.label")} isFullScreen={isFullScreen} className={mobileApp ? "mobile-app" : ""} style={{ transition: "none !important" }}>
       <div
         ref={dialogAnnouncementRef}
         aria-live="assertive"
@@ -408,7 +414,7 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
           minHeight={CHAT_MIN_WINDOW_HEIGHT}
           maxHeight={isFullScreen ? window.innerHeight : height - 50}
           maxWidth={isFullScreen ? window.innerWidth : width - 50}
-          enable={isFullScreen ? {} : RESIZABLE_HANDLES}
+          enable={isFullScreen || mobileApp ? {} : RESIZABLE_HANDLES}
           handleComponent={RESIZE_HANDLE_COMPONENTS}
           onResizeStart={handleResizeStart}
           onResizeStop={handleChatResize}
