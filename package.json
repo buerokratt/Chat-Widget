@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@babel/runtime": "^7.12.13",
+    "@buerokratt-ria/notifications": "file:notifications-sdk.tgz",
     "@reduxjs/toolkit": "^1.6.2",
     "@types/styled-components": "^5.1.19",
     "@xmldom/xmldom": "^0.7.5",
