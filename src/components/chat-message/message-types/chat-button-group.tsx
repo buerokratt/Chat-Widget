@@ -6,6 +6,7 @@ import {addMessage, initChat, queueMessage, sendNewMessage} from "../../../slice
 import useChatSelector from "../../../hooks/use-chat-selector";
 import {parseButtons} from "../../../utils/chat-utils";
 import {ChatMessageStyled} from "../ChatMessageStyled";
+import { isMobileApp } from "../../../utils/browser-utils";
 
 const ChatButtonGroup = ({message}: { message: Message }): JSX.Element => {
     const dispatch = useAppDispatch();
@@ -39,7 +40,7 @@ const ChatButtonGroup = ({message}: { message: Message }): JSX.Element => {
     const enabled = messages[messages.length - 1] === message && chatMode === CHAT_MODES.FLOW;
 
     return (
-        <ChatMessageStyled>
+        <ChatMessageStyled className={isMobileApp() ? "mobile-app" : ""}>
             <div className="buttonsRow">
                 {parsedButtons?.map(({title, payload}) => (
                     <button

@@ -5,6 +5,7 @@ export const ChatStyles = styled.div<{isFullScreen?: boolean}>`
     .chatWrapper {
         z-index: 9999;
         position: fixed !important;
+        transition: transform 250ms ease !important;
         margin: ${props => props.isFullScreen ? '0' : '1em'};
         right: 0;
         bottom: 0;
@@ -12,7 +13,6 @@ export const ChatStyles = styled.div<{isFullScreen?: boolean}>`
         left: ${props => props.isFullScreen ? '0' : 'auto'};
         width: ${props => props.isFullScreen ? '100vw' : 'auto'};
         height: ${props => props.isFullScreen ? '100vh' : 'auto'};
-        transition: none !important;
     }
 
     .chat-resize-handle {
@@ -134,7 +134,7 @@ export const ChatStyles = styled.div<{isFullScreen?: boolean}>`
             margin: 0.5em;
             top: 0;
             left: 0;
-            transition: none !important;
+            transition: all 250ms !important;
         }
     }
 
@@ -158,6 +158,12 @@ export const ChatStyles = styled.div<{isFullScreen?: boolean}>`
 
     .authenticated {
         box-shadow: 0 0 8px 2px #0078ff;
+    }
+
+    &.mobile-app .chat {
+        @media (prefers-color-scheme: dark) {
+            background: #1c1c1e;
+        }
     }
 
     @media screen and (max-width: 480px) {

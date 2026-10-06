@@ -66,6 +66,55 @@ Snippet can be embedded to any site using the following html:
 <script id="script-bundle" type="text/javascript" src="LOCATION_OF_WIDGET_BUNDLE" crossorigin=""></script>
 ```
 
+## Multiple widgets on the same page
+
+Every persisted key (chat id, open/closed state, dimensions, language, etc.) is namespaced by an
+instance id, and the mount point is configurable, so more than one widget can run on the same page
+without the instances overwriting each other's `localStorage`/`sessionStorage` data. Give each
+instance's container a unique id and add `data-target` and `data-instance-id` attributes to that
+instance's `<script id="script-bundle">` tag:
+
+```
+<div id="byk-va-2"></div>
+<script>
+  window._env_ = { ...same as above... };
+</script>
+<script
+  id="script-bundle"
+  type="text/javascript"
+  src="LOCATION_OF_WIDGET_BUNDLE"
+  data-target="byk-va-2"
+  data-instance-id="search-widget"
+  crossorigin=""
+></script>
+```
+
+- `data-target` — id of the container `<div>` this instance should render into. Defaults to `byk-va`.
+- `data-instance-id` — any unique string. When present, it's appended to every storage key this
+  instance reads/writes, so it never collides with another instance's data, and it's sent as a
+  `chatId` query parameter on the instance's API calls so the backend can tell its chat apart from
+  another instance's. Omit it only on a genuine single-widget page, to keep the original, unprefixed
+  keys and behavior.
+- `data-domain` — overrides `WIDGET_DOMAIN` for this instance only, when multi-domain requests need
+  to report a different domain per instance. Optional; falls back to `WIDGET_DOMAIN`, then
+  `window.location`.
+
+**Important:** on a page with more than one widget, every instance needs its own `data-instance-id`
+— including what might otherwise look like "the main" one. Two unnamed instances on the same page
+share the same localStorage keys, so they would read and overwrite each other's stored chat id.
+
+Every instance, named or not, sends its own stored chat id as the `chatId` query parameter once a chat
+has started. It doesn't rely on the backend's default-chat fallback (the `chatJwt` cookie's own `chatId`
+field), because that field always points at whichever chat was initialized most recently — including
+chats started by widgets on sibling subdomains, when the cookie is set on the parent domain.
+
+The `chatJwt` cookie itself stays shared and `HttpOnly` across all instances — it tracks every
+active chat's id in a `chatIds` array, and each instance's `chatId` query parameter selects which of
+those the request concerns (validated against that array server-side; a chatId not in the array is
+rejected). One consequence: `auth/jwt/extend` refreshes the cookie's expiry for *all* tracked chats
+at once, since there's only one cookie — there's no way for one widget's activity to keep the cookie
+alive while another's expires independently.
+
 ## Iframe Support
 
 If you want to use the widget inside an Iframe use the following snippet or reference iframe-index.html
@@ -119,6 +168,7 @@ If you want to use the widget inside an Iframe use the following snippet or refe
 - `ENABLE_HIDDEN_FEATURES`: set it to `'TRUE'` will show experimental features, `'FALSE'` will hide them
 - `FEEDBACK_RATING_COLORS_ENABLED`: set it to `'TRUE'` to show colors on the NPS/feedback rating widget, `'FALSE'` to hide them
 - `ENABLE_MULTI_DOMAIN`: set it to `'TRUE'` to append the current page's domain to multi-domain related requests, `'FALSE'` to disable
+- `WIDGET_DOMAIN`: domain sent with multi-domain requests instead of `window.location` (e.g. when the widget is embedded on a page whose own URL isn't the domain the backend should recognize). Optional — falls back to `window.location` when unset. Can be overridden per instance via the `data-domain` script attribute, see [Multiple widgets on the same page](#multiple-widgets-on-the-same-page)
 - `TERMINATION_TIMEOUT`: Timeout (in seconds) sent to the notification node when queuing a chat for termination
 - `WIDGET_HEIGHT`: Default height (in pixels) of the chat window
 - `WIDGET_WIDTH`: Default width (in pixels) of the chat window

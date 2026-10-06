@@ -1,13 +1,17 @@
 import React, {memo, MouseEventHandler} from 'react';
 import {useTranslation} from 'react-i18next';
 import {motion} from 'framer-motion';
-import {setIsChatOpen, setIsFullScreen} from '../../slices/chat-slice';
+import {resetChatState, setIsChatOpen, setIsFullScreen} from '../../slices/chat-slice';
 import {showConfirmationModal} from '../../slices/widget-slice';
 import Close from '../../static/icons/close.svg';
 import FullScreen from '../../static/icons/full-screen.svg';
 import Minimize from '../../static/icons/minimize.svg';
 import CloseFullScreen from '../../static/icons/close-full-screen.svg';
 import Shield from '../../static/icons/shield.svg';
+import MinimizeCircle from '../../static/icons/minimize-circle.svg';
+import CloseCircle from '../../static/icons/close-circle.svg';
+import MinimizeCircleDark from '../../static/icons/minimize-circle-dark.svg';
+import CloseCircleDark from '../../static/icons/close-circle-dark.svg';
 import {useAppDispatch} from '../../store';
 import useChatSelector from '../../hooks/use-chat-selector';
 import useAuthenticationSelector from '../../hooks/use-authentication-selector';
@@ -15,6 +19,7 @@ import {ChatHeaderInitialStyles, ChatHeaderStyles} from "./ChatHeaderStyled";
 import { useScroll } from '../../contexts/ScrollContext';
 import { setToLocalStorage } from '../../utils/local-storage-utils';
 import { LOCAL_STORAGE_INSTANTLY_OPEN_CHAT_WIDGET_KEY } from '../../constants';
+import { isMobileApp, notifyMobileApp } from '../../utils/browser-utils';
 
 interface ChatHeaderType {
     detailHandler: MouseEventHandler<HTMLButtonElement>;
@@ -24,16 +29,24 @@ interface ChatHeaderType {
 const ChatHeader = (props: ChatHeaderType): JSX.Element => {
     const {detailHandler, isDetailSelected} = props;
     const {t} = useTranslation();
-    const { chatId, isChatOpen, isFullScreen } = useChatSelector();
+    const { chatId, isChatOpen, isFullScreen, isChatEnded } = useChatSelector();
     const { scrollToBottom } = useScroll();
     const {isAuthenticated} = useAuthenticationSelector();
+    const mobileApp = isMobileApp();
     const closeChatState = () => {
-        dispatch(setIsChatOpen(false));
+        if (isChatEnded) {
+            dispatch(resetChatState({ event: null }));
+        } else {
+            dispatch(setIsChatOpen(false));
+        }
         if (!chatId) {
             setToLocalStorage(LOCAL_STORAGE_INSTANTLY_OPEN_CHAT_WIDGET_KEY, false);
         }
     }
-    const minimizeChat = () => closeChatState();
+    const minimizeChat = () => {
+        closeChatState();
+        if (mobileApp) notifyMobileApp("minimize");
+    };
     const setFullScreen = (value: boolean) => {
       dispatch(setIsFullScreen(value));
       setTimeout(() => {
@@ -42,6 +55,41 @@ const ChatHeader = (props: ChatHeaderType): JSX.Element => {
       window.parent.postMessage({ isOpened: isChatOpen, isFullScreen: value }, window._env_.IFRAME_TARGET_OIRGIN);
     };
     const dispatch = useAppDispatch();
+
+    if (mobileApp) {
+        return (
+            <ChatHeaderInitialStyles className="mobile-app-header">
+                <ChatHeaderStyles isFullScreen={isFullScreen} className="mobile-app-header">
+                    <button
+                        title={t('header.button.minimize.label')}
+                        onClick={minimizeChat}
+                        aria-label={t('header.button.minimize.label')}
+                        type="button"
+                    >
+                        <img src={MinimizeCircle} alt="Minimize icon" className="mobile-icon mobile-icon-light"/>
+                        <img src={MinimizeCircleDark} alt="Minimize icon" className="mobile-icon mobile-icon-dark"/>
+                    </button>
+                    <h2 className="title">{t('widget.title')}</h2>
+                    <button
+                        title={t('header.button.close.label')}
+                        onClick={() => {
+                            if (chatId && !isChatEnded) {
+                                dispatch(showConfirmationModal());
+                            } else {
+                                closeChatState();
+                                notifyMobileApp("close");
+                            }
+                        }}
+                        aria-label={t('header.button.close.label')}
+                        type="button"
+                    >
+                        <img src={CloseCircle} alt={t('header.button.close.label')} className="mobile-icon mobile-icon-light"/>
+                        <img src={CloseCircleDark} alt={t('header.button.close.label')} className="mobile-icon mobile-icon-dark"/>
+                    </button>
+                </ChatHeaderStyles>
+            </ChatHeaderInitialStyles>
+        );
+    }
 
     return (
         <ChatHeaderInitialStyles>
@@ -80,7 +128,7 @@ const ChatHeader = (props: ChatHeaderType): JSX.Element => {
                     <button
                         title={t('header.button.close.label')}
                         onClick={() => {
-                            chatId ? dispatch(showConfirmationModal()) : closeChatState();
+                            chatId && !isChatEnded ? dispatch(showConfirmationModal()) : closeChatState();
                         }}
                         aria-label={t('header.button.close.label')}
                         type="button"
@@ -90,8 +138,7 @@ const ChatHeader = (props: ChatHeaderType): JSX.Element => {
                 </div>
             </ChatHeaderStyles>
         </ChatHeaderInitialStyles>
-    )
-        ;
+    );
 };
 
 export default memo(ChatHeader);

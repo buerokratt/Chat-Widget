@@ -5,6 +5,7 @@ import useAuthenticationSelector from "./use-authentication-selector";
 import { redirectIfComeBackFromTim } from "../utils/auth-utils";
 import authenticationService from "../services/authentication-service";
 import { setIsChatOpen } from "../slices/chat-slice";
+import { namespacedKey } from "../utils/widget-instance-utils";
 
 const useAuthentication = (): void => {
   const dispatch = useAppDispatch();
@@ -30,7 +31,7 @@ const useAuthentication = (): void => {
 
   useEffect(() => {
     const code = new URLSearchParams(window.location.search).get("auth_code");
-    const lastCode = sessionStorage.getItem("last_auth_code");
+    const lastCode = sessionStorage.getItem(namespacedKey("last_auth_code"));
 
     const shouldReauthenticate =
       code && window._env_?.SMAX_INTEGRATION?.enabled && code !== lastCode;
@@ -38,7 +39,7 @@ const useAuthentication = (): void => {
     if (shouldReauthenticate) {
       dispatch(authSmaxUser(code)).then((action) => {
         if (action.meta.requestStatus === "fulfilled") {
-          sessionStorage.setItem("last_auth_code", code);
+          sessionStorage.setItem(namespacedKey("last_auth_code"), code);
           dispatch(setIsChatOpen(true));
         } else {
           console.error("Failed to authenticate with SMAX");

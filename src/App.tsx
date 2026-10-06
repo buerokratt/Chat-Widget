@@ -35,7 +35,8 @@ import { customJwtExtend } from "./slices/authentication-slice";
 import { getFromLocalStorage, setToLocalStorage } from "./utils/local-storage-utils";
 import useNameAndTitleVisibility from "./hooks/use-name-title-visibility";
 import { generateUEID } from "./utils/generators";
-import { isMobile, isMobileWidth } from "./utils/browser-utils";
+import { isMobile, isMobileApp, isMobileWidth } from "./utils/browser-utils";
+import { namespacedKey } from "./utils/widget-instance-utils";
 import { ScrollProvider } from "./contexts/ScrollContext";
 
 declare global {
@@ -57,6 +58,7 @@ declare global {
       ENABLE_HIDDEN_FEATURES: string;
       FEEDBACK_RATING_COLORS_ENABLED: string;
       ENABLE_MULTI_DOMAIN: string;
+      WIDGET_DOMAIN: string;
       WIDGET_HEIGHT: number;
       WIDGET_WIDTH: number;
       TERMINATION_TIMEOUT: number;
@@ -145,10 +147,10 @@ const App: FC = () => {
   }, []);
 
   const initializeSession = () => {
-    let tabId = sessionStorage.getItem("tabId");
+    let tabId = sessionStorage.getItem(namespacedKey("tabId"));
     if (!tabId) {
       tabId = generateUEID();
-      sessionStorage.setItem("tabId", tabId);
+      sessionStorage.setItem(namespacedKey("tabId"), tabId);
     }
 
     let currentState = getCurrentSessionState();
@@ -157,14 +159,14 @@ const App: FC = () => {
       currentState.ids.push(tabId);
       currentState.count = currentState.ids.length;
       localStorage.setItem(
-        CHAT_SESSIONS.SESSION_STATE_KEY,
+        namespacedKey(CHAT_SESSIONS.SESSION_STATE_KEY),
         JSON.stringify(currentState)
       );
     }
 
     const handleTabClose = () => {
       const currentAppState = JSON.parse(
-        localStorage.getItem(CHAT_SESSIONS.SESSION_STATE_KEY) as string
+        localStorage.getItem(namespacedKey(CHAT_SESSIONS.SESSION_STATE_KEY)) as string
       ) || { ids: [], count: 0 };
 
       const updatedIds = currentAppState.ids.filter(
@@ -176,7 +178,7 @@ const App: FC = () => {
       };
 
       localStorage.setItem(
-        CHAT_SESSIONS.SESSION_STATE_KEY,
+        namespacedKey(CHAT_SESSIONS.SESSION_STATE_KEY),
         JSON.stringify(updatedState)
       );
     };
@@ -191,7 +193,7 @@ const App: FC = () => {
   const getCurrentSessionState = () => {
     return (
       JSON.parse(
-        localStorage.getItem(CHAT_SESSIONS.SESSION_STATE_KEY) as string
+        localStorage.getItem(namespacedKey(CHAT_SESSIONS.SESSION_STATE_KEY)) as string
       ) || { ids: [], count: 0 }
     );
   };
@@ -244,7 +246,7 @@ const App: FC = () => {
     return (
       <ScrollProvider>
         <Suspense fallback={null}>
-          {isChatOpen ? <Chat triggerRef={triggerRef} /> : <Profile triggerRef={triggerRef} />}
+          {isMobileApp() || isChatOpen ? <Chat triggerRef={triggerRef} /> : <Profile triggerRef={triggerRef} />}
         </Suspense>
       </ScrollProvider>
     );
