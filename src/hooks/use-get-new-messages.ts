@@ -19,12 +19,21 @@ import {
 } from "../utils/state-management-utils";
 import { v4 as uuidv4 } from "uuid";
 
+const getLatestUpdatedTimestamp = (messages: Message[], current: string): string =>
+  messages.reduce((latest, message) => {
+    const timestamp = message.updated ?? message.created;
+    return timestamp && new Date(timestamp).getTime() > new Date(latest).getTime() ? timestamp : latest;
+  }, current);
+
 const useGetNewMessages = (): void => {
   const { lastReadMessageTimestamp, isChatEnded, chatId } = useChatSelector();
   const dispatch = useAppDispatch();
   const [sseUrl, setSseUrl] = useState("");
   const [lastReadMessageTimestampValue, setLastReadMessageTimestampValue] =
     useState("");
+  const lastReadMessageTimestampRef = useRef("");
+  const isFetchingNewMessages = useRef(false);
+  const hasPendingFetch = useRef(false);
   const currentStreamContent = useRef("");
   const currentStreamId = useRef("");
   const currentStreamUuid = useRef("");
@@ -32,6 +41,7 @@ const useGetNewMessages = (): void => {
 
   useEffect(() => {
     if (lastReadMessageTimestamp && !lastReadMessageTimestampValue) {
+      lastReadMessageTimestampRef.current = lastReadMessageTimestamp;
       setLastReadMessageTimestampValue(lastReadMessageTimestamp);
     }
   }, [lastReadMessageTimestamp]);
@@ -51,18 +61,30 @@ const useGetNewMessages = (): void => {
         if (!data) return;
         const type = data.type;
         if (type === "message") {
-          const result = await dispatch(
-            getNewMessages({ timeRangeBegin: lastReadMessageTimestampValue.split("+")[0] })
-          );
+          if (isFetchingNewMessages.current) {
+            hasPendingFetch.current = true;
+            return;
+          }
+          isFetchingNewMessages.current = true;
+          try {
+            do {
+              hasPendingFetch.current = false;
+              const result = await dispatch(
+                getNewMessages({ timeRangeBegin: lastReadMessageTimestampRef.current.split("+")[0] })
+              );
 
-          if (result.payload && Array.isArray(result.payload)) {
-            const messages: Message[] = result.payload;
+              if (result.payload && Array.isArray(result.payload)) {
+                const messages: Message[] = result.payload;
 
-            if (messages.length !== 0) {
-              setLastReadMessageTimestampValue(messages[messages.length - 1].created ?? `${lastReadMessageTimestamp}`);
-              dispatch(addMessagesToDisplay(messages.filter(isDisplayableMessages)));
-              dispatch(handleStateChangingEventMessages(messages.filter(isStateChangingEventMessage)));
-            }
+                if (messages.length !== 0) {
+                  lastReadMessageTimestampRef.current = getLatestUpdatedTimestamp(messages, lastReadMessageTimestampRef.current);
+                  dispatch(addMessagesToDisplay(messages.filter(isDisplayableMessages)));
+                  dispatch(handleStateChangingEventMessages(messages.filter(isStateChangingEventMessage)));
+                }
+              }
+            } while (hasPendingFetch.current);
+          } finally {
+            isFetchingNewMessages.current = false;
           }
         } else if (type === "stream_start") {
           currentStreamContent.current = "";
