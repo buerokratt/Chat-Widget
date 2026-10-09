@@ -26,16 +26,6 @@ export const wasPageReloadedNavigate = () => {
   });
 };
 
-export const isChatAboutToBeTerminated = () => {
-  const terminationTime = sessionStorage.getItem(namespacedKey("terminationTime"));
-
-  if (!terminationTime) return false;
-  const terminationTimeout = window._env_.TERMINATION_TIMEOUT;
-  const preTerminationTime = (terminationTimeout - 1) * 1000;
-
-  return preTerminationTime > Date.now() - parseInt(terminationTime);
-};
-
 export const isMobileWidth = () => {
   return window.innerWidth < 480;
 };

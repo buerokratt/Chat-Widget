@@ -5,12 +5,15 @@ import useChatSelector from "./use-chat-selector";
 import { getChatMessages } from "../slices/chat-slice";
 
 const useNotificationsConnection = (): void => {
-  const { chatId, isChatEnded } = useChatSelector();
+  const { chatId, chatStatus, isChatEnded } = useChatSelector();
   const notificationsClient = useNotificationsClient();
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (isChatEnded || !chatId) {
+    // A restored chat starts with no local status. Wait for getChat() to load
+    // the server status before opening SSE, otherwise an already-ended chat
+    // briefly reconnects while that request is in flight.
+    if (chatStatus === null || isChatEnded || !chatId) {
       notificationsClient.disconnect();
       return;
     }
@@ -32,7 +35,7 @@ const useNotificationsConnection = (): void => {
       unsubscribeFromState();
       notificationsClient.disconnect();
     };
-  }, [chatId, dispatch, isChatEnded, notificationsClient]);
+  }, [chatId, chatStatus, dispatch, isChatEnded, notificationsClient]);
 };
 
 export default useNotificationsConnection;

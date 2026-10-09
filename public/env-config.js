@@ -17,7 +17,6 @@ window._env_ = {
   FEEDBACK_RATING_COLORS_ENABLED: "FALSE",
   ENABLE_MULTI_DOMAIN: "TRUE",
   WIDGET_DOMAIN: "http://localhost:3003/",
-  TERMINATION_TIMEOUT: 10,
   WIDGET_HEIGHT: 450,
   WIDGET_WIDTH: 400,
   STREAM_TYPING_SPEED: 30, // in milliseconds - lower is faster

@@ -55,7 +55,6 @@ Snippet can be embedded to any site using the following html:
     IFRAME_TARGET_OIRGIN: "*",
     FEEDBACK_RATING_COLORS_ENABLED: 'FALSE',
     ENABLE_MULTI_DOMAIN: 'FALSE',
-    TERMINATION_TIMEOUT: 10,
     WIDGET_HEIGHT: 450;
     WIDGET_WIDTH: 400;
     STREAM_TYPING_SPEED: 30,
@@ -170,7 +169,6 @@ If you want to use the widget inside an Iframe use the following snippet or refe
 - `FEEDBACK_RATING_COLORS_ENABLED`: set it to `'TRUE'` to show colors on the NPS/feedback rating widget, `'FALSE'` to hide them
 - `ENABLE_MULTI_DOMAIN`: set it to `'TRUE'` to append the current page's domain to multi-domain related requests, `'FALSE'` to disable
 - `WIDGET_DOMAIN`: domain sent with multi-domain requests instead of `window.location` (e.g. when the widget is embedded on a page whose own URL isn't the domain the backend should recognize). Optional — falls back to `window.location` when unset. Can be overridden per instance via the `data-domain` script attribute, see [Multiple widgets on the same page](#multiple-widgets-on-the-same-page)
-- `TERMINATION_TIMEOUT`: Timeout (in seconds) sent to the notification node when queuing a chat for termination
 - `WIDGET_HEIGHT`: Default height (in pixels) of the chat window
 - `WIDGET_WIDTH`: Default width (in pixels) of the chat window
 - `STREAM_TYPING_SPEED`: Delay (in milliseconds) between characters when streaming LLM responses - lower is faster

@@ -29,9 +29,6 @@ import {
   filterDuplicatMessages,
   getChatModeBasedOnLastMessage,
 } from "../utils/chat-utils";
-import {
-  isChatAboutToBeTerminated,
-} from "../utils/browser-utils";
 import { namespacedKey } from "../utils/widget-instance-utils";
 import { isMobileApp, notifyMobileApp } from "../utils/browser-utils";
 import {
@@ -385,46 +382,6 @@ export const endChat = createAsyncThunk(
   }
 );
 
-export const addChatToTerminationQueue = createAsyncThunk(
-  "addChatToTerminationQueue",
-  async (args, thunkApi) => {
-    const { chat } = thunkApi.getState() as { chat: ChatState };
-
-    sessionStorage.setItem(namespacedKey("terminationTime"), Date.now().toString());
-    localStorage.setItem(namespacedKey("previousChatId"), chat.chatId ?? "");
-
-    thunkApi.dispatch(resetState());
-
-    if (chat.chatId) {
-      ChatService.addChatToTerminationQueue(chat.chatId);
-      return { success: true };
-    }
-  }
-);
-
-export const removeChatFromTerminationQueue = createAsyncThunk(
-  "chat/removeChatFromTerminationQueue",
-  async (args, thunkApi) => {
-    const chatId = localStorage.getItem(namespacedKey("previousChatId"));
-
-    if (!chatId || !isChatAboutToBeTerminated()) {
-      return null;
-    }
-
-    setToLocalStorage(SESSION_STORAGE_CHAT_ID_KEY, chatId);
-
-    thunkApi.dispatch(resetStateWithValue(chatId));
-    try {
-      await ChatService.removeChatFromTerminationQueue(chatId);
-      sessionStorage.removeItem(namespacedKey("terminationTime"));
-      return { success: true };
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }
-);
-
 export const resetChatState = createAsyncThunk(
   "",
   async (args: { event: CHAT_EVENTS | null }, thunkApi) => {
@@ -594,9 +551,6 @@ export const chatSlice = createSlice({
   reducers: {
     resetState: () => initialState,
     resetStateOpen: () => initialStateOpen,
-    resetStateWithValue: (state, action: PayloadAction<string>) => {
-      state.chatId = action.payload;
-    },
     setChatId: (state, action: PayloadAction<string>) => {
       state.chatId = action.payload;
     },
@@ -972,12 +926,6 @@ export const chatSlice = createSlice({
       clearStateVariablesFromLocalStorage();
       localStorage.removeItem(namespacedKey("previousChatId"));
     });
-    builder.addCase(addChatToTerminationQueue.fulfilled, (state) => {
-      state.chatStatus = CHAT_STATUS.ENDED;
-      state.feedback.isFeedbackMessageGiven = false;
-      state.feedback.isFeedbackRatingGiven = false;
-      clearStateVariablesFromLocalStorage();
-    });
     builder.addCase(sendChatNpmRating.rejected, (state) => {
       state.errorMessage = ERROR_MESSAGE;
     });
@@ -1063,7 +1011,6 @@ export const {
   removeMessageFromDisplay,
   addMessagesToDisplay,
   handleStateChangingEventMessages,
-  resetStateWithValue,
   removeEstimatedWaitingMessage,
   updateStreamingMessage,
   clearStreamingMessage,

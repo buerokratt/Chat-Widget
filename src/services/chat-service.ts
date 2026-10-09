@@ -1,6 +1,5 @@
 import {UserContacts} from "./../model/user-contacts-model";
 import http from "./http-service";
-import notificationHttp from "./notification-service";
 import {Attachment, Message} from "../model/message-model";
 import {Chat} from "../model/chat-model";
 import {RUUTER_ENDPOINTS} from "../constants";
@@ -162,31 +161,6 @@ class ChatService {
 
   getTitleVisibility(): Promise<string> {
     return http.get(RUUTER_ENDPOINTS.GET_CSA_TITLE_VISIBILITY);
-  }
-
-  addChatToTerminationQueue(chatId: string): void {
-    const sent = navigator.sendBeacon(
-      `${window._env_.NOTIFICATION_NODE_URL}${RUUTER_ENDPOINTS.ADD_CHAT_TO_TERMINATION_QUEUE}`,
-      JSON.stringify({ chatId, timeout: window._env_.TERMINATION_TIMEOUT })
-    );
-    if (!sent) {
-      console.error("Failed to send beacon for adding chat to termination queue");
-    }
-  }
-
-  async removeChatFromTerminationQueue(chatId: string): Promise<void> {
-    try {
-      await notificationHttp.post(RUUTER_ENDPOINTS.REMOVE_CHAT_FROM_TERMINATION_QUEUE, { chatId });
-    } catch (error) {
-      const sent = navigator.sendBeacon(
-        `${window._env_.NOTIFICATION_NODE_URL}${RUUTER_ENDPOINTS.REMOVE_CHAT_FROM_TERMINATION_QUEUE}`,
-        JSON.stringify({ chatId })
-      );
-
-      if (!sent) {
-        throw error;
-      }
-    }
   }
 
   stopStream(channelId: string): Promise<void> {

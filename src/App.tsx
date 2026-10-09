@@ -65,7 +65,6 @@ declare global {
       WIDGET_DOMAIN: string;
       WIDGET_HEIGHT: number;
       WIDGET_WIDTH: number;
-      TERMINATION_TIMEOUT: number;
       STREAM_TYPING_SPEED: number;
       IFRAME_TARGET_OIRGIN: string;
       SMAX_INTEGRATION: { enabled: boolean };

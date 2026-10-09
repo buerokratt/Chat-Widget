@@ -143,8 +143,6 @@ export enum RUUTER_ENDPOINTS {
   SEND_ATTACHMENT = '/attachments/add',
   GET_CSA_NAME_VISIBILITY = '/chats/config/name-visibility',
   GET_CSA_TITLE_VISIBILITY = '/chats/config/title-visibility',
-  ADD_CHAT_TO_TERMINATION_QUEUE = '/add-chat-to-termination-queue',
-  REMOVE_CHAT_FROM_TERMINATION_QUEUE = '/remove-chat-from-termination-queue',
   AUTHENTICATE_SMAX_USER = '/auth/authenticate-smax-user',
 }
 
