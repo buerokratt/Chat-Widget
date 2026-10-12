@@ -31,7 +31,11 @@ export const ChatStyles = styled.div<{isFullScreen?: boolean}>`
       width: 100%;
       background-color: #F0F1F2;
       color: #003cff;
-      padding: 5px 0px;
+      padding: 0 12px;
+      border-top: 5px solid #F0F1F2;
+      border-bottom: 5px solid #F0F1F2;
+      box-sizing: border-box;
+      overflow-wrap: anywhere;
       font-size: 22px;
       text-align: center;
       font-family: "Aino Headline";
