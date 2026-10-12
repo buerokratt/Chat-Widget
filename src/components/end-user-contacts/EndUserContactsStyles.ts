@@ -13,6 +13,8 @@ export const EndUserContactsStyle = styled.div`
     flex: 1;
     min-height: 0;
     overflow-y: auto;
+    overflow-x: hidden;
+    overflow-wrap: anywhere;
 
     input,
     textarea {

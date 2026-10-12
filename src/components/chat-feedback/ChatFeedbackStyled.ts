@@ -6,6 +6,8 @@ export const ChatFeedbackStyled = styled.div`
     flex-shrink: 0;
     max-height: 50%;
     overflow-y: auto;
+    overflow-x: hidden;
+    overflow-wrap: anywhere;
 
     .downloadContainer {
         display: flex;
@@ -17,6 +19,12 @@ export const ChatFeedbackStyled = styled.div`
         left: 0;
     }
     
+    .feedback-paragraph {
+        max-height: 4.5em;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
     .p-style {
         display: block;
         margin-top: 1em;

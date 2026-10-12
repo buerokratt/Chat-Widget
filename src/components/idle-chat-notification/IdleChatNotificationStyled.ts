@@ -46,6 +46,8 @@ export const IdleChatNotificationStyled = styled.div`
         align-items: center;
         gap: 10px;
         overflow-y: auto;
+        overflow-x: hidden;
+        overflow-wrap: anywhere;
     }
 
     .byk_title {
@@ -58,9 +60,13 @@ export const IdleChatNotificationStyled = styled.div`
         text-align: center;
         color: ${colors.mustakivi};
         margin: 0;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
     }
 
     .byk_actions {
+        flex-shrink: 0;
         align-items: center;
         display: flex;
         flex-flow: row nowrap;
