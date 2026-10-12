@@ -166,6 +166,7 @@ export const ConfirmationModalStyled = styled.div`
     }
 
     .feedback-btn {
+        overflow-wrap: normal;
         padding: 0.5rem;
         width: 28px;
         vertical-align: baseline;
@@ -274,6 +275,7 @@ export const ConfirmationModalStyles = styled.div`
     }
 
     .feedback-btn {
+        overflow-wrap: normal;
         padding: 0.5rem;
         width: 28px;
         vertical-align: baseline;
