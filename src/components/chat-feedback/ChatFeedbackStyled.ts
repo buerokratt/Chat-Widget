@@ -3,6 +3,9 @@ import {colors, fontChat} from "../../styling/style_settings";
 
 export const ChatFeedbackStyled = styled.div`
     margin: 0 0.8em;
+    flex-shrink: 0;
+    max-height: 50%;
+    overflow-y: auto;
 
     .downloadContainer {
         display: flex;

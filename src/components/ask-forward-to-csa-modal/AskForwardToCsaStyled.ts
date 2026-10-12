@@ -1,13 +1,17 @@
 import styled from "styled-components";
 
 export const AskForwardToCsaModalStyles = styled.div`
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+
     .container {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         gap: 30px;
-        height: 100%;
+        min-height: 100%;
         text-align: center;
     }
 

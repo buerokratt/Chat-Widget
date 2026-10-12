@@ -10,7 +10,9 @@ export const TextAreaStyle = styled.textarea`
 `;
 
 export const EndUserContactsStyle = styled.div`
-    height: 100%;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
 
     input,
     textarea {
@@ -58,14 +60,14 @@ export const EndUserContactsStyle = styled.div`
     }
 
     form {
-        height: 115%;
+        min-height: 100%;
         width: 100%;
         padding: 0.5rem;
+        box-sizing: border-box;
         display: flex;
         justify-content: center;
         align-items: center;
         flex-direction: column;
-        margin-top: -3rem;
     }
 
     .form-body {

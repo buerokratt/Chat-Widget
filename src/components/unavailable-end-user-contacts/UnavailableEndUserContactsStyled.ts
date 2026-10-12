@@ -12,7 +12,9 @@ export const TextAreaStyle = styled.textarea`
 
 export const UnavailableEndUserContactsStyle = styled.div`{
 
-    height: 100%;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
 
     input,
     textarea {
@@ -61,12 +63,11 @@ export const UnavailableEndUserContactsStyle = styled.div`{
     }
 
     form {
-        height: 115%;
+        min-height: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
         flex-direction: column;
-        margin-top: -2.5rem;
         margin-left: 1rem;
         margin-right: 1rem;
     }

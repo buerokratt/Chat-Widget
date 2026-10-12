@@ -50,8 +50,10 @@ export const ConfirmationModalStyled = styled.div`
         width: 80%;
         height: 80%;
         justify-content: center;
+        justify-content: safe center;
         align-items: center;
         gap: 10px;
+        overflow-y: auto;
     }
 
     .title {

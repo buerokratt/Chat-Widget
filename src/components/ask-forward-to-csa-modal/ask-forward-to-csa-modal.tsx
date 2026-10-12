@@ -14,7 +14,7 @@ const AskForwardToCsaModal = (): JSX.Element => {
     const {t} = useTranslation();
 
     return (
-        <AskForwardToCsaModalStyles style={{ height: "100%" }}>
+        <AskForwardToCsaModalStyles>
             <div className="container">
                 <div className="h3-style header" role="heading" aria-level={3}>{forwardToCsaMessage}</div>
                 <div className="buttons">
