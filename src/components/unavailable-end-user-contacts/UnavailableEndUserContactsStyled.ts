@@ -52,7 +52,7 @@ export const UnavailableEndUserContactsStyle = styled.div`{
     }
 
     .form-header {
-        margin-bottom: 1rem;
+        margin-bottom: 0.1rem;
         text-align: center;
         min-height: 0;
         overflow-y: auto;
