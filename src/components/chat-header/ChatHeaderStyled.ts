@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import {colors, fontTitle} from "../../styling/style_settings";
+import styled, { css } from "styled-components";
+import {colors, darkMode, fontTitle} from "../../styling/style_settings";
 
 export const ChatHeaderStyles = styled.div<{isFullScreen?: boolean}> `
     display: flex;
@@ -48,10 +48,10 @@ export const ChatHeaderStyles = styled.div<{isFullScreen?: boolean}> `
             }
         }
 
-        @media (prefers-color-scheme: dark) {
+        ${darkMode(css`
             background: #1c1c1e;
             border-bottom: 1px solid #3a3a3c;
-        }
+        `)}
     }
 `
 
@@ -103,16 +103,16 @@ export const ChatHeaderInitialStyles = styled.div`
             margin-right: 0;
             color: ${colors.mustakivi};
 
-            @media (prefers-color-scheme: dark) {
+            ${darkMode(css`
                 color: ${colors.white};
-            }
+            `)}
         }
 
         .mobile-icon-dark {
             display: none;
         }
 
-        @media (prefers-color-scheme: dark) {
+        ${darkMode(css`
             .mobile-icon-light {
                 display: none;
             }
@@ -120,6 +120,6 @@ export const ChatHeaderInitialStyles = styled.div`
             .mobile-icon-dark {
                 display: block;
             }
-        }
+        `)}
     }
 `;

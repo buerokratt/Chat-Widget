@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import {colors, fontChat, fontChatBold} from "../../styling/style_settings";
+import styled, { css } from "styled-components";
+import {colors, darkMode, fontChat, fontChatBold} from "../../styling/style_settings";
 
 export const ChatStyles = styled.div<{isFullScreen?: boolean}>`
     .chatWrapper {
@@ -165,9 +165,9 @@ export const ChatStyles = styled.div<{isFullScreen?: boolean}>`
     }
 
     &.mobile-app .chat {
-        @media (prefers-color-scheme: dark) {
+        ${darkMode(css`
             background: #1c1c1e;
-        }
+        `)}
     }
 
     @media screen and (max-width: 480px) {

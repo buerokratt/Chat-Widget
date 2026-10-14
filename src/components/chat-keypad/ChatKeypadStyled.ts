@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import { colors } from "../../styling/style_settings";
+import styled, { css } from "styled-components";
+import { colors, darkMode } from "../../styling/style_settings";
 
 export const ChatKeypadStyled = styled.div`
   .keypad {
@@ -121,7 +121,7 @@ export const ChatKeypadStyled = styled.div`
       }
     }
 
-    @media (prefers-color-scheme: dark) {
+    ${darkMode(css`
       background: #1c1c1e;
 
       .input {
@@ -137,6 +137,6 @@ export const ChatKeypadStyled = styled.div`
           background: #1c1c1e;
         }
       }
-    }
+    `)}
   }
 `;

@@ -68,3 +68,11 @@ export type MobileAppAction = "minimize" | "close";
 export const notifyMobileApp = (action: MobileAppAction): void => {
   window.BurokrattApp?.postMessage(JSON.stringify({ action }));
 };
+
+export type MobileAppTheme = "light" | "dark";
+
+export const getMobileAppTheme = (): MobileAppTheme | null => {
+  if (!isMobileApp()) return null;
+  const theme = new URLSearchParams(window.location.search).get("theme");
+  return theme === "light" || theme === "dark" ? theme : null;
+};

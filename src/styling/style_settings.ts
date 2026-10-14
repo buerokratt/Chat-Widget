@@ -77,3 +77,16 @@ export const buttonS = css`
 `;
 
 export const context = 16;
+export const THEME_ATTRIBUTE = 'data-byk-theme';
+
+export const darkMode = (styles: ReturnType<typeof css>) => css`
+    html[${THEME_ATTRIBUTE}="dark"] & {
+        ${styles}
+    }
+
+    @media (prefers-color-scheme: dark) {
+        html:not([${THEME_ATTRIBUTE}="light"]) & {
+            ${styles}
+        }
+    }
+`;
