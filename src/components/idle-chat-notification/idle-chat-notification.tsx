@@ -3,9 +3,9 @@ import {useTranslation} from 'react-i18next';
 import Button from '../button/button';
 import {useAppDispatch} from '../../store';
 import {setIdleChat} from '../../slices/chat-slice';
-import {customJwtExtend} from '../../slices/authentication-slice';
 import {IdleChatNotificationStyled} from "./IdleChatNotificationStyled";
 import useFocusTrap from "../../hooks/useFocusTrap";
+import useExtendJwt from '../../hooks/use-extend-jwt';
 
 interface IdleChatNotificationProps {
     customMessage?: string;
@@ -15,10 +15,11 @@ interface IdleChatNotificationProps {
 const IdleChatNotification: FC<IdleChatNotificationProps> = ({customMessage}) => {
     const {t} = useTranslation();
     const dispatch = useAppDispatch();
+    const extendJwt = useExtendJwt();
     const dialogRef = useRef<HTMLDialogElement>(null);
     const dismissIdle = () => {
         dispatch(setIdleChat({ isIdle: false, lastActive: new Date().getTime() }));
-        dispatch(customJwtExtend());
+        void extendJwt();
     };
     useFocusTrap(dialogRef, { focusFirstOnMount: true, onEscape: dismissIdle });
 
@@ -38,12 +39,7 @@ const IdleChatNotification: FC<IdleChatNotificationProps> = ({customMessage}) =>
                         <div className="byk_actions">
                             <Button
                                 title={t("widget.action.yes")}
-                                onClick={() => {
-                                    dispatch(
-                                        setIdleChat({isIdle: false, lastActive: new Date().getTime()})
-                                    );
-                                    dispatch(customJwtExtend());
-                                }}
+                                onClick={dismissIdle}
                             >
                                 {t("widget.action.continue")}
                             </Button>
