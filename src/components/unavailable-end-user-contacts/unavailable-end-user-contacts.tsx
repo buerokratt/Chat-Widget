@@ -98,7 +98,7 @@ const UnavailableEndUserContacts = (): JSX.Element => {
     return (
         <UnavailableEndUserContactsStyle>
             <form>
-                <div className="container">
+                <div className={`container ${askForContacts ? "with-contacts" : ""}`}>
                     <div className="form-header h3-style" role="heading" aria-level={3}><Markdownify message={contactContentMessage}></Markdownify></div>
                     {invalidMessage && <div className="missing-feeback p-style">{invalidMessage}</div>}
                     {askForContacts && (

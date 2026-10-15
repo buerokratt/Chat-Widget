@@ -50,8 +50,12 @@ export const ConfirmationModalStyled = styled.div`
         width: 80%;
         height: 80%;
         justify-content: center;
+        justify-content: safe center;
         align-items: center;
         gap: 10px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        overflow-wrap: anywhere;
     }
 
     .title {
@@ -162,6 +166,7 @@ export const ConfirmationModalStyled = styled.div`
     }
 
     .feedback-btn {
+        overflow-wrap: normal;
         padding: 0.5rem;
         width: 28px;
         vertical-align: baseline;
@@ -237,6 +242,18 @@ export const ConfirmationModalStyles = styled.div`
     flex-direction: column;
     display: flex;
 
+    .feedback-paragraph,
+    .feedback-paragraph-secondary {
+        flex-shrink: 0;
+        max-height: 4.5em;
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        &.p-style {
+            margin: 0.5em 0;
+        }
+    }
+
     .feedback-paragraph {
         font-size: 16px;
         text-align: center;
@@ -258,6 +275,7 @@ export const ConfirmationModalStyles = styled.div`
     }
 
     .feedback-btn {
+        overflow-wrap: normal;
         padding: 0.5rem;
         width: 28px;
         vertical-align: baseline;

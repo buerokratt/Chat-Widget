@@ -33,7 +33,7 @@ export const ProfileStyles = styled.div `
     }
 
     .profile__jump {
-        animation: 0.4s jump ease infinite alternate;
+        animation: 1s jump ease infinite;
     }
 
     .profile__wiggle {
@@ -129,11 +129,12 @@ export const ProfileStyles = styled.div `
     }
 
     @keyframes jump {
-        0% {
+        0%,
+        100% {
             transform: scale(1);
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
         }
-        100% {
+        50% {
             transform: scale(1.05);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }

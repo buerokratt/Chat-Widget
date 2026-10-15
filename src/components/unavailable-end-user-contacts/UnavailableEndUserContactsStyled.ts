@@ -12,7 +12,11 @@ export const TextAreaStyle = styled.textarea`
 
 export const UnavailableEndUserContactsStyle = styled.div`{
 
-    height: 100%;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overflow-wrap: anywhere;
 
     input,
     textarea {
@@ -48,8 +52,33 @@ export const UnavailableEndUserContactsStyle = styled.div`{
     }
 
     .form-header {
-        margin-bottom: 1rem;
+        margin-bottom: 0.1rem;
         text-align: center;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        margin: auto 0;
+        min-height: 0;
+        max-height: 100%;
+
+        > :not(.form-header) {
+            flex-shrink: 0;
+        }
+
+        &.with-contacts {
+            flex-shrink: 0;
+            max-height: none;
+
+            .form-header {
+                flex-shrink: 0;
+                max-height: 6em;
+            }
+        }
     }
 
     .form-footer {
@@ -61,12 +90,12 @@ export const UnavailableEndUserContactsStyle = styled.div`{
     }
 
     form {
-        height: 115%;
+        height: 100%;
+        box-sizing: border-box;
+        padding-bottom: 0.5rem;
         display: flex;
-        justify-content: center;
         align-items: center;
         flex-direction: column;
-        margin-top: -2.5rem;
         margin-left: 1rem;
         margin-right: 1rem;
     }
