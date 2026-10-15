@@ -84,6 +84,7 @@ export interface ChatState {
   contactMsgId: string;
   forwardToCsaMessage: string;
   forwardToCsaMessageId: string;
+  handledForwardToCsaMessageIds: string[];
   contactContentMessage: string;
   isChatRedirected: boolean;
   feedback: {
@@ -146,6 +147,7 @@ const initialState: ChatState = {
   showUnavailableContactForm: false,
   showAskToForwardToCsaForm: false,
   forwardToCsaMessageId: "",
+  handledForwardToCsaMessageIds: [],
   askForContacts: true,
   forwardToCsaMessage: "",
   contactContentMessage: "",
@@ -216,6 +218,7 @@ const initialStateOpen: ChatState = {
     showUnavailableContactForm: false,
     showAskToForwardToCsaForm: false,
     forwardToCsaMessageId: "",
+    handledForwardToCsaMessageIds: [],
     askForContacts: true,
     forwardToCsaMessage: "",
     contactContentMessage: "",
@@ -649,6 +652,9 @@ export const chatSlice = createSlice({
     },
     setShowAskToForwardToCsaForm: (state, action: PayloadAction<boolean>) => {
       state.showAskToForwardToCsaForm = action.payload;
+      if (!action.payload && state.forwardToCsaMessageId && !state.handledForwardToCsaMessageIds.includes(state.forwardToCsaMessageId)) {
+        state.handledForwardToCsaMessageIds.push(state.forwardToCsaMessageId);
+      }
     },
     setShowLoadingMessage: (state, action: PayloadAction<boolean>) => {
       state.showLoadingMessage = action.payload;
@@ -781,6 +787,7 @@ export const chatSlice = createSlice({
             state.contactContentMessage = msg.content ?? "";
             break;
           case CHAT_EVENTS.ASK_TO_FORWARD_TO_CSA:
+            if (msg.id && state.handledForwardToCsaMessageIds.includes(msg.id)) break;
             state.showAskToForwardToCsaForm = true;
             state.forwardToCsaMessageId = msg.id ?? "";
             state.forwardToCsaMessage = msg.content ?? "";
