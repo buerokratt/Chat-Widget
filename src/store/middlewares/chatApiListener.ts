@@ -1,3 +1,4 @@
+import { chatActiveMinutes } from "../../utils/duration-utils";
 import {Middleware} from "redux";
 import {initChat} from "../../slices/chat-slice";
 import {RUUTER_ENDPOINTS} from "../../constants";
@@ -13,7 +14,7 @@ const chatApiMiddleware: Middleware = (storeAPI) => (next) => async (action) => 
 
             const newKey = await http.post(RUUTER_ENDPOINTS.ADD_TIM, {
                 chatId: action.payload.id,
-                timeout: widgetConfig?.chatActiveDuration ?? 30,
+                timeout: chatActiveMinutes(widgetConfig?.chatActiveDuration),
             });
         } catch (err) {
             console.error("Failed to call add id to TIM:", err);

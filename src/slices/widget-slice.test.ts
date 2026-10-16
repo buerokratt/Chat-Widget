@@ -1,10 +1,10 @@
+import { DEFAULT_CHAT_ACTIVE_MINUTES } from "../utils/duration-utils";
 import {
   CHAT_BUBBLE_PROACTIVE_SECONDS,
   CHAT_SHOW_BUBBLE_MESSAGE,
   CHAT_BUBBLE_MESSAGE_DELAY_SECONDS,
   CHAT_BUBBLE_COLOR,
   CHAT_BUBBLE_ANIMATION,
-  IDLE_CHAT_INTERVAL,
 } from "../constants";
 import reducer, {
   closeConfirmationModal,
@@ -25,7 +25,7 @@ const initialState: WidgetState = {
     isLoaded: false,
     isBurokrattActive: null,
     showIdleWarningMessage: false,
-    chatActiveDuration: IDLE_CHAT_INTERVAL,
+    chatActiveDuration: DEFAULT_CHAT_ACTIVE_MINUTES,
     idleMessage: '',
     showAutoCloseText: false,
     autoCloseText: "",

@@ -1,3 +1,4 @@
+import { chatActiveMinutes, DEFAULT_CHAT_ACTIVE_MINUTES } from "../utils/duration-utils";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   CHAT_BUBBLE_ANIMATION,
@@ -6,7 +7,6 @@ import {
   CHAT_BUBBLE_PROACTIVE_SECONDS,
   CHAT_SHOW_BUBBLE_MESSAGE,
   CHAT_STATUS,
-  IDLE_CHAT_INTERVAL,
 } from "../constants";
 import WidgetService from "../services/widget-service";
 import { endChat, resetState } from "./chat-slice";
@@ -59,7 +59,7 @@ const initialState: WidgetState = {
     isBurokrattActive: null,
     idleMessage: "",
     showIdleWarningMessage: true,
-    chatActiveDuration: IDLE_CHAT_INTERVAL,
+    chatActiveDuration: DEFAULT_CHAT_ACTIVE_MINUTES,
     showAutoCloseText: true,
     autoCloseText:
       "Aitäh, et pöördusite, küsimuste korral võib alati uuesti ühendust võtta. Kena päeva jätku!",
@@ -140,9 +140,7 @@ export const widgetSlice = createSlice({
         action.payload?.isBurokrattActive === "true";
       state.widgetConfig.showIdleWarningMessage =
         action.payload?.showIdleWarning === "true";
-      state.widgetConfig.chatActiveDuration = parseInt(
-        action.payload?.chatActiveDuration ?? IDLE_CHAT_INTERVAL.toString()
-      );
+      state.widgetConfig.chatActiveDuration = chatActiveMinutes(action.payload?.chatActiveDuration);
       state.widgetConfig.idleMessage = action.payload?.idleMessage ?? "";
       state.widgetConfig.showAutoCloseText =
           action.payload?.showAutoCloseText === "true";
