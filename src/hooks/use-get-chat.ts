@@ -34,7 +34,10 @@ const useGetChat = (): void => {
         } 
       };
 
-      events = sse(sseUrl, onMessage);
+      events = sse(sseUrl, onMessage, async () => {
+        const chat = await chatService.getChatById(chatId ?? "");
+        dispatch(setChat(chat));
+      });
     }
     return () => {
       events?.close();

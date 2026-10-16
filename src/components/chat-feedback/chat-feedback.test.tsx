@@ -1,7 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { configureStore, EnhancedStore } from '@reduxjs/toolkit';
-import { fireEvent, screen } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { render } from '../../utils/test-utils';
 import chatReducer from '../../slices/chat-slice';
 import authenticationReducer from '../../slices/authentication-slice';
@@ -39,13 +39,14 @@ function createStore() {
     },
     preloadedState: {
       chat: { ...initialChatState, chatId: '1', chatStatus: CHAT_STATUS.ENDED },
+      widget: { ...widgetReducer(undefined, { type: 'init' }), widgetConfig: { ...widgetReducer(undefined, { type: 'init' }).widgetConfig, feedbackActive: true, feedbackNoticeActive: true, feedbackQuestion: 'Question', feedbackNotice: 'Notice' } },
     },
   });
 }
 
 describe('chat-feedback', () => {
   beforeEach(() => {
-    store = createEmptyStore();
+    store = createStore();
   });
 
   it('should call render feedback confirmation', () => {
@@ -66,11 +67,11 @@ describe('chat-feedback', () => {
     screen.getByText('1');
     screen.getByText('10');
 
-    screen.getByText('feedback.upperText');
-    screen.getByText('feedback.lowerText');
+    screen.getByText('Question');
+    screen.getByText('Notice');
   });
 
-  it('should call ChatService.sendChatNpmRating when rating is given', () => {
+  it('should call ChatService.sendChatNpmRating when rating is given', async () => {
     store = createStore();
     ChatService.sendNpmRating = jest.fn(() => Promise.resolve());
     render(
@@ -79,10 +80,10 @@ describe('chat-feedback', () => {
       </Provider>,
     );
     fireEvent.click(screen.getByText('1'));
-    expect(ChatService.sendNpmRating).toHaveBeenCalled();
+    await waitFor(() => expect(ChatService.sendNpmRating).toHaveBeenCalledWith({ chatId: '1', npmRating: 1 }));
   });
 
-  it('should call ChatService.sendFeedbackMessage when session is Ended and text is typed', () => {
+  it('should call ChatService.sendFeedbackMessage when session is Ended and text is typed', async () => {
     store = createStore();
     ChatService.sendFeedbackMessage = jest.fn(() => Promise.resolve());
     render(
@@ -93,6 +94,6 @@ describe('chat-feedback', () => {
     fireEvent.click(screen.getByText('7'));
     fireEvent.change(screen.getByPlaceholderText('keypad.input.placeholder'), { target: { value: 'ABC' } });
     fireEvent.click(screen.getByText('chat.feedback.button.label'));
-    expect(ChatService.sendFeedbackMessage).toHaveBeenCalled();
+    await waitFor(() => expect(ChatService.sendFeedbackMessage).toHaveBeenCalledWith({ chatId: '1', userFeedback: 'ABC' }));
   });
 });

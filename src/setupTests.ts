@@ -1,3 +1,4 @@
+import "./test-env";
 import "@testing-library/jest-dom";
 import { Settings } from "luxon";
 import { server } from "./mocks/server";
@@ -5,33 +6,10 @@ import "./i18n";
 
 const { getComputedStyle } = window;
 window.getComputedStyle = (elt) => getComputedStyle(elt);
-window._env_ = {
-  RUUTER_API_URL: "http://localhost:8086/backoffice",
-  NOTIFICATION_NODE_URL: "http://localhost:4040",
-  ENVIRONMENT: "development",
-  TIM_AUTHENTICATION_URL: "http://localhost:8085/oauth2/authorization/tara",
-  TERMS_AND_CONDITIONS_LINK: "https://www.kratid.ee/kasutustingimused",
-  ORGANIZATION_NAME: "TEST",
-  OFFICE_HOURS: {
-    ENABLED: false,
-    TIMEZONE: "Europe/Tallinn",
-    BEGIN: 9,
-    END: 17,
-    DAYS: [1, 2, 3, 4, 5],
-  },
 
-  ENABLE_HIDDEN_FEATURES: "TRUE",
-  FEEDBACK_RATING_COLORS_ENABLED: "FALSE",
-  ENABLE_MULTI_DOMAIN: "FALSE",
-  WIDGET_DOMAIN: "http://localhost:3003/",
-  TERMINATION_TIMEOUT: 10,
-  WIDGET_HEIGHT: 450,
-  WIDGET_WIDTH: 400,
-  STREAM_TYPING_SPEED: 30,
-  IFRAME_TARGET_OIRGIN: "*",
-  SMAX_INTEGRATION: { enabled: false },
-  FALLBACK_LANGUAGE: "et",
-};
+
+const unhandledRequests: string[] = [];
+
 
 beforeAll(() => {
   Settings.now = () => new Date(2021, 12, 18, 12).valueOf();
@@ -43,13 +21,22 @@ beforeAll(() => {
     Trans: ({ children }: { children: React.ReactNode }) => children,
   }));
 
-  server.listen();
+  server.listen({ onUnhandledRequest: (req) => {
+    unhandledRequests.push(`${req.method} ${req.url.pathname}`);
+    throw new Error(`Unhandled mock request: ${req.method} ${req.url.pathname}`);
+  } });
 });
 
 afterEach(() => {
   server.resetHandlers();
+  const unhandled = unhandledRequests.splice(0);
+  expect(unhandled).toEqual([]);
 });
 
 afterAll(() => {
   server.close();
+  expect(unhandledRequests).toEqual([]);
 });
+
+class TestResizeObserver { observe() {} unobserve() {} disconnect() {} }
+global.ResizeObserver = TestResizeObserver;

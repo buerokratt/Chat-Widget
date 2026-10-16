@@ -1,4 +1,4 @@
-const sse = <T>(url: string, onMessage: (data: T) => void): EventSource => {
+const sse = <T>(url: string, onMessage: (data: T) => void, onOpen?: () => void | Promise<void>): EventSource => {
   const eventSource = new EventSource(
     `${window._env_.NOTIFICATION_NODE_URL}/sse${url}`
   );
@@ -12,6 +12,7 @@ const sse = <T>(url: string, onMessage: (data: T) => void): EventSource => {
   };
 
   eventSource.onopen = () => {
+    Promise.resolve(onOpen?.()).catch(() => console.warn('SSE storage catch-up failed'));
     console.log("SSE connection opened, url:", url);
   };
 

@@ -1,3 +1,5 @@
+import { ScrollProvider } from '../contexts/ScrollContext';
+import PropTypes from "prop-types";
 /* eslint-disable */
 import { configureStore } from '@reduxjs/toolkit';
 import { render as rtlRender } from '@testing-library/react';
@@ -11,7 +13,7 @@ const render = (
   { preloadedState, store = configureStore({ reducer: { chat: chatReducer, widget: widgetReducer }, preloadedState }), ...renderOptions } = {},
 ) => {
   function Wrapper({ children }) {
-    return <Provider store={store}>{children}</Provider>;
+    return <Provider store={store}><ScrollProvider>{children}</ScrollProvider></Provider>;
   }
 
   Wrapper.propTypes = {

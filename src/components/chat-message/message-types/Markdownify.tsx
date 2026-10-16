@@ -38,7 +38,7 @@ const LinkPreview: React.FC<{
   const basicAuthPattern = /^[a-zA-Z][a-zA-Z\d+\-.]*:\/\/[^@]+@/;
 
   if (basicAuthPattern.test(href)) {
-    return null;
+    return <>{children}</>;
   }
 
   if (sanitizeLinks) {

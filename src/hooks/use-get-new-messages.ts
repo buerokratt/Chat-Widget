@@ -31,9 +31,6 @@ const useGetNewMessages = (): void => {
   const [sseUrl, setSseUrl] = useState("");
   const [lastReadMessageTimestampValue, setLastReadMessageTimestampValue] =
     useState("");
-  const lastReadMessageTimestampRef = useRef("");
-  const isFetchingNewMessages = useRef(false);
-  const hasPendingFetch = useRef(false);
   const currentStreamContent = useRef("");
   const currentStreamId = useRef("");
   const currentStreamUuid = useRef("");
@@ -41,7 +38,6 @@ const useGetNewMessages = (): void => {
 
   useEffect(() => {
     if (lastReadMessageTimestamp && !lastReadMessageTimestampValue) {
-      lastReadMessageTimestampRef.current = lastReadMessageTimestamp;
       setLastReadMessageTimestampValue(lastReadMessageTimestamp);
     }
   }, [lastReadMessageTimestamp]);
@@ -57,35 +53,35 @@ const useGetNewMessages = (): void => {
   useEffect(() => {
     let events: EventSource | undefined;
     if (sseUrl) {
+      let active = true;
+      let pending = false;
+      let dirty = false;
+      let cursor = "1970-01-01T00:00:00.000";
+      const syncMessages = async () => {
+        dirty = true;
+        if (pending) return;
+        pending = true;
+        try {
+          while (active && dirty) {
+            dirty = false;
+            const result = await dispatch(getNewMessages({ timeRangeBegin: cursor }));
+            if (!active) return;
+            if (result.payload && Array.isArray(result.payload)) {
+              const messages: Message[] = result.payload;
+              if (messages.length) {
+                cursor = getLatestUpdatedTimestamp(messages, cursor).split("+")[0];
+                dispatch(addMessagesToDisplay(messages.filter(isDisplayableMessages)));
+                dispatch(handleStateChangingEventMessages(messages.filter(isStateChangingEventMessage)));
+              }
+            }
+          }
+        } finally { pending = false; }
+      };
       const onMessage = async (data: any) => {
         if (!data) return;
         const type = data.type;
         if (type === "message") {
-          if (isFetchingNewMessages.current) {
-            hasPendingFetch.current = true;
-            return;
-          }
-          isFetchingNewMessages.current = true;
-          try {
-            do {
-              hasPendingFetch.current = false;
-              const result = await dispatch(
-                getNewMessages({ timeRangeBegin: lastReadMessageTimestampRef.current.split("+")[0] })
-              );
-
-              if (result.payload && Array.isArray(result.payload)) {
-                const messages: Message[] = result.payload;
-
-                if (messages.length !== 0) {
-                  lastReadMessageTimestampRef.current = getLatestUpdatedTimestamp(messages, lastReadMessageTimestampRef.current);
-                  dispatch(addMessagesToDisplay(messages.filter(isDisplayableMessages)));
-                  dispatch(handleStateChangingEventMessages(messages.filter(isStateChangingEventMessage)));
-                }
-              }
-            } while (hasPendingFetch.current);
-          } finally {
-            isFetchingNewMessages.current = false;
-          }
+          await syncMessages();
         } else if (type === "stream_start") {
           currentStreamContent.current = "";
           currentStreamId.current = data.streamId;
@@ -153,7 +149,9 @@ const useGetNewMessages = (): void => {
         }
       };
 
-      events = sse(sseUrl, onMessage);
+      events = sse(sseUrl, onMessage, syncMessages);
+      const close = events.close.bind(events);
+      events.close = () => { active = false; close(); };
     }
     return () => {
       events?.close();

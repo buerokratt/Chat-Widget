@@ -29,6 +29,6 @@ describe('waiting time notification', () => {
         <WaitingTimeNotification />
       </Provider>,
     );
-    screen.getByText('Hetkel on lõik klienditeenindajad hõivatud.');
+    screen.getByText('Kas soovite jätta enda kontaktandmed, et klienditeenindaja saaks ise ühendust võtta?');
   });
 });

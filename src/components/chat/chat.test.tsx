@@ -21,16 +21,6 @@ function createEmptyStore() {
 }
 
 describe('chat', () => {
-  beforeAll(() => {
-    server.listen({
-      onUnhandledRequest: ({ method, url }) => {
-        if (!url.pathname.startsWith('http://localhost:8080/')) {
-          throw new Error(`Unhandled ${method} request to ${url}`);
-        }
-      },
-    });
-  });
-
   it('should render', () => {
     emptyStore = createEmptyStore();
     render(

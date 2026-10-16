@@ -45,12 +45,12 @@ describe('Widget details component', () => {
 
     expect(setHrefSpy).not.toHaveBeenCalled();
     screen.getByRole('button', {
-      name: /tutvu teenuse tingimustega/i,
+      name: /tutvuge teenuse tingimustega/i,
     });
 
     fireEvent.click(
       screen.getByRole('button', {
-        name: /tutvu teenuse tingimustega/i,
+        name: /tutvuge teenuse tingimustega/i,
       }),
     );
 

@@ -1,0 +1,7 @@
+{
+  "widget": {
+    "dockerfile": "ci/central/widget.Dockerfile",
+    "context": ".",
+    "testTarget": "test"
+  }
+}

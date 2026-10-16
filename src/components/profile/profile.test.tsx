@@ -56,4 +56,19 @@ describe('Profile component', () => {
 
     expect(screen.getByText(1)).toBeInTheDocument();
   });
+  it('cancels the delayed bubble update when unmounted', () => {
+    jest.useFakeTimers();
+    const schedule = jest.spyOn(window, 'setTimeout');
+    const cancel = jest.spyOn(window, 'clearTimeout');
+    const { unmount } = render(<Provider store={emptyStore}><Profile /></Provider>);
+    const index = schedule.mock.calls.findIndex((args) => args[1] === 5000);
+    expect(index).toBeGreaterThanOrEqual(0);
+    const timeoutId = schedule.mock.results[index].value;
+    unmount();
+    expect(cancel).toHaveBeenCalledWith(timeoutId);
+    jest.runOnlyPendingTimers();
+    schedule.mockRestore(); cancel.mockRestore();
+    jest.useRealTimers();
+  });
+
 });

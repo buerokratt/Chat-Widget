@@ -153,7 +153,7 @@ class ChatService {
     endUserEmail,
     endUserPhone,
   }: UserContacts): Promise<void> {
-    return http.post(RUUTER_ENDPOINTS.SEND_CONTACT_INFO);
+    return http.post(RUUTER_ENDPOINTS.SEND_CONTACT_INFO, { chatId, endUserEmail, endUserPhone });
   }
 
   async getNameVisibility(): Promise<string> {

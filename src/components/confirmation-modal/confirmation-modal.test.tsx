@@ -67,7 +67,9 @@ describe("Confirmation modal component", () => {
       </Provider>
     );
 
-    expect(screen.getAllByRole("button").length).toBe(2);
+    expect(screen.getByRole('button', { name: 'Jah, sain vastuse' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Jah, vastuseta' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Ei soovi sulgeda' })).toBeInTheDocument();
     expect(screen.getByRole("dialog")).toBeInTheDocument();
     expect(
       screen.getByText("Kas soovite vestluse sulgeda?")

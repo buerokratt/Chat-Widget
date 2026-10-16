@@ -2,12 +2,13 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 import { configureStore, EnhancedStore } from '@reduxjs/toolkit';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { render } from '../../utils/test-utils';
 import ChatKeyPad from './chat-keypad';
 import { waitForRequest } from '../../mocks/server';
 import { RUUTER_ENDPOINTS } from '../../constants';
 import chatReducer from '../../slices/chat-slice';
+import { initialChatState } from '../../test-initial-states';
 import KeypadErrorMessage from './keypad-error-message';
 
 let store: EnhancedStore;
@@ -32,22 +33,22 @@ describe('Keypad', () => {
     store = createTestStore();
   });
 
-  it('clears input after pressing enter', () => {
-    render(<ChatKeyPad />);
-    const input = screen.getByRole('button') as HTMLInputElement;
+  it('clears input after pressing enter', async () => {
+    render(<ChatKeyPad />, { preloadedState: { chat: { ...initialChatState, chatId: '1' } } });
+    const input = screen.getByRole('textbox') as HTMLInputElement;
     userEvent.type(input, 'Hello!{enter}');
-    expect(input.value).toBeFalsy();
+    await waitFor(() => expect(input.value).toBe(''));
   });
 
   it('sends new message request when chatId is present', async () => {
-    const preloadedState = { chat: { chatId: '1', messages: [], messageQueue: [] } };
+    const preloadedState = { chat: { ...initialChatState, chatId: '1' } };
     const message = 'I need help!';
     render(<ChatKeyPad />, { preloadedState });
     const input = screen.getByRole('textbox') as HTMLInputElement;
     const pendingSendNewMessage = waitForRequest('POST', RUUTER_ENDPOINTS.POST_MESSAGE);
     userEvent.type(input, `${message}{enter}`);
     const request = await pendingSendNewMessage;
-    expect(request.body.content).toBe(message);
+    expect(request.body.message.content).toBe(message);
   });
 
   it('keypad error message returns empty string no children', () => {

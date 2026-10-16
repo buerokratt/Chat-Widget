@@ -135,7 +135,7 @@ describe('Chat slice', () => {
     it('should set loading true when initChat is pending', () => {
       const action = { type: initChat.pending.type };
       const state = reducer({ ...initialChatState, loading: false }, action);
-      expect(state).toEqual({ ...initialChatState, loading: true, lastReadMessageTimestamp: state.lastReadMessageTimestamp });
+      expect(state).toEqual({ ...initialChatState, loading: true, showLoadingMessage: true, lastReadMessageTimestamp: state.lastReadMessageTimestamp });
     });
 
     it('should set chat id and chat status open when initChat is fulfilled', () => {
@@ -151,12 +151,12 @@ describe('Chat slice', () => {
     });
 
     it('should get chat messages when getChatMessages is fulfilled', () => {
-      const action = { type: getChatMessages.fulfilled.type, payload: { content: 'hey', authorTimestamp: new Date().toString(), chatId: '123' } };
+      const action = { type: getChatMessages.fulfilled.type, payload: [{ id: 'm1', content: 'hey', authorTimestamp: '2026-10-15T10:00:00.000Z', chatId: '123' }] };
       const state = reducer(initialChatState, action);
       expect(state).toEqual({
         ...initialChatState,
         lastReadMessageTimestamp: state.lastReadMessageTimestamp,
-        messages: { content: 'hey', authorTimestamp: new Date().toString(), chatId: '123' },
+        messages: action.payload,
       });
     });
 
@@ -196,7 +196,8 @@ describe('Chat slice', () => {
     it('should set estimatedWaitingTime when getEstimatedWaitingTime is fulfilled', () => {
       const action = { type: getEstimatedWaitingTime.fulfilled.type, payload: { positionInUnassignedChats: '1', durationInSeconds: '100' } };
       const state = reducer(initialChatState, action);
-      expect(state).toEqual({ ...initialChatState, estimatedWaiting: { positionInUnassignedChats: '1', durationInSeconds: '100' } });
+      expect(state).toEqual({ ...initialChatState, estimatedWaiting: action.payload, messages: [{ id: 'estimatedWaiting', chatId: 'estimatedWaiting', authorTimestamp: state.messages[0].authorTimestamp }] });
+      expect(reducer(state, action).messages).toHaveLength(1);
     });
   });
 

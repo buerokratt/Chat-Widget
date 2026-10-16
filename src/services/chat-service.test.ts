@@ -11,34 +11,34 @@ describe('ChatService', () => {
     const message: Message = { chatId: 'chatID', content: 'test', authorTimestamp: 'timeStamp', authorRole: 'R123123123' };
     const endUserTechnicalData: EndUserTechnicalData = { endUserUrl: '', endUserOs: '' };
     chatService.init(message, endUserTechnicalData, [], '');
-    expect(http.post).toHaveBeenCalledWith(RUUTER_ENDPOINTS.INIT_CHAT, { message, endUserTechnicalData });
+    expect(http.post).toHaveBeenCalledWith(RUUTER_ENDPOINTS.INIT_CHAT, { message, endUserTechnicalData, holidays: [], holidayNames: '', domain: 'none' });
   });
 
   it('should send new message', () => {
     const messageToSend: Message = { chatId: '1', content: 'hey', authorTimestamp: new Date().toString() };
     chatService.sendNewMessage(messageToSend, [], '');
-    expect(http.post).toHaveBeenCalledWith(RUUTER_ENDPOINTS.POST_MESSAGE, messageToSend);
+    expect(http.post).toHaveBeenCalledWith(RUUTER_ENDPOINTS.POST_MESSAGE, { message: messageToSend, holidays: [], holidayNames: '', domain: 'none' });
   });
 
   it('should query all messages of a chat', () => {
     chatService.getMessages('1');
-    expect(http.post).toHaveBeenCalledWith(RUUTER_ENDPOINTS.GET_MESSAGES_BY_CHAT_ID, { id: '1' });
+    expect(http.post).toHaveBeenCalledWith(RUUTER_ENDPOINTS.GET_MESSAGES_BY_CHAT_ID, { chatId: '1' });
   });
 
   it('should query chat by id', () => {
     chatService.getChatById('1');
-    expect(http.post).toHaveBeenCalledWith(RUUTER_ENDPOINTS.GET_CHAT_BY_ID, { id: '1' });
+    expect(http.post).toHaveBeenCalledWith(RUUTER_ENDPOINTS.GET_CHAT_BY_ID, { chatId: '1' });
   });
 
   it('should end given chat session', () => {
     const messageToSend: Message = { chatId: '1', content: 'hey', authorTimestamp: new Date().toString() };
     chatService.endChat(messageToSend, null);
-    expect(http.post).toHaveBeenCalledWith(RUUTER_ENDPOINTS.END_CHAT, messageToSend);
+    expect(http.post).toHaveBeenCalledWith(RUUTER_ENDPOINTS.END_CHAT, { message: messageToSend, status: null });
   });
 
   it('return chats, by chat id', () => {
-    chatService.getChatById('1');
-    expect(http.post).toHaveBeenCalledWith(RUUTER_ENDPOINTS.GET_CHAT_BY_ID, { id: 'cid' });
+    chatService.getChatById('cid');
+    expect(http.post).toHaveBeenCalledWith(RUUTER_ENDPOINTS.GET_CHAT_BY_ID, { chatId: 'cid' });
   });
 
   it('should query message with rating', () => {
@@ -60,6 +60,12 @@ describe('ChatService', () => {
   it('should send message with new event', () => {
     const message: Message = { chatId: '1', content: 'hey', authorTimestamp: new Date().toString() };
     chatService.sendMessageWithNewEvent(message);
-    expect(http.post).toHaveBeenCalledWith(RUUTER_ENDPOINTS.SEND_MESSAGE_WITH_NEW_EVENT, message);
+    expect(http.post).toHaveBeenCalledWith(RUUTER_ENDPOINTS.SEND_MESSAGE_WITH_NEW_EVENT, { ...message, rating: '' });
+  });
+
+  it('sends contacts in the backend body', () => {
+    const contacts = { chatId: '1', endUserEmail: 'test@example.ee', endUserPhone: '+3721234567' };
+    chatService.sendUserContacts(contacts);
+    expect(http.post).toHaveBeenCalledWith(RUUTER_ENDPOINTS.SEND_CONTACT_INFO, contacts);
   });
 });

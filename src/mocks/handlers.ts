@@ -8,39 +8,26 @@ import endChat from './responses/end-chat.json';
 import postMessage from './responses/post-message.json';
 import { RUUTER_ENDPOINTS } from '../constants';
 
-const ruuterUrl = 'http://localhost:3003';
+const ruuterUrl = 'http://localhost:8086/backoffice';
 
 const handlers = [
+  rest.get(`${ruuterUrl}${RUUTER_ENDPOINTS.GET_WIDGET_CONFIG}`, (_req, res, ctx) => res(ctx.json({ response: {
+    isBurokrattActive: 'true', isWidgetActive: 'false', instantlyOpenChatWidget: 'false',
+    feedbackActive: 'false', feedbackNoticeActive: 'false', showIdleWarning: 'false', showAutoCloseText: 'false',
+  } }))),
   rest.post(`${ruuterUrl}${RUUTER_ENDPOINTS.INIT_CHAT}`, (_req, res, ctx) => res(ctx.json(initChat))),
-  rest.post(`${ruuterUrl}${RUUTER_ENDPOINTS.POST_MESSAGE}`, (_req, res, ctx) => res(ctx.json(postMessage))),
+  rest.post(`${ruuterUrl}${RUUTER_ENDPOINTS.POST_MESSAGE}`, (_req, res, ctx) => res(ctx.json({ response: 'Message Sent Successfully' }))),
   rest.post(`${ruuterUrl}${RUUTER_ENDPOINTS.GET_MESSAGES_BY_CHAT_ID}`, (_req, res, ctx) => res(ctx.json(messagesByChatId))),
   rest.post(`${ruuterUrl}${RUUTER_ENDPOINTS.END_CHAT}`, (_req, res, ctx) => res(ctx.json(endChat))),
   rest.post(`${ruuterUrl}${RUUTER_ENDPOINTS.GET_CHAT_BY_ID}`, (_req, res, ctx) => res(ctx.json(chatById))),
-  rest.post(`${ruuterUrl}${RUUTER_ENDPOINTS.GET_NEW_MESSAGES}`, (_req, res, ctx) => res(ctx.json(messagesForChatInTimerange))),
-  rest.get(`${ruuterUrl}${RUUTER_ENDPOINTS.DOWNLOAD_CHAT}`, async (_req, res, ctx) => {
-    // To be added: fix with correct mocking
-    const url = 'https://cors-anywhere.herokuapp.com/https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
-    const requestOptions = {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/pdf',
-        },
-    };
-    const pdfFile = await fetch(url, requestOptions)
-    .then((res) =>
-    res.arrayBuffer(),)
-
-  return res(
-    ctx.set('Content-Length', pdfFile.byteLength.toString()),
-    ctx.set('Content-Type', 'application/pdf'),
-    ctx.body(pdfFile),
-  )
-    
-  }),
+  rest.get(`${ruuterUrl}${RUUTER_ENDPOINTS.GET_NEW_MESSAGES}`, (_req, res, ctx) => res(ctx.json(messagesForChatInTimerange))),
+  rest.post(`${ruuterUrl}${RUUTER_ENDPOINTS.DOWNLOAD_CHAT}`, (_req, res, ctx) => res(
+    ctx.set('Content-Type', 'application/pdf'), ctx.body('%PDF-1.4\n%%EOF')
+  )),
 
   rest.post(`${ruuterUrl}${RUUTER_ENDPOINTS.SEND_ATTACHMENT}`, (_req, res, ctx) => res(ctx.status(200))),
   rest.post(`${ruuterUrl}${RUUTER_ENDPOINTS.SEND_CONTACT_INFO}`, (req, res, ctx) => {
-console.log('req.body',req.body)
+
     const success = {
       "response": "Updated 123 with example@example.com and +1 404."
     }
@@ -50,45 +37,19 @@ console.log('req.body',req.body)
       ctx.json(success));
   }),
 
-  rest.get(`${ruuterUrl}${RUUTER_ENDPOINTS.DOWNLOAD_CHAT}`, async (_req, res, ctx) => {
-    // To be done: fix with correct mocking
-    const url = 'https://cors-anywhere.herokuapp.com/https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
-    const requestOptions = {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/pdf',
-        },
-    };
-    const pdfFile = await fetch(url, requestOptions)
-    .then((res) =>
-    res.arrayBuffer(),)
-
-  return res(
-    ctx.set('Content-Length', pdfFile.byteLength.toString()),
-    ctx.set('Content-Type', 'application/pdf'),
-    ctx.body(pdfFile),
-  )
-    
-  }),
-  rest.post(`${ruuterUrl}${RUUTER_ENDPOINTS.CUSTOM_JWT_EXTEND}`, (_req, res, ctx) => res(
-    ctx.json({
-      "custom_jwt_extend": "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIiLCJjaGF0SWQiOiJhZWRhODM3Zi03MTdiLTQwMTgtOTkyMC0wYjY0NmU4NDA1N2UiLCJpc3MiOiJieWsuYnVlcm9rcmF0dC5lZSIsImZvcndhcmRUbyI6IiIsImV4cCI6MTY3NTc3NjA2MSwiaWF0IjoxNjc1NzY4ODYxLCJqdGkiOiI0MTVmZWNjNi1kNDQ2LTRkNTctYWU3NS0xNWYzMjhkYjFhM2IifQ.VpQCPYrnfbxBKgLMJ_gLBPZPb6FYJ9sxwt2ScrqpycNqs58LvFZ1qGduDAJUpB3bjtw6oUgzMAPHvfp2XPDzJfiJTiGXKm7HmO7S-3zP4enWt2X6Uv1G9QbKlzO9uRjdSkx8v5GktGj5ThoZupuNLNSGQ-WGecwntU7HqIlNcODvr5GpBoRev5PyKgbMF-Xw3QFe-MOCBzsi7OoL0ZnpXOa_JayFWHPERKdrgTJWIvE3EEI1tyAsGwJaMxvcb3fBfrbdYEtlGiwl4hzkrQS8vFi9G49JILLn6X00EJfWgAOQDy2dTgxeGpFGLdPFYUYcAYOp5idbprrZRmxuNp87JA"
-    })
-  )),
+  rest.get(`${ruuterUrl}${RUUTER_ENDPOINTS.CUSTOM_JWT_EXTEND}`, (_req, res, ctx) => res(ctx.json({ response: 'test-only-renewal' }))),
+  rest.get(`${ruuterUrl}${RUUTER_ENDPOINTS.GET_EMERGENCY_NOTICE}`, (_req, res, ctx) => res(ctx.json({ response: { emergencyNoticeStartISO: '', emergencyNoticeEndISO: '', emergencyNoticeText: '' } }))),
   rest.get(`${ruuterUrl}${RUUTER_ENDPOINTS.GET_GREETING}`, (_req, res, ctx) => res(
     ctx.status(200),
     ctx.json({
-      "greeting": "Tere tulemast! Kuidas ma saan teid aidata?"
+      "response": { "est": "Tere tulemast! Kuidas ma saan teid aidata?", "eng": "Welcome", "isActive": false }
     })
   )),
-  rest.post(`${ruuterUrl}${RUUTER_ENDPOINTS.CUSTOM_JWT_USERINFO}`, (_req, res, ctx) => res(
+  rest.get(`${ruuterUrl}${RUUTER_ENDPOINTS.CUSTOM_JWT_USERINFO}`, (_req, res, ctx) => res(
     ctx.status(200),
-    ctx.json({
-      "jwtExpirationTimestamp": "2024-10-10T10:10:10.000Z",
-      "firstName": "firstname",
-      "lastName": "lastname",
-      "personalCode": "11111",
-    })
+    ctx.json({ response: {
+      jwtExpirationTimestamp: '2099-10-10T10:10:10.000Z', firstName: 'Test', lastName: 'User', personalCode: '11111',
+    } })
   )),
   rest.post(`${ruuterUrl}${RUUTER_ENDPOINTS.GET_WAITING_TIME}`, (_req, res, ctx) => res(
     ctx.status(200),

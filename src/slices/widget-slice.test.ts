@@ -43,15 +43,11 @@ const initialState: WidgetState = {
   chatId: null,
 };
 
-describe("Widget slice", () => {
-  it("should showConfirmationModal", () => {
-    expect(reducer(initialState, showConfirmationModal())).toEqual({
-      showConfirmationModal: true,
-      burokrattOnlineStatus: null,
-    });
-
-    // it('should closeConfirmationModal', () => {
-    //   expect(reducer(initialState, closeConfirmationModal())).toEqual({ ...initialState, showConfirmationModal: false });
-    // });
+describe('Widget slice', () => {
+  it('opens confirmation without losing configuration', () => {
+    expect(reducer(initialState, showConfirmationModal())).toEqual({ ...initialState, showConfirmationModal: true });
+  });
+  it('closes confirmation without losing configuration', () => {
+    expect(reducer({ ...initialState, showConfirmationModal: true }, closeConfirmationModal())).toEqual(initialState);
   });
 });

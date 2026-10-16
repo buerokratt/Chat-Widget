@@ -5,6 +5,9 @@ import { fireEvent, screen } from '@testing-library/react';
 import { render } from '../../utils/test-utils';
 import ChatKeyPad from './chat-keypad';
 import chatReducer from '../../slices/chat-slice';
+import ChatService from '../../services/chat-service';
+import { initialChatState } from '../../test-initial-states';
+import { MESSAGE_MAX_CHAR_LIMIT, MESSAGE_VISIBILITY_LIMIT, FEEDBACK_MESSAGE_MAX_CHAR_LIMIT } from '../../constants';
 import ChatKeypadCharCounter from './chat-keypad-char-counter';
 
 let store: EnhancedStore;
@@ -38,7 +41,7 @@ describe('Keypad char counter', () => {
     store = createTestStore();
   });
 
-  it('keypad character counter is displayed and over limit', () => {
+  it('counter stays gray until the configured 3000 warning threshold', () => {
     render(
       <Provider store={store}>
         <ChatKeypadCharCounter userInput={warninglongCharMessage} />
@@ -46,7 +49,7 @@ describe('Keypad char counter', () => {
     );
     const counterText = screen.getByText(/2901\/3000/i);
     expect(counterText).toBeInTheDocument();
-    expect(counterText).toHaveStyle('color: #ff4800');
+    expect(counterText).toHaveStyle('color: #a7a9ab');
   });
 
   it('keypad character counter is gray color when under limit', () => {
@@ -75,9 +78,38 @@ describe('Keypad char counter', () => {
     );
     fireEvent.click(
       screen.getByRole('img', {
-        name: /send icon/i,
+        name: /send message icon/i,
       }),
     );
     screen.getByText('keypad.long-message-warning'.replace('{{limit}}', '3000'));
   });
+  it.each([
+    [MESSAGE_VISIBILITY_LIMIT, 'hidden', '#a7a9ab'],
+    [MESSAGE_VISIBILITY_LIMIT + 1, 'visible', '#a7a9ab'],
+    [MESSAGE_MAX_CHAR_LIMIT, 'visible', '#a7a9ab'],
+    [MESSAGE_MAX_CHAR_LIMIT + 1, 'visible', '#ff4800'],
+  ])('counter boundary at %i characters', (length, visibility, color) => {
+    render(<ChatKeypadCharCounter userInput={'a'.repeat(length as number)} />);
+    expect(screen.getByText(`${length}/3000`)).toHaveStyle(`visibility: ${visibility}; color: ${color}`);
+  });
+  it('uses feedback limits when requested', () => {
+    render(<ChatKeypadCharCounter userInput={'a'.repeat(FEEDBACK_MESSAGE_MAX_CHAR_LIMIT + 1)} isFeedback />);
+    expect(screen.getByText('501/500')).toHaveStyle('color: #ff4800; visibility: visible');
+  });
+  it('blocks over-limit sends by Enter and button, retaining the draft', () => {
+    const send = jest.spyOn(ChatService, 'sendNewMessage');
+    const init = jest.spyOn(ChatService, 'init');
+    render(<ChatKeyPad />, { preloadedState: { chat: { ...initialChatState, chatId: '1' } } });
+    const input = screen.getByRole('textbox');
+    const draft = 'a'.repeat(MESSAGE_MAX_CHAR_LIMIT + 1);
+    fireEvent.change(input, { target: { value: draft } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+    fireEvent.click(screen.getByAltText('Send message icon'));
+    expect(send).not.toHaveBeenCalled();
+    expect(init).not.toHaveBeenCalled();
+    expect(input).toHaveValue(draft);
+    expect(screen.getByText('keypad.long-message-warning')).toBeInTheDocument();
+    send.mockRestore(); init.mockRestore();
+  });
+
 });

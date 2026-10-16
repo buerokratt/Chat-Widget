@@ -43,7 +43,8 @@ export const Profile = ({ triggerRef }: ProfileProps): JSX.Element => {
     };
 
     useEffect(() => {
-        setTimeout(() => setDelayFinished(true), widgetConfig.bubbleMessageSeconds * 1000);
+        const timeoutId = setTimeout(() => setDelayFinished(true), widgetConfig.bubbleMessageSeconds * 1000);
+        return () => clearTimeout(timeoutId);
     }, []);
 
     useReloadChatEndEffect();
