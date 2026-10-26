@@ -65,6 +65,14 @@ export const ChatMessageStyled = styled.div`
       color: white;
     }
 
+    pre,
+    code {
+      max-width: 100%;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
     @keyframes blink {
       0%,
       50% {
