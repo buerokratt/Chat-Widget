@@ -21,7 +21,7 @@ const ChatKeypadCharCounter = (props: ChatKeypadCharCounterType): ReactElement =
       const isFeedback = typeof props.isFeedback === 'boolean' && props.isFeedback;
       return {
         maxChar: isFeedback ? FEEDBACK_MESSAGE_MAX_CHAR_LIMIT : MESSAGE_MAX_CHAR_LIMIT,
-        warning: isFeedback ? FEEDBACK_MESSAGE_LIMIT_WARNING_AT : MESSAGE_WARNING_LIMIT,
+        warning: isFeedback ? FEEDBACK_MESSAGE_LIMIT_WARNING_AT : MESSAGE_WARNING_LIMIT - 1,
         visibility: isFeedback ? FEEDBACK_MESSAGE_LIMIT_VISIBILE_AT : MESSAGE_VISIBILITY_LIMIT,
       };
     }, [props.isFeedback]);
@@ -43,8 +43,8 @@ const ChatKeypadCharCounter = (props: ChatKeypadCharCounterType): ReactElement =
 const grayVariant = css`
     color: #a7a9ab;
 `;
-const orangeVariant = css`
-    color: #ff4800;
+const redVariant = css`
+    color: #f00;
 `;
 
 const marginCheck = isMobile() ? "0rem 3.5rem 0.45rem 0" : "-0.45rem 3.5rem 0.25rem 0";
@@ -54,7 +54,7 @@ const ChatKeypadCharCounterStyle = styled.div<{
   isVisible: boolean;
   isConfirmationFeedback?: boolean;
 }>`
-  ${(props) => (props.warning ? orangeVariant : grayVariant)}
+  ${(props) => (props.warning ? redVariant : grayVariant)}
   visibility: ${(props) => (props.isVisible ? "visible" : "hidden")};
   font-size: 0.7rem;
   margin: ${(props) => (props.isConfirmationFeedback ? "0" : marginCheck)};
