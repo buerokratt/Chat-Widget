@@ -82,6 +82,7 @@ export interface ChatState {
   showAskToForwardToCsaForm: boolean;
   askForContacts: boolean;
   contactMsgId: string;
+  handledContactMessageIds: string[];
   forwardToCsaMessage: string;
   forwardToCsaMessageId: string;
   handledForwardToCsaMessageIds: string[];
@@ -165,6 +166,7 @@ const initialState: ChatState = {
     comment: "",
   },
   contactMsgId: "",
+  handledContactMessageIds: [],
   feedback: {
     isFeedbackConfirmationShown: false,
     isFeedbackMessageGiven: false,
@@ -236,6 +238,7 @@ const initialStateOpen: ChatState = {
         comment: "",
     },
     contactMsgId: "",
+    handledContactMessageIds: [],
     feedback: {
         isFeedbackConfirmationShown: false,
         isFeedbackMessageGiven: false,
@@ -646,9 +649,15 @@ export const chatSlice = createSlice({
     },
     setShowContactForm: (state, action: PayloadAction<boolean>) => {
       state.showContactForm = action.payload;
+      if (!action.payload && state.contactMsgId && !state.handledContactMessageIds.includes(state.contactMsgId)) {
+        state.handledContactMessageIds.push(state.contactMsgId);
+      }
     },
     setShowUnavailableContactForm: (state, action: PayloadAction<boolean>) => {
       state.showUnavailableContactForm = action.payload;
+      if (!action.payload && state.contactMsgId && !state.handledContactMessageIds.includes(state.contactMsgId)) {
+        state.handledContactMessageIds.push(state.contactMsgId);
+      }
     },
     setShowAskToForwardToCsaForm: (state, action: PayloadAction<boolean>) => {
       state.showAskToForwardToCsaForm = action.payload;
@@ -767,12 +776,14 @@ export const chatSlice = createSlice({
             state.messages = state.messages.map((message) => (message.id === msg.id ? msg : message));
             break;
           case CHAT_EVENTS.CONTACT_INFORMATION:
+            if (msg.id && state.handledContactMessageIds.includes(msg.id)) break;
             state.showContactForm = true;
             state.contactMsgId = msg.id ?? "";
             break;
           case CHAT_EVENTS.UNAVAILABLE_HOLIDAY_ASK_CONTACTS:
           case CHAT_EVENTS.UNAVAILABLE_CSAS_ASK_CONTACTS:
           case CHAT_EVENTS.UNAVAILABLE_ORGANIZATION_ASK_CONTACTS:
+            if (msg.id && state.handledContactMessageIds.includes(msg.id)) break;
             state.askForContacts = true;
             state.showUnavailableContactForm = true;
             state.contactMsgId = msg.id ?? "";
@@ -781,6 +792,7 @@ export const chatSlice = createSlice({
           case CHAT_EVENTS.UNAVAILABLE_HOLIDAY:
           case CHAT_EVENTS.UNAVAILABLE_CSAS:
           case CHAT_EVENTS.UNAVAILABLE_ORGANIZATION:
+            if (msg.id && state.handledContactMessageIds.includes(msg.id)) break;
             state.askForContacts = false;
             state.showUnavailableContactForm = true;
             state.contactMsgId = msg.id ?? "";
