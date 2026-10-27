@@ -152,6 +152,12 @@ const ChatKeyPad = (): JSX.Element => {
     }
   }, [isChatOpen, isKeypadDisabled, userInputFile]);
 
+  useEffect(() => {
+    if (chatStatus === CHAT_STATUS.ENDED) {
+      handleUploadClear();
+    }
+  }, [chatStatus]);
+
   const handleTextFeedback = () => {
     if (widgetConfig.feedbackActive && !feedback.isFeedbackRatingGiven) {
       dispatch(setFeedbackWarning(true));

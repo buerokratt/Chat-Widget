@@ -2,12 +2,14 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 import { configureStore, EnhancedStore } from '@reduxjs/toolkit';
-import { screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import { render } from '../../utils/test-utils';
 import ChatKeyPad from './chat-keypad';
 import { waitForRequest } from '../../mocks/server';
 import { RUUTER_ENDPOINTS } from '../../constants';
-import chatReducer from '../../slices/chat-slice';
+import chatReducer, { setChat } from '../../slices/chat-slice';
+import widgetReducer from '../../slices/widget-slice';
+import { Chat } from '../../model/chat-model';
 import KeypadErrorMessage from './keypad-error-message';
 
 let store: EnhancedStore;
@@ -48,6 +50,19 @@ describe('Keypad', () => {
     userEvent.type(input, `${message}{enter}`);
     const request = await pendingSendNewMessage;
     expect(request.body.content).toBe(message);
+  });
+
+  it('clears unsent input when the chat is ended', () => {
+    const preloadedState = { chat: { chatId: '1', chatStatus: 'OPEN', messages: [], messageQueue: [] } };
+    const testStore = configureStore({ reducer: { chat: chatReducer, widget: widgetReducer }, preloadedState } as any);
+    render(<ChatKeyPad />, { preloadedState, store: testStore as any });
+    const input = screen.getByRole('textbox') as HTMLInputElement;
+    userEvent.type(input, 'Unsent message');
+    expect(input.value).toBe('Unsent message');
+    act(() => {
+      testStore.dispatch(setChat({ status: 'ENDED' } as Chat));
+    });
+    expect(input.value).toBe('');
   });
 
   it('keypad error message returns empty string no children', () => {
