@@ -196,7 +196,7 @@ const ChatKeyPad = (): JSX.Element => {
   const isInputValid = () => {
     if (!sanitizeHtml(userInput).trim()) return false;
 
-    if (sanitizeHtml(userInput).length > MESSAGE_MAX_CHAR_LIMIT) {
+    if (sanitizeHtml(userInput).length > MESSAGE_MAX_CHAR_LIMIT - 1) {
       setErrorMessage(t("keypad.long-message-warning", { limit: MESSAGE_MAX_CHAR_LIMIT }));
       return false;
     }
@@ -204,7 +204,7 @@ const ChatKeyPad = (): JSX.Element => {
   };
 
   useEffect(() => {
-    if (userInput.length > MESSAGE_MAX_CHAR_LIMIT) {
+    if (userInput.length > MESSAGE_MAX_CHAR_LIMIT - 1) {
       setErrorMessage(t("keypad.long-message-warning", { limit: MESSAGE_MAX_CHAR_LIMIT }));
     } else {
       setErrorMessage("");

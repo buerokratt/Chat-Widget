@@ -46,7 +46,7 @@ describe('Keypad char counter', () => {
     );
     const counterText = screen.getByText(/2901\/3000/i);
     expect(counterText).toBeInTheDocument();
-    expect(counterText).toHaveStyle('color: #ff4800');
+    expect(counterText).toHaveStyle('color: #f00');
   });
 
   it('keypad character counter is gray color when under limit', () => {
