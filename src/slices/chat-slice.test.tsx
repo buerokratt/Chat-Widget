@@ -175,6 +175,7 @@ describe('Chat slice', () => {
         isFeedbackMessageGiven: false,
         isFeedbackRatingGiven: false,
         showFeedbackWarning: false,
+        draftMessage: "",
       };
       const action = { type: endChat.fulfilled.type };
       const state = reducer({ ...initialChatState, chatStatus: CHAT_STATUS.OPEN }, action);

@@ -185,7 +185,6 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
 
   useEffect(() => {
     if (
-      feedback.isFeedbackRatingGiven &&
       feedback.isFeedbackMessageGiven &&
       !feedback.isFeedbackConfirmationShown
     ) {
@@ -201,7 +200,6 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
     dispatch,
     feedback.isFeedbackConfirmationShown,
     feedback.isFeedbackMessageGiven,
-    feedback.isFeedbackRatingGiven,
   ]);
 
   useEffect(() => {

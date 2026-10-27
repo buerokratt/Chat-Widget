@@ -11,6 +11,7 @@ import {
   sendFeedbackMessage,
   sendMessagePreview,
   sendNewMessage,
+  setFeedbackDraftMessage,
   setFeedbackMessageGiven,
   setFeedbackWarning,
   setStopTypingStream,
@@ -159,7 +160,9 @@ const ChatKeyPad = (): JSX.Element => {
   }, [chatStatus]);
 
   const handleTextFeedback = () => {
-    if (widgetConfig.feedbackActive && !feedback.isFeedbackRatingGiven) {
+    const feedbackText = sanitizeHtml(userInput);
+    const hasFeedbackText = widgetConfig.feedbackNoticeActive && !!feedbackText.trim();
+    if (widgetConfig.feedbackActive && !feedback.isFeedbackRatingGiven && !hasFeedbackText) {
       dispatch(setFeedbackWarning(true));
       return;
     }
@@ -168,7 +171,7 @@ const ChatKeyPad = (): JSX.Element => {
       return;
     }
     dispatch(setFeedbackWarning(false));
-    if (widgetConfig.feedbackNoticeActive) dispatch(sendFeedbackMessage({ userInput: sanitizeHtml(userInput) }));
+    if (hasFeedbackText) dispatch(sendFeedbackMessage({ userInput: feedbackText }));
     dispatch(setFeedbackMessageGiven(true));
     setIsKeypadDisabled(true);
     if (!widgetConfig.feedbackActive) {
@@ -342,6 +345,7 @@ const ChatKeyPad = (): JSX.Element => {
           placeholder={t("keypad.input.placeholder")}
           onChange={(e) => {
             setUserInput(e.target.value);
+            if (chatStatus === CHAT_STATUS.ENDED && !!chatId) dispatch(setFeedbackDraftMessage(e.target.value));
             adjustHeight();
           }}
           onKeyDown={(event) => {
