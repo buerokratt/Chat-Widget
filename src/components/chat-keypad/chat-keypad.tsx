@@ -52,6 +52,16 @@ import sanitizeHtml from "sanitize-html";
 // Prevents unnecessary window scrolling when the on-screen keyboard is open
 const preventWindowScrolling = (e: TouchEvent, direction: "up" | "down") => {
   const target = e.target as HTMLElement;
+
+  const textarea = target.closest("textarea");
+  if (textarea) {
+    const canScrollUp = textarea.scrollTop > 0;
+    const canScrollDown = textarea.scrollTop + textarea.clientHeight < textarea.scrollHeight;
+    if ((direction === "down" && canScrollUp) || (direction === "up" && canScrollDown)) {
+      return;
+    }
+  }
+
   const contentElement = document.getElementsByClassName("os-content")[0] as HTMLElement;
   const top = contentElement.getBoundingClientRect().top;
 

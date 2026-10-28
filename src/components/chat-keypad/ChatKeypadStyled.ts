@@ -31,6 +31,7 @@ export const ChatKeypadStyled = styled.div`
       padding-bottom: 2px;
       resize: none;
       overflow: visible;
+      overscroll-behavior: contain;
       color: inherit;
       font: inherit;
       line-height: 1.5;
