@@ -14,9 +14,10 @@ import { getFromLocalStorage, setToLocalStorage } from './local-storage-utils';
 export const findMatchingMessageFromMessageList = (messageToMatch: Message, messages: Message[]): Message | undefined =>
   messages.find(
     (message) =>
-      message.authorTimestamp?.trim() !== '' &&
-      DateTime.fromISO(message.authorTimestamp).toString() === DateTime.fromISO(messageToMatch.authorTimestamp).toString() &&
-      message.authorRole === messageToMatch.authorRole,
+      (messageToMatch.authorRole === 'assistant' && !!messageToMatch.id && message.id === messageToMatch.id) ||
+      (message.authorTimestamp?.trim() !== '' &&
+        DateTime.fromISO(message.authorTimestamp).toString() === DateTime.fromISO(messageToMatch.authorTimestamp).toString() &&
+        message.authorRole === messageToMatch.authorRole),
   );
 
 const stateChangingEventMessages = [

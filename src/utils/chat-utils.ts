@@ -4,6 +4,84 @@ import { EndUserContacts } from "../slices/chat-slice";
 
 export const filterDocReferences = (text: string): string => text.replaceAll(/\[do?c?\s*\d*\s*\]?/g, "");
 
+interface Citation {
+  url: string;
+  title: string;
+  filepath: string;
+}
+
+const SUPERSCRIPT_DIGITS = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+
+const toSuperscript = (num: number): string =>
+  String(num)
+    .split("")
+    .map((digit) => SUPERSCRIPT_DIGITS[Number(digit)])
+    .join("");
+
+const buildCitationLinkLine = (displayNum: number, citation: Citation): string => {
+  const link = `  • ${toSuperscript(displayNum)} [${citation.title}](${citation.filepath})`;
+  try {
+    return `${link}\n- ${JSON.parse(citation.url).join("\n")}\n\n`;
+  } catch {
+    try {
+      new URL(citation.url);
+      return `${link}\n- ${citation.url}\n\n`;
+    } catch {
+      try {
+        new URL(citation.filepath);
+        return link;
+      } catch {
+        return "";
+      }
+    }
+  }
+};
+
+export const formatCitations = (content: string, context?: { citations?: Citation[] }): string => {
+  if (!context?.citations) return content;
+
+  const uniqueCitations: Citation[] = [];
+  const filepathToUniqueIndex = new Map<string, number>();
+  const originalDocToUniqueDoc = new Map<number, number>();
+  context.citations.forEach((citation, index) => {
+    if (!filepathToUniqueIndex.has(citation.filepath)) {
+      filepathToUniqueIndex.set(citation.filepath, uniqueCitations.length);
+      uniqueCitations.push(citation);
+    }
+    originalDocToUniqueDoc.set(index + 1, filepathToUniqueIndex.get(citation.filepath)!);
+  });
+
+  const appearanceOrder: number[] = [];
+  const docRefRegex = /\[doc(\d+)\]/g;
+  let match: RegExpExecArray | null;
+  while ((match = docRefRegex.exec(content)) !== null) {
+    const uniqueIndex = originalDocToUniqueDoc.get(Number(match[1]));
+    if (uniqueIndex !== undefined && !appearanceOrder.includes(uniqueIndex)) {
+      appearanceOrder.push(uniqueIndex);
+    }
+  }
+
+  let formattedContent = content;
+  originalDocToUniqueDoc.forEach((uniqueIndex, originalDocNum) => {
+    const displayIndex = appearanceOrder.indexOf(uniqueIndex);
+    if (displayIndex === -1) return;
+    formattedContent = formattedContent.replaceAll(`[doc${originalDocNum}]`, `⁽${toSuperscript(displayIndex + 1)}⁾`);
+  });
+
+  formattedContent = formattedContent
+    .replaceAll(/([)\\/\p{L}\p{N}])⁽/gu, "$1 ⁽")
+    .replaceAll(/(⁽[⁰¹²³⁴⁵⁶⁷⁸⁹]+⁾)\1+/g, "$1");
+
+  const links = appearanceOrder
+    .map((uniqueIndex, i) => buildCitationLinkLine(i + 1, uniqueCitations[uniqueIndex]))
+    .filter((line) => line);
+  if (links.length > 0) {
+    formattedContent += "\n\nViited:\n" + links.join("\n");
+  }
+
+  return formattedContent;
+};
+
 export const parseButtons = (message: Message): MessageButton[] => {
   try {
     if(!message?.buttons || message.buttons === '')
