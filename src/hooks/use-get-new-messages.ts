@@ -18,6 +18,7 @@ import {
   isStateChangingEventMessage,
 } from "../utils/state-management-utils";
 import { v4 as uuidv4 } from "uuid";
+import { formatCitations } from "../utils/chat-utils";
 
 const getLatestUpdatedTimestamp = (messages: Message[], current: string): string =>
   messages.reduce((latest, message) => {
@@ -148,7 +149,7 @@ const useGetNewMessages = (): void => {
           };
           setTimeout(() => { dispatch(setShowLoadingMessage(false)); }, 0);
           dispatch(setTypingStream(false));
-          dispatch(addMessagesToDisplay([message]));
+          dispatch(addMessagesToDisplay([{ ...message, content: formatCitations(data.content ?? "", data.context) }]));
           dispatch(sendNewLlmMessage({ message, context: data.context, uuid }));
         }
       };

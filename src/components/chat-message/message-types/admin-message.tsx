@@ -20,7 +20,7 @@ import {
 import {useAppDispatch} from "../../../store";
 import ChatButtonGroup from "./chat-button-group";
 import ChatOptionGroup from "./chat-option-group";
-import {filterDocReferences, parseButtons, parseOptions} from "../../../utils/chat-utils";
+import {filterDocReferences, formatCitations, parseButtons, parseOptions} from "../../../utils/chat-utils";
 import useChatSelector from "../../../hooks/use-chat-selector";
 import {useTranslation} from "react-i18next";
 import Markdownify from "./Markdownify";
@@ -135,7 +135,10 @@ const AdminMessage = ({message}: { message: Message }): JSX.Element => {
                           );
                         }
                         setTimeout(() => {
-                          dispatch(updateMessage(updatedMessage));
+                          dispatch(updateMessage({
+                            ...updatedMessage,
+                            content: formatCitations(updatedMessage.content ?? "", updatedMessage.context),
+                          }));
                           dispatch(setTypingStream(false));
                           dispatch(setStopTypingStream(false));
                         }, 0);
