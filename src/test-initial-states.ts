@@ -49,6 +49,7 @@ export const initialChatState: ChatState = {
     isFeedbackMessageGiven: false,
     isFeedbackRatingGiven: false,
     showFeedbackWarning: false,
+    draftMessage: "",
   },
   downloadChat: {
     isLoading: false,

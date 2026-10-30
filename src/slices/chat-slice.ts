@@ -93,6 +93,7 @@ export interface ChatState {
     isFeedbackMessageGiven: boolean;
     isFeedbackRatingGiven: boolean;
     showFeedbackWarning: boolean;
+    draftMessage: string;
   };
   endUserContacts: EndUserContacts;
   downloadChat: {
@@ -172,6 +173,7 @@ const initialState: ChatState = {
     isFeedbackMessageGiven: false,
     isFeedbackRatingGiven: false,
     showFeedbackWarning: false,
+    draftMessage: "",
   },
   downloadChat: {
     isLoading: false,
@@ -244,6 +246,7 @@ const initialStateOpen: ChatState = {
         isFeedbackMessageGiven: false,
         isFeedbackRatingGiven: false,
         showFeedbackWarning: false,
+        draftMessage: "",
     },
     downloadChat: {
         isLoading: false,
@@ -647,6 +650,9 @@ export const chatSlice = createSlice({
     setFeedbackWarning: (state, action: PayloadAction<boolean>) => {
       state.feedback.showFeedbackWarning = action.payload;
     },
+    setFeedbackDraftMessage: (state, action: PayloadAction<string>) => {
+      state.feedback.draftMessage = action.payload;
+    },
     setShowContactForm: (state, action: PayloadAction<boolean>) => {
       state.showContactForm = action.payload;
       if (!action.payload && state.contactMsgId && !state.handledContactMessageIds.includes(state.contactMsgId)) {
@@ -1047,6 +1053,7 @@ export const {
   setFeedbackMessageGiven,
   setFeedbackRatingGiven,
   setFeedbackWarning,
+  setFeedbackDraftMessage,
   resetNewMessagesAmount,
   setPhoneNumber,
   setIsFeedbackConfirmationShown,
