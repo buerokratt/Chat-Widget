@@ -95,7 +95,7 @@ export interface ChatState {
     isFeedbackMessageGiven: boolean;
     isFeedbackRatingGiven: boolean;
     showFeedbackWarning: boolean;
-    draftMessage: string;
+    draftRating: number | null;
   };
   endUserContacts: EndUserContacts;
   downloadChat: {
@@ -176,7 +176,7 @@ const initialState: ChatState = {
     isFeedbackMessageGiven: false,
     isFeedbackRatingGiven: false,
     showFeedbackWarning: false,
-    draftMessage: "",
+    draftRating: null,
   },
   downloadChat: {
     isLoading: false,
@@ -250,7 +250,7 @@ const initialStateOpen: ChatState = {
         isFeedbackMessageGiven: false,
         isFeedbackRatingGiven: false,
         showFeedbackWarning: false,
-        draftMessage: "",
+        draftRating: null,
     },
     downloadChat: {
         isLoading: false,
@@ -665,8 +665,8 @@ export const chatSlice = createSlice({
     setFeedbackWarning: (state, action: PayloadAction<boolean>) => {
       state.feedback.showFeedbackWarning = action.payload;
     },
-    setFeedbackDraftMessage: (state, action: PayloadAction<string>) => {
-      state.feedback.draftMessage = action.payload;
+    setFeedbackDraftRating: (state, action: PayloadAction<number | null>) => {
+      state.feedback.draftRating = action.payload;
     },
     setShowContactForm: (state, action: PayloadAction<boolean>) => {
       state.showContactForm = action.payload;
@@ -1001,6 +1001,7 @@ export const chatSlice = createSlice({
       state.chatStatus = CHAT_STATUS.ENDED;
       state.feedback.isFeedbackMessageGiven = false;
       state.feedback.isFeedbackRatingGiven = false;
+      state.feedback.draftRating = null;
       clearStateVariablesFromLocalStorage();
       localStorage.removeItem(namespacedKey("previousChatId"));
     });
@@ -1008,6 +1009,7 @@ export const chatSlice = createSlice({
       state.chatStatus = CHAT_STATUS.ENDED;
       state.feedback.isFeedbackMessageGiven = false;
       state.feedback.isFeedbackRatingGiven = false;
+      state.feedback.draftRating = null;
       clearStateVariablesFromLocalStorage();
     });
     builder.addCase(sendChatNpmRating.rejected, (state) => {
@@ -1079,7 +1081,7 @@ export const {
   setFeedbackMessageGiven,
   setFeedbackRatingGiven,
   setFeedbackWarning,
-  setFeedbackDraftMessage,
+  setFeedbackDraftRating,
   resetNewMessagesAmount,
   setPhoneNumber,
   setIsFeedbackConfirmationShown,

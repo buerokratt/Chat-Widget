@@ -1,7 +1,7 @@
 import React, {useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {useAppDispatch} from "../../store";
-import {downloadChat, sendChatNpmRating, setFeedbackRatingGiven} from "../../slices/chat-slice";
+import {downloadChat, setFeedbackDraftRating, setFeedbackRatingGiven} from "../../slices/chat-slice";
 import { isFeedbackRatingColorsEnabled } from "../../constants";
 import useChatSelector from "../../hooks/use-chat-selector";
 import {Download, DownloadElement} from "../../hooks/use-download-file";
@@ -25,9 +25,8 @@ const ChatFeedback = (): JSX.Element => {
         };
         if (feedbackRating === null) return;
         setSelectedFeedbackButtonValue(feedbackRating);
-        dispatch(
-          sendChatNpmRating({ NpmRating: parseInt(feedbackRating ?? "1") }),
-        );
+        // Rating is only stored as a draft; it is sent together with the feedback text when the user presses Send.
+        dispatch(setFeedbackDraftRating(parseInt(feedbackRating)));
         dispatch(setFeedbackRatingGiven(true));
     };
 

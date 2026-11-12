@@ -1,7 +1,7 @@
 import React, {memo, MouseEventHandler} from 'react';
 import {useTranslation} from 'react-i18next';
 import {motion} from 'framer-motion';
-import {resetChatState, sendFeedbackMessage, setIsChatOpen, setIsFullScreen} from '../../slices/chat-slice';
+import {resetChatState, setIsChatOpen, setIsFullScreen} from '../../slices/chat-slice';
 import {showConfirmationModal} from '../../slices/widget-slice';
 import Close from '../../static/icons/close.svg';
 import FullScreen from '../../static/icons/full-screen.svg';
@@ -18,9 +18,7 @@ import useAuthenticationSelector from '../../hooks/use-authentication-selector';
 import {ChatHeaderInitialStyles, ChatHeaderStyles} from "./ChatHeaderStyled";
 import { useScroll } from '../../contexts/ScrollContext';
 import { setToLocalStorage } from '../../utils/local-storage-utils';
-import { FEEDBACK_MESSAGE_MAX_CHAR_LIMIT, LOCAL_STORAGE_INSTANTLY_OPEN_CHAT_WIDGET_KEY } from '../../constants';
-import useWidgetSelector from '../../hooks/use-widget-selector';
-import sanitizeHtml from 'sanitize-html';
+import { LOCAL_STORAGE_INSTANTLY_OPEN_CHAT_WIDGET_KEY } from '../../constants';
 import { isMobileApp, notifyMobileApp } from '../../utils/browser-utils';
 
 interface ChatHeaderType {
@@ -31,31 +29,18 @@ interface ChatHeaderType {
 const ChatHeader = (props: ChatHeaderType): JSX.Element => {
     const {detailHandler, isDetailSelected} = props;
     const {t} = useTranslation();
-    const { chatId, isChatOpen, isFullScreen, isChatEnded, feedback } = useChatSelector();
-    const { widgetConfig } = useWidgetSelector();
+    const { chatId, isChatOpen, isFullScreen, isChatEnded } = useChatSelector();
     const { scrollToBottom } = useScroll();
     const {isAuthenticated} = useAuthenticationSelector();
     const mobileApp = isMobileApp();
     const closeChatState = () => {
         if (isChatEnded) {
-            sendUnsentFeedbackMessage();
             dispatch(resetChatState({ event: null }));
         } else {
             dispatch(setIsChatOpen(false));
         }
         if (!chatId) {
             setToLocalStorage(LOCAL_STORAGE_INSTANTLY_OPEN_CHAT_WIDGET_KEY, false);
-        }
-    }
-    const sendUnsentFeedbackMessage = () => {
-        const feedbackText = sanitizeHtml(feedback.draftMessage);
-        if (
-            widgetConfig.feedbackNoticeActive &&
-            !feedback.isFeedbackMessageGiven &&
-            feedbackText.trim() &&
-            feedbackText.trim().length <= FEEDBACK_MESSAGE_MAX_CHAR_LIMIT
-        ) {
-            dispatch(sendFeedbackMessage({ userInput: feedbackText }));
         }
     }
     const minimizeChat = () => {
