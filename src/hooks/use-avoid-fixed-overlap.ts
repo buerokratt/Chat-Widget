@@ -30,7 +30,13 @@ const getNaturalRect = (el: HTMLElement): Rect => {
 const rectsOverlap = (a: Rect, b: Rect): boolean =>
   a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
 
-const getFixedCandidates = (el: HTMLElement): Rect[] => {
+export interface AvoidFixedOverlapOptions {
+  getMinCandidateTop?: (el: HTMLElement) => number;
+}
+
+const defaultMinCandidateTop = (el: HTMLElement): number => el.offsetHeight + GAP_PX;
+
+const getFixedCandidates = (el: HTMLElement, minCandidateTop: number): Rect[] => {
   const candidates: Rect[] = [];
 
   for (const candidate of Array.from(document.body.querySelectorAll("*"))) {
@@ -43,7 +49,7 @@ const getFixedCandidates = (el: HTMLElement): Rect[] => {
     const rect = candidate.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) continue;
 
-    if (rect.top < el.offsetHeight + GAP_PX) continue;
+    if (rect.top < minCandidateTop) continue;
 
     candidates.push(rect);
   }
@@ -53,11 +59,11 @@ const getFixedCandidates = (el: HTMLElement): Rect[] => {
 
 const MAX_ITERATIONS = 8;
 
-const computeOverlapOffset = (el: HTMLElement): number => {
+const computeOverlapOffset = (el: HTMLElement, getMinCandidateTop: (el: HTMLElement) => number): number => {
   const natural = getNaturalRect(el);
   if (natural.width === 0 || natural.height === 0) return 0;
 
-  const candidates = getFixedCandidates(el);
+  const candidates = getFixedCandidates(el, getMinCandidateTop(el));
 
   let offset = 0;
   for (let i = 0; i < MAX_ITERATIONS; i++) {
@@ -74,9 +80,15 @@ const computeOverlapOffset = (el: HTMLElement): number => {
   return offset;
 };
 
-export const useAvoidFixedOverlap = (ref: RefObject<HTMLElement>, enabled = true): number => {
+export const useAvoidFixedOverlap = (
+  ref: RefObject<HTMLElement>,
+  enabled = true,
+  options: AvoidFixedOverlapOptions = {}
+): number => {
   const [offset, setOffset] = useState(0);
   const offsetRef = useRef(0);
+  const getMinCandidateTopRef = useRef(options.getMinCandidateTop ?? defaultMinCandidateTop);
+  getMinCandidateTopRef.current = options.getMinCandidateTop ?? defaultMinCandidateTop;
 
   useEffect(() => {
     if (!enabled) {
@@ -89,7 +101,7 @@ export const useAvoidFixedOverlap = (ref: RefObject<HTMLElement>, enabled = true
     const recompute = () => {
       rafId = null;
       if (!ref.current) return;
-      const next = computeOverlapOffset(ref.current);
+      const next = computeOverlapOffset(ref.current, getMinCandidateTopRef.current);
       if (next !== offsetRef.current) {
         offsetRef.current = next;
         setOffset(next);

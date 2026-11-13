@@ -53,6 +53,7 @@ import PostChatMessage from "../post-chat-message/post-chat-message";
 import { format } from "date-fns";
 import EmergencyNotice from "../emergency-notice/emergency-notice";
 import { isMobileApp } from "../../utils/browser-utils";
+import { useAvoidFixedOverlap } from "../../hooks/use-avoid-fixed-overlap";
 
 const RESIZABLE_HANDLES = {
   topLeft: true,
@@ -64,6 +65,12 @@ const RESIZABLE_HANDLES = {
   bottomLeft: false,
   left: true,
 };
+
+const CHAT_WINDOW_VERTICAL_SPACING = 50;
+
+// Only treat fixed elements anchored to the lower half of the viewport (e.g. cookie banners) as obstacles,
+// so tall page headers or full-height side panels don't push the chat window around.
+const getChatMinCandidateTop = () => window.innerHeight / 2;
 
 const RESIZE_HANDLE_COMPONENTS = {
   topLeft: (
@@ -140,6 +147,13 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
   }, []);
   const dialogAnnouncementRef = useRef<HTMLDivElement>(null);
   const isMobileLayout = width < 480 || height < 480;
+  const overlapOffset = useAvoidFixedOverlap(chatWrapperRef, !isFullScreen && !isMobileLayout && !mobileApp, {
+    getMinCandidateTop: getChatMinCandidateTop,
+  });
+  const maxChatHeight = Math.max(CHAT_MIN_WINDOW_HEIGHT, height - CHAT_WINDOW_VERTICAL_SPACING - overlapOffset);
+  const chatSize = isFullScreen
+    ? { width, height }
+    : { width: chatDimensions.width, height: Math.min(chatDimensions.height, maxChatHeight) };
   useEffect(() => {
     const vv = window.visualViewport;
     const currentRef = chatRef.current;
@@ -405,12 +419,13 @@ const Chat = ({ triggerRef }: ChatProps): JSX.Element => {
       <div
         className="chatWrapper"
         ref={chatWrapperRef}
+        style={overlapOffset > 0 ? { transform: `translateY(-${overlapOffset}px)` } : undefined}
       >
         <Resizable
-          size={isFullScreen ? { width, height } : chatDimensions}
+          size={chatSize}
           minWidth={CHAT_MIN_WINDOW_WIDTH}
           minHeight={CHAT_MIN_WINDOW_HEIGHT}
-          maxHeight={isFullScreen ? window.innerHeight : height - 50}
+          maxHeight={isFullScreen ? window.innerHeight : maxChatHeight}
           maxWidth={isFullScreen ? window.innerWidth : width - 50}
           enable={isFullScreen || mobileApp ? {} : RESIZABLE_HANDLES}
           handleComponent={RESIZE_HANDLE_COMPONENTS}
