@@ -24,6 +24,12 @@ export const ChatStyles = styled.div<{isFullScreen?: boolean}>`
         justify-content: center;
         cursor: nwse-resize;
         z-index: 100;
+
+        img {
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
     }
 
     .sub-title {

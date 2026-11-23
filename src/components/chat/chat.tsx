@@ -67,8 +67,11 @@ const RESIZABLE_HANDLES = {
 
 const RESIZE_HANDLE_COMPONENTS = {
   topLeft: (
-    <div className="chat-resize-handle chat-resize-handle-top-left">
-      <img src={ResizeHandleIcon} alt="Resize chat window" />
+    <div
+      className="chat-resize-handle chat-resize-handle-top-left"
+      onDragStart={(e) => e.preventDefault()}
+    >
+      <img src={ResizeHandleIcon} alt="Resize chat window" draggable={false} />
     </div>
   ),
 };
