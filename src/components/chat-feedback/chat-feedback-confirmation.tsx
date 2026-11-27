@@ -3,15 +3,18 @@ import styled from 'styled-components';
 import {useTranslation} from 'react-i18next';
 import SmileIcon from '../../static/icons/smiling_buerokratt.svg';
 import {FEEDBACK_CONFIRMATION_TIMEOUT} from '../../constants';
+import useWidgetSelector from '../../hooks/use-widget-selector';
 
 const ChatFeedbackConfirmation = (): JSX.Element => {
     const {t} = useTranslation();
+    const {widgetConfig} = useWidgetSelector();
+    const isFeedbackEnabled = !!widgetConfig.feedbackActive || !!widgetConfig.feedbackNoticeActive;
 
     return (
         <FeedbackConfirmationStyle>
             <div className="smile-icon">
                 <img src={SmileIcon} alt="Smile icon"/>
-                <div className="feedback-confirmation-message h2-style" role="heading" aria-level={2}>{t('feedback.confirmationText')}</div>
+                <div className="feedback-confirmation-message h2-style" role="heading" aria-level={2}>{t(isFeedbackEnabled ? 'feedback.confirmationText' : 'feedback.csaEndedChatText')}</div>
             </div>
             <TimeoutBar timeout={`${FEEDBACK_CONFIRMATION_TIMEOUT}ms`}/>
         </FeedbackConfirmationStyle>

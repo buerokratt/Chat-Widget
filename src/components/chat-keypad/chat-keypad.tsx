@@ -103,6 +103,7 @@ const ChatKeyPad = (): JSX.Element => {
   const touchStartYRef = useRef<number>(0);
   const { widgetConfig } = useWidgetSelector();
   const keypadDisableCheck = userInputFile ? true : isKeypadDisabled;
+  const isFeedbackEnabled = !!widgetConfig.feedbackActive || !!widgetConfig.feedbackNoticeActive;
   const isFeedbackTextLocked = chatStatus === CHAT_STATUS.ENDED && !!chatId && !widgetConfig.feedbackNoticeActive;
   const isInputLocked = showLoadingMessage || keypadDisableCheck || isFeedbackTextLocked;
 
@@ -184,8 +185,9 @@ const ChatKeyPad = (): JSX.Element => {
       dispatch(setFeedbackWarning(true));
       return;
     }
-    if (!widgetConfig.feedbackActive && !widgetConfig.feedbackNoticeActive) {
-      dispatch(resetState());
+    if (!isFeedbackEnabled) {
+      dispatch(setFeedbackMessageGiven(true));
+      setIsKeypadDisabled(true);
       return;
     }
     dispatch(setFeedbackWarning(false));
@@ -397,7 +399,7 @@ const ChatKeyPad = (): JSX.Element => {
             styleType={StyledButtonType.GRAY}
             disabled={userInput.trim().length > FEEDBACK_MESSAGE_MAX_CHAR_LIMIT}
           >
-            {t("chat.feedback.button.label")}
+            {isFeedbackEnabled ? t("chat.feedback.button.label") : t("widget.action.close")}
           </FeedbackButtonStyle>
         ) : (
           <>

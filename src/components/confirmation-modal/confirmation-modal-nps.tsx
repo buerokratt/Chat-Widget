@@ -31,6 +31,7 @@ const ConfirmationModalNps = ({ npsFeedback }: Props) => {
   const [selectedFeedbackButtonValue, setSelectedFeedbackButtonValue] = useState<string>("");
 
   const [feedbackText, setFeedbackText] = useState<string>("");
+  const isFeedbackEnabled = !!widgetConfig.feedbackActive || !!widgetConfig.feedbackNoticeActive;
 
   const handleFeedback = (feedbackRating: string | null) => {
     if (feedbackRating === null) return;
@@ -99,21 +100,33 @@ const ConfirmationModalNps = ({ npsFeedback }: Props) => {
           )}
         </ConfirmationModalStyles>
         <div className="npsActions">
-          <Button
-            onClick={() => dispatch(endChat(endChatParams))}
-            title={t("widget.action.skip")}
-            color={ButtonColor.GRAY}
-          >
-            {t("widget.action.skip")}
-          </Button>
-          <Button
-            onClick={handleConfirm}
-            title={t("widget.action.confirm")}
-            color={feedbackText.trim().length > FEEDBACK_MESSAGE_MAX_CHAR_LIMIT ? ButtonColor.GRAY : ButtonColor.BLUE}
-            disabled={feedbackText.trim().length > FEEDBACK_MESSAGE_MAX_CHAR_LIMIT}
-          >
-            {t("widget.action.confirm")}
-          </Button>
+          {isFeedbackEnabled ? (
+            <>
+              <Button
+                onClick={() => dispatch(endChat(endChatParams))}
+                title={t("widget.action.skip")}
+                color={ButtonColor.GRAY}
+              >
+                {t("widget.action.skip")}
+              </Button>
+              <Button
+                onClick={handleConfirm}
+                title={t("widget.action.confirm")}
+                color={feedbackText.trim().length > FEEDBACK_MESSAGE_MAX_CHAR_LIMIT ? ButtonColor.GRAY : ButtonColor.BLUE}
+                disabled={feedbackText.trim().length > FEEDBACK_MESSAGE_MAX_CHAR_LIMIT}
+              >
+                {t("widget.action.confirm")}
+              </Button>
+            </>
+          ) : (
+            <Button
+              onClick={() => dispatch(endChat(endChatParams))}
+              title={t("widget.action.close")}
+              color={ButtonColor.BLUE}
+            >
+              {t("widget.action.close")}
+            </Button>
+          )}
         </div>
       </div>
     </ConfirmationModalStyled>
