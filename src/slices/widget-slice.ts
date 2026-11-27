@@ -147,8 +147,8 @@ export const widgetSlice = createSlice({
       state.widgetConfig.showAutoCloseText =
           action.payload?.showAutoCloseText === "true";
       state.widgetConfig.autoCloseText = action.payload?.autoCloseText ?? "";
-      // Feedback (rating + text) is temporarily disabled regardless of backend config
-      state.widgetConfig.feedbackActive = false;
+      state.widgetConfig.feedbackActive =
+        action.payload?.feedbackActive === "true";
       state.widgetConfig.feedbackQuestion =
         action.payload?.feedbackQuestion ?? "";
       state.widgetConfig.feedbackNoticeActive = false;

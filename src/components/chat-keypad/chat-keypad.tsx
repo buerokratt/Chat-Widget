@@ -103,7 +103,8 @@ const ChatKeyPad = (): JSX.Element => {
   const touchStartYRef = useRef<number>(0);
   const { widgetConfig } = useWidgetSelector();
   const keypadDisableCheck = userInputFile ? true : isKeypadDisabled;
-  const isInputLocked = showLoadingMessage || keypadDisableCheck;
+  const isFeedbackTextLocked = chatStatus === CHAT_STATUS.ENDED && !!chatId && !widgetConfig.feedbackNoticeActive;
+  const isInputLocked = showLoadingMessage || keypadDisableCheck || isFeedbackTextLocked;
 
   const handleUploadClick = () => {
     hiddenFileInputRef.current?.click();
@@ -155,19 +156,26 @@ const ChatKeyPad = (): JSX.Element => {
   }, []);
 
   useEffect(() => {
-    if (isChatOpen && textareaRef.current && !isKeypadDisabled && !userInputFile) {
+    if (isChatOpen && textareaRef.current && !isKeypadDisabled && !userInputFile && !isFeedbackTextLocked) {
       const timeoutId = setTimeout(() => {
         textareaRef.current?.focus();
       }, 100);
       return () => clearTimeout(timeoutId);
     }
-  }, [isChatOpen, isKeypadDisabled, userInputFile]);
+  }, [isChatOpen, isKeypadDisabled, userInputFile, isFeedbackTextLocked]);
 
   useEffect(() => {
     if (chatStatus === CHAT_STATUS.ENDED) {
       handleUploadClear();
     }
   }, [chatStatus]);
+
+  useEffect(() => {
+    if (isFeedbackTextLocked) {
+      setUserInput("");
+      textareaRef.current?.blur();
+    }
+  }, [isFeedbackTextLocked]);
 
   const handleTextFeedback = () => {
     const feedbackText = sanitizeHtml(userInput);
@@ -355,7 +363,7 @@ const ChatKeyPad = (): JSX.Element => {
           aria-label={t("keypad.input.label")}
           className="input"
           value={userInputFile ? userInputFile.name : userInput}
-          placeholder={t("keypad.input.placeholder")}
+          placeholder={isFeedbackTextLocked ? "" : t("keypad.input.placeholder")}
           onChange={(e) => {
             setUserInput(e.target.value);
             adjustHeight();

@@ -11,7 +11,7 @@ const ChatFeedbackConfirmation = (): JSX.Element => {
         <FeedbackConfirmationStyle>
             <div className="smile-icon">
                 <img src={SmileIcon} alt="Smile icon"/>
-                <div className="feedback-confirmation-message h2-style" role="heading" aria-level={2}>{t('feedback.csaEndedChatText')}</div>
+                <div className="feedback-confirmation-message h2-style" role="heading" aria-level={2}>{t('feedback.confirmationText')}</div>
             </div>
             <TimeoutBar timeout={`${FEEDBACK_CONFIRMATION_TIMEOUT}ms`}/>
         </FeedbackConfirmationStyle>
